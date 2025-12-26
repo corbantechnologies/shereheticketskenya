@@ -30,18 +30,22 @@ export default function OrganizerNavbar({ company }: OrganizerNavbarProps) {
   const pathname = usePathname();
 
   const navItems = [
-    { icon: Home, label: "Dashboard", href: `.` },
-    { icon: Calendar, label: "Events", href: `./events` },
+    { icon: Home, label: "Dashboard", href: `/company/${company.reference}` },
+    {
+      icon: Calendar,
+      label: "Events",
+      href: `/company/${company.reference}/events`,
+    },
     {
       icon: BarChart3,
       label: "Analytics",
-      href: `./analytics`,
+      href: `/company/${company.reference}/analytics`,
     },
 
     {
       icon: Settings,
       label: "Settings",
-      href: `./settings`,
+      href: `/company/${company.reference}/settings`,
     },
     { icon: Building2, label: "Companies", href: `/organizer/dashboard` },
   ];
