@@ -24,6 +24,8 @@ interface User {
     is_event_manager: boolean;
     is_staff: boolean;
     is_active: boolean;
+    is_premium: boolean;
+    companies: string[];
 }
 
 interface updateUser {
