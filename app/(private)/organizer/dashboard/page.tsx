@@ -39,7 +39,7 @@ export default function OrganizerDashboardPage() {
     <div className="min-h-screen bg-background">
       {/* Hero Greeting */}
       <div className="bg-gradient-to-br from-[var(--mainBlue)] to-[var(--mainBlue)]/80 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="max-w-7xl mx-auto px-6 py-20 md:py-28">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Welcome back, {first_name}! 🎉
           </h1>
@@ -50,13 +50,14 @@ export default function OrganizerDashboardPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-10">
+      {/* Main Content - Now properly below hero without overlap */}
+      <div className="max-w-7xl mx-auto px-6 pt-12 pb-20">
         {/* Premium Status & Quick Actions */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12">
           <div className="flex items-center gap-6">
             <Badge
               variant={is_premium ? "default" : "secondary"}
-              className="text-lg px-6 py-2"
+              className="text-lg px-6 py-3"
             >
               {is_premium ? "Premium Organizer" : "Free Plan"}
             </Badge>
@@ -91,7 +92,7 @@ export default function OrganizerDashboardPage() {
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
-                    <Avatar className="h-16 w-16 ring-4 ring-white shadow-lg">
+                    <Avatar className="h-16 w-16 ring-4 ring-background shadow-lg">
                       <AvatarImage src={company.logo || undefined} />
                       <AvatarFallback className="bg-[var(--mainRed)] text-white text-2xl font-bold">
                         <Building2 className="h-8 w-8" />
