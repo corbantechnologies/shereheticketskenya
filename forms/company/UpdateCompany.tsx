@@ -29,6 +29,7 @@ interface Company {
 interface UpdateCompanyProps {
   company: Company;
   refetch: () => void;
+  closeDialog?: () => void;
 }
 
 const updateSchema = Yup.object().shape({
@@ -44,6 +45,7 @@ const updateSchema = Yup.object().shape({
 export default function UpdateCompany({
   company,
   refetch,
+  closeDialog,
 }: UpdateCompanyProps) {
   const [loading, setLoading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(company.logo);
@@ -75,7 +77,8 @@ export default function UpdateCompany({
 
       await updateCompany(company.reference, formData, header);
       refetch();
-      alert("Company updated successfully!");
+      if (closeDialog) closeDialog(); // Close on success
+      // alert("Company updated successfully!"); // Removed alert for smoother UX
     } catch (error) {
       console.error(error);
       alert("Failed to update company");
@@ -86,9 +89,6 @@ export default function UpdateCompany({
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-8">Update Company Details</h2>
-
       <Formik
         initialValues={{
           name: company.name || "",
@@ -105,172 +105,220 @@ export default function UpdateCompany({
         onSubmit={handleSubmit}
       >
         {({ setFieldValue, isSubmitting }) => (
-          <Form className="space-y-8">
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="name">Company Name *</Label>
-                <Field
-                  as={Input}
-                  id="name"
-                  name="name"
-                  placeholder="Enter company name"
-                />
-                <ErrorMessage
-                  name="name"
-                  component="p"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
+          <Form className="w-full">
+            {/* Details Section */}
+            <div className="space-y-6">
+              <h3 className="text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider border-b pb-2">
+                Company Info
+              </h3>
 
-              <div>
-                <Label htmlFor="email">Contact Email</Label>
-                <Field
-                  as={Input}
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="company@email.com"
-                />
-                <ErrorMessage
-                  name="email"
-                  component="p"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Field
-                  as={Input}
-                  id="phone"
-                  name="phone"
-                  placeholder="+254 ..."
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="website">Website</Label>
-                <Field
-                  as={Input}
-                  id="website"
-                  name="website"
-                  placeholder="https://example.com"
-                />
-                <ErrorMessage
-                  name="website"
-                  component="p"
-                  className="text-red-500 text-sm mt-1"
-                />
-              </div>
-            </div>
-
-            {/* Location */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Location</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <Label htmlFor="country">Country</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="name">
+                    Company Name <span className="text-red-500">*</span>
+                  </Label>
                   <Field
                     as={Input}
-                    id="country"
-                    name="country"
-                    placeholder="Kenya"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Sherehe Events"
+                    className="bg-white"
+                  />
+                  <ErrorMessage
+                    name="name"
+                    component="p"
+                    className="text-red-500 text-xs mt-0.5"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="city">City</Label>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
                   <Field
                     as={Input}
-                    id="city"
-                    name="city"
-                    placeholder="Nairobi"
+                    id="email"
+                    name="email"
+                    placeholder="contact@example.com"
+                    className="bg-white"
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="p"
+                    className="text-red-500 text-xs mt-0.5"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="address">Address</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
                   <Field
                     as={Input}
-                    id="address"
-                    name="address"
-                    placeholder="123 Main St"
+                    id="phone"
+                    name="phone"
+                    placeholder="+254..."
+                    className="bg-white"
+                  />
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="website">Website</Label>
+                  <Field
+                    as={Input}
+                    id="website"
+                    name="website"
+                    placeholder="https://..."
+                    className="bg-white"
+                  />
+                  <ErrorMessage
+                    name="website"
+                    component="p"
+                    className="text-red-500 text-xs mt-0.5"
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Logo Upload */}
-            <div>
-              <Label>Company Logo</Label>
-              <div className="mt-2">
-                {logoPreview && (
-                  <img
-                    src={logoPreview}
-                    alt="Current logo"
-                    className="w-32 h-32 rounded-lg object-cover mb-4"
-                  />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setFieldValue("logo", file);
-                      setLogoPreview(URL.createObjectURL(file));
-                    }
-                  }}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[var(--mainRed)] file:text-white hover:file:bg-[var(--mainRed)]/90"
-                />
+              <div className="pt-2">
+                <h3 className="text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider border-b pb-2 mb-4">
+                  Location
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Field
+                      as={Input}
+                      id="country"
+                      name="country"
+                      placeholder="Kenya"
+                      className="bg-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Field
+                      as={Input}
+                      id="city"
+                      name="city"
+                      placeholder="Nairobi"
+                      className="bg-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Field
+                      as={Input}
+                      id="address"
+                      name="address"
+                      placeholder="Building, Street, etc."
+                      className="bg-white"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Banner Upload */}
-            <div>
-              <Label>Company Banner</Label>
-              <div className="mt-2">
-                {bannerPreview && (
-                  <img
-                    src={bannerPreview}
-                    alt="Current banner"
-                    className="w-full h-48 rounded-lg object-cover mb-4"
+            {/* Branding Section */}
+            <div className="space-y-6">
+              <h3 className="text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider border-b pb-2">
+                Branding
+              </h3>
+
+              {/* Logo Upload */}
+              <div className="p-4 border rounded-lg bg-[var(--secondary)]/30 border-dashed border-[var(--border)]">
+                <Label className="mb-2 block font-medium">Logo</Label>
+                <div className="flex items-center gap-4">
+                  <div className="shrink-0">
+                    {logoPreview ? (
+                      <img
+                        src={logoPreview}
+                        alt="Logo preview"
+                        className="h-16 w-16 object-cover rounded-md border bg-white"
+                      />
+                    ) : (
+                      <div className="h-16 w-16 flex items-center justify-center rounded-md border bg-white text-gray-300">
+                        <span className="text-xs">No Logo</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setFieldValue("logo", file);
+                          setLogoPreview(URL.createObjectURL(file));
+                        }
+                      }}
+                      className="bg-white text-xs file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[var(--primary)] file:text-white hover:file:bg-[var(--primary)]/90 cursor-pointer"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-[var(--muted-foreground)] mt-2">
+                  Recommended: Square image, 500x500px.
+                </p>
+              </div>
+
+              {/* Banner Upload */}
+              <div className="p-4 border rounded-lg bg-[var(--secondary)]/30 border-dashed border-[var(--border)]">
+                <Label className="mb-2 block font-medium">Banner Image</Label>
+                <div className="space-y-3">
+                  {bannerPreview ? (
+                    <div className="relative w-full h-16 rounded-md overflow-hidden group border bg-white">
+                      <img
+                        src={bannerPreview}
+                        alt="Banner preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-16 rounded-md border border-dashed flex items-center justify-center bg-white text-gray-300">
+                      <span className="text-xs">No Banner</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setFieldValue("banner", file);
+                        setBannerPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="bg-white text-xs file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[var(--primary)] file:text-white hover:file:bg-[var(--primary)]/90 cursor-pointer"
                   />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setFieldValue("banner", file);
-                      setBannerPreview(URL.createObjectURL(file));
-                    }
-                  }}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[var(--mainBlue)] file:text-white hover:file:bg-[var(--mainBlue)]/90"
-                />
+                  <p className="text-xs text-[var(--muted-foreground)]">
+                    Recommended: Wide image, 1200x400px.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Submit */}
-            <div className="flex justify-end">
+            {/* Submit Footer */}
+            <div className="flex items-center justify-end gap-3 pt-6 border-t mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={closeDialog}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
               <Button
                 type="submit"
                 disabled={loading || isSubmitting}
-                className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90"
+                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto font-semibold px-8 shadow-sm"
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
+                    Saving...
                   </>
                 ) : (
-                  "Save Changes"
+                  "Update Company"
                 )}
               </Button>
             </div>
           </Form>
         )}
       </Formik>
-    </div>
   );
 }

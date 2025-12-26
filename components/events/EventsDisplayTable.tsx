@@ -47,69 +47,77 @@ export default function EventsDisplayTable({ events, companyReference }: EventsD
 
   if (events.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">No events found.</p>
+      <div className="text-center py-16 bg-[var(--background)]/30 rounded-lg border border-dashed border-[var(--border)]">
+        <div className="bg-[var(--secondary)] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calendar className="h-8 w-8 text-[var(--muted-foreground)]" />
+        </div>
+        <h3 className="text-lg font-semibold text-[var(--foreground)]">No events found</h3>
+        <p className="text-[var(--muted-foreground)] text-sm mt-1">
+            Get started by creating your first event for this company.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-lg border border-[var(--border)] overflow-hidden bg-white shadow-sm">
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Event Name</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Venue</TableHead>
-            <TableHead className="text-center">Tickets</TableHead>
-            <TableHead className="text-center">Capacity</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+        <TableHeader className="bg-[var(--secondary)]">
+          <TableRow className="hover:bg-[var(--secondary)] border-b border-[var(--border)]">
+            <TableHead className="font-semibold text-[var(--foreground)] w-[30%]">Event Name</TableHead>
+            <TableHead className="font-semibold text-[var(--foreground)]">Date</TableHead>
+            <TableHead className="font-semibold text-[var(--foreground)]">Venue</TableHead>
+            <TableHead className="font-semibold text-[var(--foreground)] text-center">Tickets</TableHead>
+            <TableHead className="font-semibold text-[var(--foreground)] text-center">Capacity</TableHead>
+            <TableHead className="font-semibold text-[var(--foreground)]">Status</TableHead>
+            <TableHead className="font-semibold text-[var(--foreground)] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {events.map((event) => (
             <TableRow
               key={event.reference}
-              className="cursor-pointer hover:bg-muted/50"
+              className="cursor-pointer hover:bg-[var(--secondary)]/40 transition-colors border-b border-[var(--border)] last:border-0"
               onClick={() => handleRowClick(event.event_code)}
             >
-              <TableCell className="font-medium">
-                <div>
-                  {event.name}
-                  <p className="text-sm text-muted-foreground">
-                    Code: {event.event_code}
-                  </p>
+              <TableCell className="font-mediumpy-4">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-[var(--foreground)] text-base">{event.name}</span>
+                  <span className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider mt-0.5">
+                    {event.event_code}
+                  </span>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="text-[var(--muted-foreground)]">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  {format(new Date(event.start_date), "PPP")}
+                  <Calendar className="h-4 w-4 text-[var(--primary)]/70" />
+                  {format(new Date(event.start_date), "MMM d, yyyy")}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="text-[var(--muted-foreground)]">
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  {event.venue || "Not set"}
+                  <MapPin className="h-4 w-4 text-[var(--primary)]/70" />
+                  {event.venue || "TBA"}
                 </div>
               </TableCell>
               <TableCell className="text-center">
-                <Badge variant="secondary">
-                  <Ticket className="h-3 w-3 mr-1" />
-                  {getTicketCount(event)}
-                </Badge>
+                 <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--secondary)] text-[var(--foreground)]">
+                    {getTicketCount(event)} Types
+                 </div>
               </TableCell>
               <TableCell className="text-center">
-                <Badge variant={getTotalCapacity(event) === "Unlimited" ? "outline" : "secondary"}>
-                  <Users className="h-3 w-3 mr-1" />
-                  {getTotalCapacity(event)}
-                </Badge>
+                 <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTotalCapacity(event) === "Unlimited" ? "bg-green-50 text-green-700 border border-green-200" : "bg-[var(--secondary)] text-[var(--foreground)]"}`}>
+                    {getTotalCapacity(event)}
+                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant={event.is_closed ? "destructive" : "default"}>
-                  {event.is_closed ? "Closed" : "Open"}
+                <Badge 
+                    variant={event.is_closed ? "secondary" : "default"}
+                    className={event.is_closed 
+                        ? "bg-gray-100 text-gray-600 hover:bg-gray-100 border-gray-200" 
+                        : "bg-green-600 hover:bg-green-700 text-white border-transparent"}
+                >
+                  {event.is_closed ? "Closed" : "Active"}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
@@ -120,8 +128,9 @@ export default function EventsDisplayTable({ events, companyReference }: EventsD
                     e.stopPropagation();
                     handleRowClick(event.event_code);
                   }}
+                  className="text-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10"
                 >
-                  Manage →
+                  Manage
                 </Button>
               </TableCell>
             </TableRow>
