@@ -20,6 +20,7 @@ interface OrganizerNavbarProps {
     name: string;
     reference: string;
     company_code: string;
+    avatar: File | null;
   };
 }
 
