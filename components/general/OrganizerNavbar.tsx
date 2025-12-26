@@ -14,13 +14,14 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 
 interface OrganizerNavbarProps {
   company: {
     name: string;
     reference: string;
     company_code: string;
-    avatar: File | null;
+    logo: string | null;
   };
 }
 
@@ -46,25 +47,30 @@ export default function OrganizerNavbar({ company }: OrganizerNavbarProps) {
   ];
 
   const isActive = (href: string) => {
-    if (href === ".")
-      return (
-        pathname.endsWith("/company/[reference]") || pathname.endsWith("/")
-      );
-    return pathname.includes(href);
+    return href === pathname;
+
   };
 
   return (
     <nav className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo + Company */}
+          {/* Logo + Company Name */}
           <div className="flex items-center">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-(--mainRed) rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">
-                  {company.name[0]}
-                </span>
-              </div>
+              {company.logo ? (
+                <Image
+                  src={company.logo}
+                  alt={`${company.name} logo`}
+                  className="w-10 h-10 rounded-lg object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-(--mainRed) rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">
+                    {company.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
               <span className="ml-3 text-xl font-semibold text-(--mainBlue) hidden sm:block">
                 {company.name}
               </span>
@@ -114,10 +120,26 @@ export default function OrganizerNavbar({ company }: OrganizerNavbarProps) {
       {mobileOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-3 space-y-1">
-            <div className="pb-3 border-b border-gray-200">
-              <p className="text-sm text-gray-500">Company</p>
-              <p className="text-base font-medium">{company.name}</p>
+            <div className="pb-3 border-b border-gray-200 flex items-center gap-3">
+              {company.logo ? (
+                <Image
+                  src={company.logo}
+                  alt={`${company.name} logo`}
+                  className="w-8 h-8 rounded-lg object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 bg-(--mainRed) rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">
+                    {company.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              <div>
+                <p className="text-sm text-gray-500">Company</p>
+                <p className="text-base font-medium">{company.name}</p>
+              </div>
             </div>
+
             {navItems.map((item) => (
               <a
                 key={item.label}
@@ -133,6 +155,7 @@ export default function OrganizerNavbar({ company }: OrganizerNavbarProps) {
                 {item.label}
               </a>
             ))}
+
             <button
               onClick={() => signOut()}
               className="w-full flex items-center gap-3 px-3 py-3 text-gray-700 hover:bg-gray-50 rounded-md text-left transition-colors"
