@@ -14,8 +14,12 @@ export default function LoadingSkeleton() {
   );
 }
 
-export function LoadingSpinner({ className }) {
-  return <Loader2 className={cn("h-4 w-4 animate-spin", className)} />;
+export function LoadingSpinner() {
+  return (
+    <div className={cn("flex items-center justify-center")}>
+      <Loader2 className="animate-spin text-mainBlue" />
+    </div>
+  );
 }
 
 export function DashboardSkeleton() {

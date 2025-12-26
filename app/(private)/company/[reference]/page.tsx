@@ -4,7 +4,10 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useFetchCompany } from "@/hooks/company/actions";
-import { DashboardSkeleton } from "@/components/general/LoadingComponents";
+import {
+  DashboardSkeleton,
+  LoadingSpinner,
+} from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -33,10 +36,20 @@ import { useState } from "react";
 export default function CompanyDetailPage() {
   const router = useRouter();
   const { reference } = useParams<{ reference: string }>();
-  const { isLoading, data: company, refetch } = useFetchCompany(reference);
+  const {
+    isLoading: isCompanyLoading,
+    data: company,
+    refetch,
+  } = useFetchCompany(reference);
   const [open, setOpen] = useState(false);
 
-  if (isLoading) return <DashboardSkeleton />;
+  if (isCompanyLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   if (!company) {
     return <div className="p-8 text-center">Company not found.</div>;
