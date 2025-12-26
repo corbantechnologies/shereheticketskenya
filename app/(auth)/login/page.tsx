@@ -15,6 +15,7 @@ import { Session, User } from "next-auth";
 interface CustomUser extends User {
     is_admin?: boolean;
     is_event_manager?: boolean;
+    is_staff?: boolean;
 }
 
 interface CustomSession extends Session {
@@ -48,10 +49,10 @@ const LoginForm: React.FC = () => {
         } else {
             toast.success("Login successful! Redirecting...");
 
-            if (session?.user?.is_admin === true) {
-                router.push("/admin/events");
+            if (session?.user?.is_staff === true) {
+                router.push("/admin/dashboard");
             } else if (session?.user?.is_event_manager === true) {
-                router.push("/organizer/events");
+                router.push("/organizer/dashboard");
             } else {
                 router.push("/");
             }
