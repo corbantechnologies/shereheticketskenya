@@ -8,8 +8,11 @@ interface Event {
   event_code: string;
   name: string;
   description: string;
+  image: string;
   start_date: string;
   end_date: string;
+  start_time: string;
+  end_time: string;
   venue: string;
   company: string;
   poster: string;
@@ -20,6 +23,8 @@ interface Event {
     price: string;
     quantity_available: number;
     is_limited: boolean;
+    ticket_type_code: string;
+    bookings: string[];
   }[];
   is_closed: boolean;
 }
@@ -47,14 +52,14 @@ interface updateEvent {
 
 export const getEvents = async (): Promise<Event[]> => {
   const response: AxiosResponse<Event[]> = await apiActions.get(
-    `/api/v1/event/`
+    `/api/v1/events/`
   );
   return response.data;
 };
 
 export const getEvent = async (event_code: string): Promise<Event> => {
   const response: AxiosResponse<Event> = await apiActions.get(
-    `/api/v1/event/${event_code}/`
+    `/api/v1/events/${event_code}/`
   );
   return response.data;
 };
@@ -65,7 +70,7 @@ export const createEvent = async (
   headers: { headers: { Authorization: string } }
 ): Promise<Event> => {
   const response: AxiosResponse<Event> = await apiActions.post(
-    `/api/v1/event/`,
+    `/api/v1/events/`,
     data,
     headers
   );
@@ -78,7 +83,7 @@ export const updateEvent = async (
   headers: { headers: { Authorization: string } }
 ): Promise<Event> => {
   const response: AxiosResponse<Event> = await apiActions.patch(
-    `/api/v1/event/${event_code}/`,
+    `/api/v1/events/${event_code}/`,
     data,
     headers
   );
@@ -90,7 +95,7 @@ export const closeEvent = async (
   headers: { headers: { Authorization: string } }
 ): Promise<Event> => {
   const response: AxiosResponse<Event> = await apiActions.patch(
-    `/api/v1/event/${event_code}/`,
+    `/api/v1/events/${event_code}/`,
     { is_closed: true },
     headers
   );
