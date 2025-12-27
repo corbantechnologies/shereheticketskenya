@@ -9,11 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Calendar,
   MapPin,
-  Clock,
   Ticket,
   Users,
   Edit3,
@@ -138,7 +136,7 @@ export default function EventDetailPage() {
         <div className="p-6 space-y-10 -mt-12 relative z-10">
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-none ring-1 ring-black/5 transform hover:-translate-y-1 transition-transform">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-muted-foreground">
@@ -150,7 +148,7 @@ export default function EventDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-none ring-1 ring-black/5 transform hover:-translate-y-1 transition-transform">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-muted-foreground">
@@ -162,7 +160,7 @@ export default function EventDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-none ring-1 ring-black/5 transform hover:-translate-y-1 transition-transform">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-muted-foreground">
@@ -179,7 +177,7 @@ export default function EventDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-none ring-1 ring-black/5 transform hover:-translate-y-1 transition-transform">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-muted-foreground">
@@ -196,7 +194,7 @@ export default function EventDetailPage() {
 
           {/* Tabs: Overview, Tickets, Bookings, Analytics */}
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-4 bg-muted/30 p-1 rounded-xl">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="tickets">Ticket Types</TabsTrigger>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
@@ -204,7 +202,7 @@ export default function EventDetailPage() {
             </TabsList>
 
             <TabsContent value="overview" className="mt-8">
-              <Card className="shadow-lg">
+              <Card className="shadow-lg border-none ring-1 ring-black/5">
                 <CardContent className="pt-6 space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold mb-3">Description</h3>
@@ -243,14 +241,14 @@ export default function EventDetailPage() {
             </TabsContent>
 
             <TabsContent value="tickets" className="mt-8">
-              <Card className="shadow-lg">
+              <Card className="shadow-lg border-none ring-1 ring-black/5">
                 <CardContent className="pt-6">
                   {ticketTypes.length > 0 ? (
                     <div className="space-y-6">
                       {ticketTypes.map((type) => (
                         <div
                           key={type.ticket_type_code}
-                          className="flex items-center justify-between p-6 border rounded-lg bg-muted/30"
+                          className="flex items-center justify-between p-6 rounded-2xl bg-muted/30 hover:bg-muted/50 transition-colors"
                         >
                           <div>
                             <h4 className="text-xl font-semibold">
@@ -283,7 +281,7 @@ export default function EventDetailPage() {
             </TabsContent>
 
             <TabsContent value="bookings" className="mt-8">
-              <Card className="shadow-lg">
+              <Card className="shadow-lg border-none ring-1 ring-black/5">
                 <CardContent className="pt-12 text-center text-muted-foreground">
                   <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
                   <p className="text-xl">Bookings list coming soon...</p>
@@ -292,7 +290,7 @@ export default function EventDetailPage() {
             </TabsContent>
 
             <TabsContent value="analytics" className="mt-8">
-              <Card className="shadow-lg">
+              <Card className="shadow-lg border-none ring-1 ring-black/5">
                 <CardContent className="pt-12 text-center text-muted-foreground">
                   <div className="h-16 w-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
                     <Ticket className="h-10 w-10" />
@@ -315,7 +313,7 @@ export default function EventDetailPage() {
             />
 
             <div className="relative flex flex-col h-full w-full bg-white">
-              <div className="flex items-center justify-between p-6 border-b">
+              <div className="flex items-center justify-between p-6">
                 <div>
                   <h2 className="text-3xl font-bold">
                     Edit Event: {event.name}

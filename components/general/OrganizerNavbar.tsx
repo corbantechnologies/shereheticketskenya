@@ -36,17 +36,17 @@ export default function OrganizerNavbar({ company }: OrganizerNavbarProps) {
       label: "Events",
       href: `/company/${company.reference}/events`,
     },
-    {
-      icon: BarChart3,
-      label: "Analytics",
-      href: `/company/${company.reference}/analytics`,
-    },
+    // {
+    //   icon: BarChart3,
+    //   label: "Analytics",
+    //   href: `/company/${company.reference}/analytics`,
+    // },
 
-    {
-      icon: Settings,
-      label: "Settings",
-      href: `/company/${company.reference}/settings`,
-    },
+    // {
+    //   icon: Settings,
+    //   label: "Settings",
+    //   href: `/company/${company.reference}/settings`,
+    // },
     { icon: Building2, label: "Companies", href: `/organizer/dashboard` },
   ];
 

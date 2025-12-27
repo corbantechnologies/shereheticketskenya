@@ -50,7 +50,7 @@ export default function CompanyDetailPage() {
     <>
       <div className="min-h-screen bg-background pb-6">
         {/* Sticky Header */}
-        <div className="bg-card border-b border-border sticky top-0 z-40 shadow-sm">
+        <div className="bg-card/80 backdrop-blur-md sticky top-0 z-40 shadow-sm">
           <div className="px-6 h-16 flex items-center justify-between">
             <Button
               variant="ghost"
@@ -93,7 +93,7 @@ export default function CompanyDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Company Card */}
             <div className="lg:col-span-2">
-              <Card className="overflow-hidden shadow-lg">
+              <Card className="overflow-hidden shadow-2xl border-none ring-1 ring-black/5">
                 {/* Banner area - with blur for readability */}
                 <div className="relative h-48">
                   {company.banner ? (
@@ -164,7 +164,7 @@ export default function CompanyDetailPage() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-6">
-              <Card className="shadow-lg hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg hover:shadow-xl transition-all border-none ring-1 ring-black/5">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-2">
                     <CardTitle className="text-sm font-medium">
@@ -179,7 +179,7 @@ export default function CompanyDetailPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg hover:shadow-xl transition-all border-none ring-1 ring-black/5">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-2">
                     <CardTitle className="text-sm font-medium">
@@ -216,7 +216,7 @@ export default function CompanyDetailPage() {
               </Button>
             </div>
 
-            <Card className="shadow-lg">
+            <Card className="shadow-xl border-none ring-1 ring-black/5">
               <CardContent className="p-0">
                 {hasRequiredDetails ? (
                   <EventsDisplayTable

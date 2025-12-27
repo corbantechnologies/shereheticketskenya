@@ -1,19 +1,16 @@
-/* eslint-disable @next/next/no-img-element */
 // app/(private)/company/[reference]/events/page.tsx
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useFetchCompany } from "@/hooks/company/actions";
 import { DashboardSkeleton } from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, Ticket, Users, AlertCircle, X } from "lucide-react";
+import { Plus, Calendar, AlertCircle, X } from "lucide-react";
 import EventsDisplayTable from "@/components/events/EventsDisplayTable";
 import { useState } from "react";
 
 export default function CompanyEventsPage() {
-  const router = useRouter();
   const { reference } = useParams<{ reference: string }>();
   const { isLoading, data: company } = useFetchCompany(reference);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -33,7 +30,7 @@ export default function CompanyEventsPage() {
     <>
       <div className="min-h-screen bg-background pb-12">
         {/* Page Header */}
-        <div className="border-b border-border bg-card">
+        <div className="bg-card/50 backdrop-blur-sm sticky top-0 z-30">
           <div className="px-6 py-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
@@ -61,7 +58,7 @@ export default function CompanyEventsPage() {
         <div className="p-6 space-y-10">
           {/* Locked State Alert */}
           {!hasRequiredDetails && (
-            <Card className="border-dashed bg-muted/30">
+            <Card className="border-none bg-muted/40 shadow-inner">
               <CardContent className="py-16 text-center">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-muted rounded-full mb-6">
                   <AlertCircle className="h-10 w-10 text-muted-foreground" />
@@ -78,7 +75,7 @@ export default function CompanyEventsPage() {
           )}
 
           {/* Events Table */}
-          <Card className="shadow-lg">
+          <Card className="shadow-xl border-none ring-1 ring-black/5">
             <CardContent className="p-0">
               {events.length > 0 ? (
                 <EventsDisplayTable
@@ -118,7 +115,7 @@ export default function CompanyEventsPage() {
 
           <div className="relative flex flex-col h-full w-full bg-white">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b">
+            <div className="flex items-center justify-between p-6">
               <div>
                 <h2 className="text-3xl font-bold">Create New Event</h2>
                 <p className="text-muted-foreground mt-2">
