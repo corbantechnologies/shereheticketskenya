@@ -4,11 +4,24 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useFetchEvent } from "@/hooks/events/actions";
+import { closeEvent } from "@/services/events";
+import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
 import { DashboardSkeleton } from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Calendar,
   MapPin,
@@ -22,12 +35,15 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function EventDetailPage() {
   const router = useRouter();
   const { event_code } = useParams<{ event_code: string }>();
   const { isLoading, data: event, refetch } = useFetchEvent(event_code);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const authHeaders = useAxiosAuth();
+  const [isClosing, setIsClosing] = useState(false);
 
   if (isLoading) return <DashboardSkeleton />;
 
@@ -40,6 +56,20 @@ export default function EventDetailPage() {
     (sum, t) => sum + (t.bookings?.length || 0),
     0
   );
+
+  const handleCloseEvent = async () => {
+    try {
+      setIsClosing(true);
+      await closeEvent(event_code, authHeaders);
+      await refetch();
+      toast.success("Event closed successfully.");
+    } catch (error) {
+      console.error("Failed to close event:", error);
+      toast.error("Failed to close event. Please try again.");
+    } finally {
+      setIsClosing(false);
+    }
+  };
 
   return (
     <>
@@ -70,34 +100,48 @@ export default function EventDetailPage() {
 
             <div className="flex gap-3">
               <Button
-                variant="secondary"
-                size="sm"
+                size="default"
                 onClick={() => setIsEditModalOpen(true)}
-                className="shadow-lg"
+                className="shadow-lg bg-green-500 hover:bg-green-600"
               >
                 <Edit3 className="mr-2 h-4 w-4" />
                 Edit Event
               </Button>
 
               {!event.is_closed && (
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={async () => {
-                    if (
-                      confirm(
-                        "Are you sure you want to close this event? This cannot be undone."
-                      )
-                    ) {
-                      // TODO: Call closeEvent API
-                      await refetch(); // Simulate success
-                    }
-                  }}
-                  className="shadow-lg"
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Close Event
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="default"
+                      disabled={isClosing}
+                      className="shadow-lg bg-red-500 hover:bg-red-600"
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      {isClosing ? "Closing..." : "Close Event"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-white text-black">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        close the event &quot;{event.name}&quot;. Ticket sales
+                        and bookings will be stopped immediately.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleCloseEvent}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Yes, Close Event
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
             </div>
           </div>
