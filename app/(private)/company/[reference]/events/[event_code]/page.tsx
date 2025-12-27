@@ -99,49 +99,50 @@ export default function EventDetailPage() {
             </Button>
 
             <div className="flex gap-3">
-              <Button
-                size="default"
-                onClick={() => setIsEditModalOpen(true)}
-                className="shadow-lg bg-green-500 hover:bg-green-600"
-              >
-                <Edit3 className="mr-2 h-4 w-4" />
-                Edit Event
-              </Button>
-
               {!event.is_closed && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      size="default"
-                      disabled={isClosing}
-                      className="shadow-lg bg-red-500 hover:bg-red-600"
-                    >
-                      <XCircle className="mr-2 h-4 w-4" />
-                      {isClosing ? "Closing..." : "Close Event"}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-white text-black">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you absolutely sure?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        close the event &quot;{event.name}&quot;. Ticket sales
-                        and bookings will be stopped immediately.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleCloseEvent}
-                        className="bg-red-600 hover:bg-red-700"
+                <>
+                  <Button
+                    size="default"
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="shadow-lg bg-green-500 hover:bg-green-600"
+                  >
+                    <Edit3 className="mr-2 h-4 w-4" />
+                    Edit Event
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="default"
+                        disabled={isClosing}
+                        className="shadow-lg bg-red-500 hover:bg-red-600"
                       >
-                        Yes, Close Event
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        <XCircle className="mr-2 h-4 w-4" />
+                        {isClosing ? "Closing..." : "Close Event"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white text-black">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          close the event &quot;{event.name}&quot;. Ticket sales
+                          and bookings will be stopped immediately.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleCloseEvent}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Yes, Close Event
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
               )}
             </div>
           </div>
