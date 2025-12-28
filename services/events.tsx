@@ -49,9 +49,11 @@ interface updateEvent {
   name: string;
   description: string;
   start_date: string;
-  end_date: string;
+  start_time: string; // Optional
+  end_date: string; // Optional
+  end_time: string; // Optional
   venue: string;
-  company: string;
+  company: string; // Pick company code
   poster: File;
   is_closed: boolean;
 }

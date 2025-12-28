@@ -38,6 +38,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
+import EditEvent from "@/forms/events/EditEvent";
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -385,27 +386,11 @@ export default function EventDetailPage() {
             />
 
             <div className="relative flex flex-col h-full w-full bg-white">
-              <div className="flex items-center justify-between p-6">
-                <div>
-                  <h2 className="text-3xl font-bold">
-                    Edit Event: {event.name}
-                  </h2>
-                  <p className="text-muted-foreground mt-2">
-                    Update event details, dates, venue, and more.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="p-3 rounded-lg hover:bg-muted transition"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-6 pb-20 text-center text-muted-foreground">
-                <Calendar className="h-20 w-20 mx-auto mb-6 opacity-50" />
-                <p className="text-2xl">Event Update Form Coming Soon...</p>
-              </div>
+              <EditEvent
+                event={event}
+                closeModal={() => setIsEditModalOpen(false)}
+                refetchEvent={refetch}
+              />
             </div>
           </div>
         )}
