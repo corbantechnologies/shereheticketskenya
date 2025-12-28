@@ -131,7 +131,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                 try {
                   const formData = new FormData();
                   formData.append("ticket_type", values.ticket_type);
-                  formData.append("quantity", values.quantity);
+                  formData.append("quantity", values.quantity.toString());
                   formData.append("name", values.name);
                   formData.append("email", values.email);
                   formData.append("phone", values.phone);
