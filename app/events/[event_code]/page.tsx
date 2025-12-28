@@ -18,6 +18,7 @@ import { useFetchEvent } from "@/hooks/events/actions";
 import TicketTypeChip from "@/components/events/TicketTypeChip";
 import MakeBooking from "@/forms/bookings/MakeBooking";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 
 export default function EventDetailPage() {
   const { event_code } = useParams<{ event_code: string }>();
@@ -29,6 +30,25 @@ export default function EventDetailPage() {
     data: event,
     refetch: refetchEvent,
   } = useFetchEvent(event_code);
+
+  const handleShare = async () => {
+    const shareData = {
+      title: event?.name || "Event",
+      text: `Check out this event: ${event?.name}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Event link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error sharing event:", error);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -93,7 +113,10 @@ export default function EventDetailPage() {
             <ArrowLeft className="w-5 h-5" />
             Back to Events
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 border border-border text-foreground hover:bg-muted rounded-md transition">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 px-4 py-2 border border-border text-foreground hover:bg-muted rounded-md transition"
+          >
             <Share2 className="w-5 h-5" />
             Share Event
           </button>
