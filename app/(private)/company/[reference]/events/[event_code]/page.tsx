@@ -99,7 +99,7 @@ export default function EventDetailPage() {
   return (
     <>
       <div className="min-h-screen bg-background">
-        {/* Hero Header with Event Poster/Gradient */}
+        {/* Hero Header with Event image/Gradient */}
         <div className="relative h-96 overflow-hidden">
           {event.image ? (
             <img

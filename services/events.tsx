@@ -3,6 +3,13 @@
 import { apiActions } from "@/tools/axios";
 import { AxiosResponse } from "axios";
 
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
 interface Event {
   reference: string;
   event_code: string;
@@ -15,7 +22,6 @@ interface Event {
   end_time: string;
   venue: string;
   company: string;
-  poster: string;
   created_at: string;
   updated_at: string;
   cancellation_policy: string;
@@ -42,7 +48,7 @@ interface createEvent {
   end_time: string; // Optional
   venue: string;
   company: string; // Pick company code
-  poster: File;
+  image: File;
 }
 
 interface updateEvent {
@@ -54,15 +60,14 @@ interface updateEvent {
   end_time: string; // Optional
   venue: string;
   company: string; // Pick company code
-  poster: File;
+  image: File;
   is_closed: boolean;
 }
 
 export const getEvents = async (): Promise<Event[]> => {
-  const response: AxiosResponse<Event[]> = await apiActions.get(
-    `/api/v1/events/`
-  );
-  return response.data.results || [];
+  const response: AxiosResponse<PaginatedResponse<Event>> =
+    await apiActions.get(`/api/v1/events/`);
+  return response.data.results ?? [];
 };
 
 export const getEvent = async (event_code: string): Promise<Event> => {

@@ -29,7 +29,7 @@ const validationSchema = Yup.object({
   end_date: Yup.date().nullable(),
   end_time: Yup.string().nullable(),
   venue: Yup.string().required("Venue is required"),
-  poster: Yup.mixed<File>()
+  image: Yup.mixed<File>()
     .nullable()
     .test(
       "fileSize",
@@ -50,7 +50,7 @@ export default function EditEvent({
   closeModal,
   refetchEvent,
 }: EditEventProps) {
-  const [posterPreview, setPosterPreview] = useState<string | null>(
+  const [imagePreview, setimagePreview] = useState<string | null>(
     event.image || null
   );
   const axiosAuth = useAxiosAuth();
@@ -84,7 +84,7 @@ export default function EditEvent({
             end_date: event.end_date || "",
             end_time: event.end_time || "",
             venue: event.venue || "",
-            poster: null as File | null,
+            image: null as File | null,
             is_closed: event.is_closed || false,
           }}
           validationSchema={validationSchema}
@@ -101,8 +101,8 @@ export default function EditEvent({
               formData.append("venue", values.venue);
               formData.append("is_closed", values.is_closed.toString());
 
-              if (values.poster) {
-                formData.append("poster", values.poster);
+              if (values.image) {
+                formData.append("image", values.image);
               }
 
               await updateEvent(event.event_code, formData, {
@@ -231,43 +231,43 @@ export default function EditEvent({
                 </div>
               </div>
 
-              {/* Poster Upload */}
+              {/* image Upload */}
               <div>
                 <Label
-                  htmlFor="poster"
+                  htmlFor="image"
                   className="text-lg font-medium flex items-center gap-2"
                 >
                   <Upload className="h-5 w-5" />
-                  Event Poster (Optional - leave blank to keep current)
+                  Event image (Optional - leave blank to keep current)
                 </Label>
                 <div className="mt-4">
                   <input
-                    id="poster"
-                    name="poster"
+                    id="image"
+                    name="image"
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        setFieldValue("poster", file);
-                        setPosterPreview(URL.createObjectURL(file));
+                        setFieldValue("image", file);
+                        setimagePreview(URL.createObjectURL(file));
                       }
                     }}
                     className="block w-full text-sm file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[var(--mainBlue)] file:text-white hover:file:bg-[var(--mainBlue)]/90 cursor-pointer"
                   />
-                  {errors.poster && touched.poster && (
+                  {errors.image && touched.image && (
                     <p className="text-destructive text-sm mt-2">
-                      {errors.poster as string}
+                      {errors.image as string}
                     </p>
                   )}
                 </div>
 
-                {posterPreview && (
+                {imagePreview && (
                   <div className="mt-6">
                     <p className="text-sm font-medium mb-3">Preview:</p>
                     <img
-                      src={posterPreview}
-                      alt="Event poster preview"
+                      src={imagePreview}
+                      alt="Event image preview"
                       className="w-full max-w-2xl h-96 object-cover rounded-xl shadow-lg"
                     />
                   </div>
