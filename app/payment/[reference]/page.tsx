@@ -237,7 +237,7 @@ function BookingPayment() {
               <span className="font-medium">Total Amount:</span>
               <span className="font-bold text-2xl">
                 {booking.currency || "KES"}{" "}
-                {parseFloat(booking.amount).toLocaleString()}
+                {booking.amount}
               </span>
             </div>
             <div className="space-y-2 text-sm text-gray-600 mb-6">
