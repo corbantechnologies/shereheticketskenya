@@ -1,4 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// app/payment/[reference]/page.tsx (or wherever your BookingPayment component is)
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -34,7 +37,7 @@ function BookingPayment() {
     refetch: refetchBooking,
   } = useFetchBooking(reference);
 
-  // Set loading to false and pre-fill phone number
+  // Initial setup
   useEffect(() => {
     if (!isLoadingBooking) {
       setLoading(false);
@@ -43,6 +46,33 @@ function BookingPayment() {
       }
     }
   }, [isLoadingBooking, booking]);
+
+  // AUTO-POLLING AFTER PAYMENT INITIATION
+  useEffect(() => {
+    if (!paymentMessage || !paymentMessage.includes("enter your M-Pesa PIN"))
+      return;
+
+    const interval = setInterval(async () => {
+      await refetchBooking();
+      if (booking?.payment_status === "COMPLETED") {
+        clearInterval(interval);
+        toast.success("Payment successful! Redirecting...");
+        router.push(`/payment/${reference}/success`);
+      } else if (booking?.payment_status === "FAILED") {
+        clearInterval(interval);
+        toast.error("Payment failed.");
+        router.push(`/payment/${reference}/failure`);
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [
+    paymentMessage,
+    booking?.payment_status,
+    refetchBooking,
+    router,
+    reference,
+  ]);
 
   const validatePhoneNumber = (phone: string) => {
     const phoneRegex = /^254\d{9}$/;
@@ -56,44 +86,41 @@ function BookingPayment() {
     }
 
     setIsProcessingPayment(true);
-    setPaymentMessage("Processing payment...");
+    setPaymentMessage("Initiating payment...");
+
     try {
       const payload = {
         booking_code: booking?.booking_code,
         phone_number: phoneNumber,
       };
 
-      await apiActions?.post("/api/v1/mpesa/pay/", payload);
+      await apiActions.post("/api/v1/mpesa/pay/", payload);
+
       setPaymentMessage(
-        "Please check your phone and enter your M-Pesa PIN to complete the payment. Click 'Check Payment Status' once you receive the M-Pesa confirmation message."
+        "Payment request sent! Please complete the payment on your phone by entering your M-Pesa PIN. You will be automatically redirected when done."
       );
+      toast.success("STK Push sent to your phone!");
     } catch (error: any) {
       setIsProcessingPayment(false);
-      setPaymentMessage("Payment failed. Please try again.");
+      setPaymentMessage("");
       toast.error(
         error.response?.data?.error ||
-          "Error initiating payment: Please try again"
+          "Failed to initiate payment. Please try again."
       );
     }
   };
 
   const handleCheckStatus = async () => {
     setIsCheckingStatus(true);
-    try {
-      await refetchBooking();
-      if (booking?.payment_status === "COMPLETED") {
-        router.push(`/payment/${reference}/success`);
-      } else if (booking?.payment_status === "FAILED") {
-        router.push(`/payment/${reference}/failure`);
-      } else {
-        toast.error("Payment is still pending. Please try again.");
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Error checking payment status. Please try again.");
-    } finally {
-      setIsCheckingStatus(false);
+    await refetchBooking();
+    if (booking?.payment_status === "COMPLETED") {
+      router.push(`/payment/${reference}/success`);
+    } else if (booking?.payment_status === "FAILED") {
+      router.push(`/payment/${reference}/failure`);
+    } else {
+      toast.error("Payment still pending. Please wait or try again shortly.");
     }
+    setIsCheckingStatus(false);
   };
 
   const getStatusColor = (status: string) => {
@@ -101,8 +128,10 @@ function BookingPayment() {
       case "PENDING":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "CONFIRMED":
+      case "COMPLETED":
         return "bg-green-100 text-green-800 border-green-200";
       case "CANCELLED":
+      case "FAILED":
         return "bg-red-100 text-red-800 border-red-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
@@ -133,7 +162,6 @@ function BookingPayment() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Booking Details
@@ -223,35 +251,35 @@ function BookingPayment() {
           </div>
         </div>
 
-        {/* Payment Card */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-6">
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
-              <CreditCard className="h-5 w-5" />
-              Payment Details
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Complete your payment to secure your booking
-            </p>
-            <div className="flex items-center justify-between text-lg mb-6">
-              <span className="font-medium">Total Amount:</span>
-              <span className="font-bold text-2xl">
-                {booking.currency || "KES"} {booking.amount}
+        {/* Payment Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+            <CreditCard className="h-5 w-5" />
+            Payment Details
+          </h2>
+
+          <div className="flex items-center justify-between text-lg mb-6">
+            <span className="font-medium">Total Amount:</span>
+            <span className="font-bold text-2xl">
+              {booking.currency || "KES"} {booking.amount}
+            </span>
+          </div>
+
+          <div className="space-y-2 text-sm text-gray-600 mb-6">
+            <div className="flex justify-between">
+              <span>Payment Status:</span>
+              <span
+                className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(
+                  booking.payment_status
+                )}`}
+              >
+                {booking.payment_status}
               </span>
             </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-6">
-              <div className="flex justify-between">
-                <span>Payment Status:</span>
-                <span
-                  className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(
-                    booking.payment_status
-                  )}`}
-                >
-                  {booking.payment_status}
-                </span>
-              </div>
-            </div>
-            {booking.payment_status === "PENDING" && (
+          </div>
+
+          {booking.payment_status === "PENDING" && (
+            <>
               <div className="mb-6">
                 <label
                   htmlFor="phoneNumber"
@@ -270,19 +298,14 @@ function BookingPayment() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Enter the phone number registered with M-Pesa (e.g.,
-                  2547XXXXXXXX)
-                </p>
               </div>
-            )}
-            {paymentMessage && (
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
-                <p className="text-blue-600">{paymentMessage}</p>
-              </div>
-            )}
-            <hr className="my-4" />
-            {booking.payment_status === "PENDING" && (
+
+              {paymentMessage && (
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
+                  <p className="text-blue-700 font-medium">{paymentMessage}</p>
+                </div>
+              )}
+
               <div className="space-y-4">
                 <button
                   onClick={handlePayment}
@@ -290,15 +313,15 @@ function BookingPayment() {
                   className="w-full py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400 flex items-center justify-center gap-2"
                 >
                   {isProcessingPayment ? (
-                    <>Processing Payment...</>
+                    <>Processing...</>
                   ) : (
                     <>
                       <CreditCard className="h-5 w-5" />
-                      Pay with M-Pesa {booking.currency || "KES"}{" "}
-                      {booking.amount}
+                      Pay with M-Pesa KES {booking.amount}
                     </>
                   )}
                 </button>
+
                 {paymentMessage && (
                   <button
                     onClick={handleCheckStatus}
@@ -306,7 +329,7 @@ function BookingPayment() {
                     className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center gap-2"
                   >
                     {isCheckingStatus ? (
-                      <>Checking Status...</>
+                      <>Checking...</>
                     ) : (
                       <>
                         <RefreshCw className="h-5 w-5" />
@@ -316,45 +339,42 @@ function BookingPayment() {
                   </button>
                 )}
               </div>
-            )}
-            {booking.payment_status === "COMPLETED" && (
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="text-green-600 font-semibold mb-2">
-                  Payment Completed!
-                </div>
-                <p className="text-sm text-green-600">
-                  Your booking has been confirmed.
-                </p>
-                {booking.mpesa_receipt_number && (
-                  <p className="text-xs text-green-600 mt-2">
-                    M-Pesa Receipt: {booking.mpesa_receipt_number}
-                  </p>
-                )}
-                <button
-                  onClick={() => router.push(`/payment/${reference}/success`)}
-                  className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                >
-                  View Booking
-                </button>
+            </>
+          )}
+
+          {/* Success/Failed States */}
+          {booking.payment_status === "COMPLETED" && (
+            <div className="text-center p-6 bg-green-50 rounded-lg border border-green-200">
+              <div className="text-green-600 font-bold text-xl mb-2">
+                Payment Completed Successfully!
               </div>
-            )}
-            {booking.payment_status === "FAILED" && (
-              <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-                <div className="text-red-600 font-semibold mb-2">
-                  Payment Failed
-                </div>
-                <p className="text-sm text-red-600">
-                  Please try again or contact support.
+              {booking.mpesa_receipt_number && (
+                <p className="text-sm">
+                  Receipt: {booking.mpesa_receipt_number}
                 </p>
-                <button
-                  onClick={() => router.push(`/pay/${reference}`)}
-                  className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Try Again
-                </button>
+              )}
+              <button
+                onClick={() => router.push(`/payment/${reference}/success`)}
+                className="mt-4 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
+              >
+                View Tickets
+              </button>
+            </div>
+          )}
+
+          {booking.payment_status === "FAILED" && (
+            <div className="text-center p-6 bg-red-50 rounded-lg border border-red-200">
+              <div className="text-red-600 font-bold text-xl mb-2">
+                Payment Failed
               </div>
-            )}
-          </div>
+              <button
+                onClick={() => router.push(`/payment/${reference}/failure`)}
+                className="mt-4 px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                View Details
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
