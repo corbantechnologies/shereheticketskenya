@@ -48,15 +48,15 @@ function BookingPayment() {
   useEffect(() => {
     if (!isLoadingBooking) {
       setLoading(false);
-      if (booking?.phone && booking?.payment_status === "PENDING") {
+      if (booking?.phone && booking?.status === "PENDING") {
         setPhoneNumber(booking.phone);
       }
 
       // If page is loaded and payment already completed (e.g. user refreshes)
-      if (booking?.payment_status === "COMPLETED") {
+      if (booking?.status === "COMPLETED") {
         toast.success("Payment already completed!");
         router.push(`/payment/${reference}/success`);
-      } else if (booking?.payment_status === "FAILED") {
+      } else if (booking?.status === "FAILED") {
         toast.error("Payment failed previously.");
         router.push(`/payment/${reference}/failure`);
       }
@@ -74,11 +74,11 @@ function BookingPayment() {
 
         const latestBooking = bookingRef.current;
 
-        if (latestBooking?.payment_status === "COMPLETED") {
+        if (latestBooking?.status === "COMPLETED") {
           clearInterval(interval);
           toast.success("Payment successful! Redirecting to your tickets...");
           router.push(`/payment/${reference}/success`);
-        } else if (latestBooking?.payment_status === "FAILED") {
+        } else if (latestBooking?.status === "FAILED") {
           clearInterval(interval);
           toast.error("Payment failed. Please try again.");
           router.push(`/payment/${reference}/failure`);
@@ -134,10 +134,10 @@ function BookingPayment() {
       await refetchBooking();
       const latest = bookingRef.current;
 
-      if (latest?.payment_status === "COMPLETED") {
+      if (latest?.status === "COMPLETED") {
         toast.success("Payment confirmed!");
         router.push(`/payment/${reference}/success`);
-      } else if (latest?.payment_status === "FAILED") {
+      } else if (latest?.status === "FAILED") {
         toast.error("Payment failed.");
         router.push(`/payment/${reference}/failure`);
       } else {
