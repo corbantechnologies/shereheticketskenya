@@ -59,11 +59,11 @@ function BookingPayment() {
     setPaymentMessage("Processing payment...");
     try {
       const payload = {
-        booking_reference: booking?.booking_code,
+        booking_code: booking?.booking_code,
         phone_number: phoneNumber,
       };
 
-       await apiActions?.post("/api/v1/mpesa/pay/", payload);
+      await apiActions?.post("/api/v1/mpesa/pay/", payload);
       setPaymentMessage(
         "Please check your phone and enter your M-Pesa PIN to complete the payment. Click 'Check Payment Status' once you receive the M-Pesa confirmation message."
       );
@@ -86,9 +86,10 @@ function BookingPayment() {
       } else if (booking?.payment_status === "FAILED") {
         router.push(`/payment/${reference}/failure`);
       } else {
-        toast.info("Payment is still pending. Please try again.");
+        toast.error("Payment is still pending. Please try again.");
       }
     } catch (error) {
+      console.log(error);
       toast.error("Error checking payment status. Please try again.");
     } finally {
       setIsCheckingStatus(false);

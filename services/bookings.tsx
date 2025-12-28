@@ -36,7 +36,36 @@ interface Booking {
   created_at: string;
   updated_at: string;
   reference: string;
-  tickets: string[];
+  tickets: {
+    reference: string;
+    booking: string;
+    ticket_type: string;
+    ticket_code: string;
+    qr_code: string;
+    is_used: boolean;
+    booking_info: {
+      name: string;
+      email: string;
+      phone: string;
+      quantity: number;
+      amount: number;
+      status: string;
+      booking_code: string;
+      event: string;
+      payment_status: string;
+      payment_status_description: string;
+      payment_method: string;
+      confirmation_code: string;
+      payment_account: string;
+      currency: string;
+      payment_date: string;
+      mpesa_receipt_number: string;
+      mpesa_phone_number: string;
+      created_at: string;
+      updated_at: string;
+      reference: string;
+    }
+  }[];
   ticket_type_info: {
     name: string;
     price: string;
