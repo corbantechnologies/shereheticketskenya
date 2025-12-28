@@ -22,13 +22,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AlertCircle, X, Plus, Edit3, Ticket, Calendar, XCircle, MapPin, Users, PartyPopper } from "lucide-react";
+import {
+  AlertCircle,
+  X,
+  Plus,
+  Edit3,
+  Ticket,
+  Calendar,
+  XCircle,
+  MapPin,
+  Users,
+  PartyPopper,
+} from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
 import EditEvent from "@/forms/events/EditEvent";
 import EditTicketType from "@/forms/tickettypes/EditTicketType";
+import EventBookingsTable from "@/components/events/EventBookingsTable";
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -52,6 +64,23 @@ export default function EventDetailPage() {
     (sum, t) => sum + (t.bookings?.length || 0),
     0
   );
+
+  // Flatten bookings from all ticket types
+  const allBookings = ticketTypes
+    .flatMap((type: any) =>
+      (type.bookings || []).map((booking: any) => ({
+        ...booking,
+        ticket_type_info: {
+          name: type.name,
+          price: type.price,
+          ticket_type_code: type.ticket_type_code,
+        },
+      }))
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
   const handleCloseEvent = async () => {
     try {
@@ -362,9 +391,14 @@ export default function EventDetailPage() {
 
             <TabsContent value="bookings" className="mt-8">
               <Card className="shadow-lg border-none ring-1 ring-black/5">
-                <CardContent className="pt-12 text-center text-muted-foreground">
-                  <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-xl">Bookings list coming soon...</p>
+                <CardContent className="pt-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">Bookings</h3>
+                    <Badge variant="outline" className="text-base px-4 py-1">
+                      {allBookings.length} Total
+                    </Badge>
+                  </div>
+                  <EventBookingsTable bookings={allBookings} />
                 </CardContent>
               </Card>
             </TabsContent>
