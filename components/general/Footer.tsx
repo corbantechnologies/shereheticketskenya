@@ -48,14 +48,14 @@ export default function Footer() {
                   Browse Events
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/categories"
                   className="hover:text-white transition-colors"
                 >
                   Categories
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/cities"
@@ -81,7 +81,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/organizer/login"
+                  href="/login"
                   className="hover:text-white transition-colors"
                 >
                   Sign In
@@ -89,7 +89,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/organizer/register"
+                  href="/signup/organizer"
                   className="hover:text-white transition-colors"
                 >
                   Create Account
@@ -124,7 +124,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-[var(--mainRed)] shrink-0" />
-                <span>+254 700 000 000</span>
+                <span>+254 710 584 581</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-[var(--mainRed)] shrink-0" />

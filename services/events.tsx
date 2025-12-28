@@ -18,6 +18,8 @@ interface Event {
   poster: string;
   created_at: string;
   updated_at: string;
+  cancellation_policy: string;
+  capacity: number;
   ticket_types: {
     name: string;
     price: string;
@@ -54,7 +56,7 @@ export const getEvents = async (): Promise<Event[]> => {
   const response: AxiosResponse<Event[]> = await apiActions.get(
     `/api/v1/events/`
   );
-  return response.data;
+  return response.data.results || [];
 };
 
 export const getEvent = async (event_code: string): Promise<Event> => {

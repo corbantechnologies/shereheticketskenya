@@ -24,12 +24,12 @@ export default function Navbar() {
           >
             Events
           </Link>
-          <Link
+          {/* <Link
             href="/categories"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
             Categories
-          </Link>
+          </Link> */}
           <Link
             href="/organizer"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
@@ -38,18 +38,6 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* Auth Buttons */}
-        <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost" asChild>
-            <Link href="/auth/login">Log In</Link>
-          </Button>
-          <Button
-            asChild
-            className="rounded-full shadow-lg shadow-[var(--mainBlue)]/20"
-          >
-            <Link href="/auth/register">Sign Up</Link>
-          </Button>
-        </div>
 
         {/* Mobile Toggle */}
         <button

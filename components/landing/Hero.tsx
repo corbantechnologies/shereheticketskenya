@@ -47,7 +47,7 @@ export default function Hero() {
             className="rounded-full px-8 h-12 text-base hover:bg-muted/50 transition-all"
             asChild
           >
-            <Link href="/organizer/register">Create an Event</Link>
+            <Link href="/signup/organizer">Create an Event</Link>
           </Button>
         </div>
 

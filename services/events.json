@@ -1,0 +1,153 @@
+{
+  "count": 3,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "a54f6b5f-bbd6-4fb6-9f98-1876aa896ef2",
+      "manager": "sherehe2539521282",
+      "company": "SPC-25OBW54A4X",
+      "name": "Drinking Spree",
+      "description": "You can't transmit the bus without compressing the neural GB feed!",
+      "start_date": "2026-01-10",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "venue": "Mombasa",
+      "capacity": null,
+      "image": null,
+      "is_closed": true,
+      "cancellation_policy": null,
+      "identity": "drinking-spree",
+      "event_code": "SPC-250QYMNF1S",
+      "created_at": "2025-12-19T00:23:50.720859+03:00",
+      "updated_at": "2025-12-27T16:19:32.333741+03:00",
+      "reference": "3KCCSB6LSS23",
+      "ticket_types": [
+        {
+          "event": "SPC-250QYMNF1S",
+          "name": "VVIP",
+          "price": "20.00",
+          "quantity_available": 10,
+          "is_limited": true,
+          "ticket_type_code": "ETT-25-ET29EGBP",
+          "created_at": "2025-12-19T00:57:53.316505+03:00",
+          "updated_at": "2025-12-19T00:57:53.316537+03:00",
+          "bookings": []
+        },
+        {
+          "event": "SPC-250QYMNF1S",
+          "name": "VVIP",
+          "price": "10.00",
+          "quantity_available": null,
+          "is_limited": false,
+          "ticket_type_code": "ETT-25-SFQPI3QD",
+          "created_at": "2025-12-19T00:41:29.271332+03:00",
+          "updated_at": "2025-12-19T00:41:29.272435+03:00",
+          "bookings": []
+        },
+        {
+          "event": "SPC-250QYMNF1S",
+          "name": "Entry Only",
+          "price": "10.00",
+          "quantity_available": null,
+          "is_limited": false,
+          "ticket_type_code": "ETT-25-G1AAJIMJ",
+          "created_at": "2025-12-19T00:57:53.320444+03:00",
+          "updated_at": "2025-12-19T00:57:53.320456+03:00",
+          "bookings": []
+        }
+      ]
+    },
+    {
+      "id": "032c7c1d-d992-42f1-ace6-e3b1ac9d45b7",
+      "manager": "sherehe2539521282",
+      "company": "SPC-25OBW54A4X",
+      "name": "Watu Wetu Events",
+      "description": "I'll program the cross-platform SDD array, that should interface the RAM monitor!",
+      "start_date": "2026-01-11",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "venue": "5154 Nikolaus Pines",
+      "capacity": null,
+      "image": null,
+      "is_closed": false,
+      "cancellation_policy": null,
+      "identity": "watu-wetu-events",
+      "event_code": "SPC-25QYEPRJUR",
+      "created_at": "2025-12-19T00:53:29.718606+03:00",
+      "updated_at": "2025-12-19T00:53:29.718628+03:00",
+      "reference": "PJM04II3YVCK",
+      "ticket_types": [
+        {
+          "event": "SPC-25QYEPRJUR",
+          "name": "VVIP",
+          "price": "20.00",
+          "quantity_available": 10,
+          "is_limited": true,
+          "ticket_type_code": "ETT-25-7GR2KSRN",
+          "created_at": "2025-12-19T00:53:29.724184+03:00",
+          "updated_at": "2025-12-19T00:53:29.724196+03:00",
+          "bookings": []
+        },
+        {
+          "event": "SPC-25QYEPRJUR",
+          "name": "Entry Only",
+          "price": "10.00",
+          "quantity_available": null,
+          "is_limited": false,
+          "ticket_type_code": "ETT-25-13EXOAZR",
+          "created_at": "2025-12-19T00:53:29.727505+03:00",
+          "updated_at": "2025-12-19T00:53:29.727525+03:00",
+          "bookings": []
+        }
+      ]
+    },
+    {
+      "id": "82ba7811-106e-439a-a9e1-cfe3be28de34",
+      "manager": "sherehe2539521282",
+      "company": "SPC-25OBW54A4X",
+      "name": "Sote Events",
+      "description": "I'll hack the redundant PCI interface, that should monitor the HTTP monitor!",
+      "start_date": "2026-01-11",
+      "end_date": null,
+      "start_time": null,
+      "end_time": null,
+      "venue": "383 Palma Drives",
+      "capacity": null,
+      "image": null,
+      "is_closed": false,
+      "cancellation_policy": null,
+      "identity": "sote-events",
+      "event_code": "SPC-25MO5FPYHM",
+      "created_at": "2025-12-19T01:01:13.686386+03:00",
+      "updated_at": "2025-12-19T01:01:13.686417+03:00",
+      "reference": "ZYURKJUX2NNT",
+      "ticket_types": [
+        {
+          "event": "SPC-25MO5FPYHM",
+          "name": "VVIP",
+          "price": "20.00",
+          "quantity_available": 10,
+          "is_limited": true,
+          "ticket_type_code": "ETT-25-O24W0VAL",
+          "created_at": "2025-12-19T01:01:13.693149+03:00",
+          "updated_at": "2025-12-19T01:01:13.693160+03:00",
+          "bookings": []
+        },
+        {
+          "event": "SPC-25MO5FPYHM",
+          "name": "Entry Only",
+          "price": "10.00",
+          "quantity_available": null,
+          "is_limited": false,
+          "ticket_type_code": "ETT-25-3PP63IJY",
+          "created_at": "2025-12-19T01:01:13.696806+03:00",
+          "updated_at": "2025-12-19T01:01:13.696822+03:00",
+          "bookings": []
+        }
+      ]
+    }
+  ]
+}

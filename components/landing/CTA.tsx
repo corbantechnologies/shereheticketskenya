@@ -33,7 +33,7 @@ export default function CTA() {
             className="rounded-full px-8 h-12 text-base bg-transparent text-white border-white hover:bg-white/10 hover:text-white"
             asChild
           >
-            <Link href="/organizer/register">Become an Organizer</Link>
+            <Link href="/signup/organizer">Become an Organizer</Link>
           </Button>
         </div>
       </div>
