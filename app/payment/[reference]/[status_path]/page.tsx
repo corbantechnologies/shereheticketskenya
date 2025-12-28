@@ -76,7 +76,7 @@ export default function BookingPaymentStatusPage() {
         } else if (["FAILED", "REVERSED"].includes(paymentStatus)) {
           toast.error("Payment failed. Please try again or contact support.");
         } else if (paymentStatus === "PENDING") {
-          toast.info("Payment is still pending. Please check back soon.");
+          toast.error("Payment is still pending. Please check back soon.");
         } else {
           toast.error("Unknown payment status. Contact support.");
         }
