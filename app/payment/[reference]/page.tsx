@@ -296,15 +296,15 @@ function BookingPayment() {
             <span>Payment Status:</span>
             <span
               className={`px-2 py-1 rounded font-medium ${getStatusColor(
-                booking.payment_status
+                booking.status
               )}`}
             >
-              {booking.payment_status}
+              {booking.status}
             </span>
           </div>
 
           {/* Only show payment form if still PENDING */}
-          {booking.payment_status === "PENDING" && (
+          {booking.status === "PENDING" && (
             <>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -363,7 +363,7 @@ function BookingPayment() {
           )}
 
           {/* Success Message (when completed) */}
-          {booking.payment_status === "COMPLETED" && (
+          {booking.status === "COMPLETED" && (
             <div className="text-center p-8 bg-green-50 rounded-lg border border-green-200">
               <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
               <h3 className="text-2xl font-bold text-green-800 mb-2">
@@ -382,7 +382,7 @@ function BookingPayment() {
           )}
 
           {/* Failed Message */}
-          {booking.payment_status === "FAILED" && (
+          {booking.status === "FAILED" && (
             <div className="text-center p-8 bg-red-50 rounded-lg border border-red-200">
               <XCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
               <h3 className="text-2xl font-bold text-red-800 mb-2">
