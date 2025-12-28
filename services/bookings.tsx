@@ -45,7 +45,7 @@ interface Booking {
 }
 
 export const makeBooking = async (formData: makeBooking | FormData) => {
-  await apiActions.post(`/api/v1/bookings/`, formData);
+  await apiActions.post(`/api/v1/bookings/create/event/`, formData);
 };
 
 export const getBookings = async (): Promise<Booking[]> => {

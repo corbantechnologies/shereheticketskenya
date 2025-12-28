@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { makeBooking } from "@/services/bookings";
+import toast from "react-hot-toast";
+import { apiActions } from "@/tools/axios";
 
 interface TicketType {
   name: string;
@@ -76,10 +78,7 @@ const validationSchema = Yup.object({
   phone: Yup.string().required("Phone number is required"),
 });
 
-export default function MakeBooking({
-  event,
-  closeModal,
-}: MakeBookingProps) {
+export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -89,7 +88,7 @@ export default function MakeBooking({
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
@@ -137,13 +136,16 @@ export default function MakeBooking({
                   formData.append("email", values.email);
                   formData.append("phone", values.phone);
 
-                  const response = await makeBooking(formData);
+                  const response = await apiActions.post(
+                    `/api/v1/bookings/create/event/`,
+                    formData
+                  );
                   router.push(`/payment/${response?.data?.reference}`);
                   setLoading(false);
                   closeModal();
                 } catch (error) {
                   console.error(error);
-                  alert("Booking failed. Please try again.");
+                  toast.error("Error making booking. Please try again.");
                 } finally {
                   setLoading(false);
                   setSubmitting(false);

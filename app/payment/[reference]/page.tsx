@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -13,15 +14,15 @@ import {
   RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { apiActions } from "@/tools/api";
-import LoadingSpinner from "@/components/general/LoadingSpinner";
+import { apiActions } from "@/tools/axios";
+import LoadingSpinner from "@/components/general/LoadingComponents";
 import { useFetchBooking } from "@/hooks/bookings/actions";
 
 function BookingPayment() {
   const router = useRouter();
-  const { reference } = useParams();
+  const { reference } = useParams<{ reference: string }>();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentMessage, setPaymentMessage] = useState(null);
+  const [paymentMessage, setPaymentMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
@@ -43,7 +44,7 @@ function BookingPayment() {
     }
   }, [isLoadingBooking, booking]);
 
-  const validatePhoneNumber = (phone) => {
+  const validatePhoneNumber = (phone: string) => {
     const phoneRegex = /^254\d{9}$/;
     return phoneRegex.test(phone);
   };
@@ -55,20 +56,20 @@ function BookingPayment() {
     }
 
     setIsProcessingPayment(true);
-    setPaymentMessage(null);
+    setPaymentMessage("Processing payment...");
     try {
       const payload = {
-        booking_reference: booking?.reference,
+        booking_reference: booking?.booking_code,
         phone_number: phoneNumber,
       };
 
-      const response = await apiActions?.post("/api/v1/mpesa/pay/", payload);
+       await apiActions?.post("/api/v1/mpesa/pay/", payload);
       setPaymentMessage(
         "Please check your phone and enter your M-Pesa PIN to complete the payment. Click 'Check Payment Status' once you receive the M-Pesa confirmation message."
       );
-    } catch (error) {
+    } catch (error: any) {
       setIsProcessingPayment(false);
-      setPaymentMessage(null);
+      setPaymentMessage("Payment failed. Please try again.");
       toast.error(
         error.response?.data?.error ||
           "Error initiating payment: Please try again"
@@ -94,7 +95,7 @@ function BookingPayment() {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
