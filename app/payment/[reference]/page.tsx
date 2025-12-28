@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/payment/[reference]/page.tsx (or wherever your BookingPayment component is)
+// app/payment/[reference]/page.tsx
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   Clock,
@@ -14,7 +14,8 @@ import {
   User,
   Ticket,
   AlertCircle,
-  RefreshCw,
+  XCircle,
+  CheckCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { apiActions } from "@/tools/axios";
@@ -37,6 +38,12 @@ function BookingPayment() {
     refetch: refetchBooking,
   } = useFetchBooking(reference);
 
+  // Use ref to always have the latest booking data inside intervals
+  const bookingRef = useRef(booking);
+  useEffect(() => {
+    bookingRef.current = booking;
+  }, [booking]);
+
   // Initial setup
   useEffect(() => {
     if (!isLoadingBooking) {
@@ -44,35 +51,46 @@ function BookingPayment() {
       if (booking?.phone && booking?.payment_status === "PENDING") {
         setPhoneNumber(booking.phone);
       }
-    }
-  }, [isLoadingBooking, booking]);
 
-  // AUTO-POLLING AFTER PAYMENT INITIATION
+      // If page is loaded and payment already completed (e.g. user refreshes)
+      if (booking?.payment_status === "COMPLETED") {
+        toast.success("Payment already completed!");
+        router.push(`/payment/${reference}/success`);
+      } else if (booking?.payment_status === "FAILED") {
+        toast.error("Payment failed previously.");
+        router.push(`/payment/${reference}/failure`);
+      }
+    }
+  }, [isLoadingBooking, booking, router, reference]);
+
+  // AUTO-POLLING AFTER STK PUSH — FIXED with ref
   useEffect(() => {
     if (!paymentMessage || !paymentMessage.includes("enter your M-Pesa PIN"))
       return;
 
     const interval = setInterval(async () => {
-      await refetchBooking();
-      if (booking?.payment_status === "COMPLETED") {
-        clearInterval(interval);
-        toast.success("Payment successful! Redirecting...");
-        router.push(`/payment/${reference}/success`);
-      } else if (booking?.payment_status === "FAILED") {
-        clearInterval(interval);
-        toast.error("Payment failed.");
-        router.push(`/payment/${reference}/failure`);
+      try {
+        await refetchBooking();
+
+        const latestBooking = bookingRef.current;
+
+        if (latestBooking?.payment_status === "COMPLETED") {
+          clearInterval(interval);
+          toast.success("Payment successful! Redirecting to your tickets...");
+          router.push(`/payment/${reference}/success`);
+        } else if (latestBooking?.payment_status === "FAILED") {
+          clearInterval(interval);
+          toast.error("Payment failed. Please try again.");
+          router.push(`/payment/${reference}/failure`);
+        }
+        // Else: still pending → continue polling
+      } catch (err) {
+        console.error("Error during polling:", err);
       }
-    }, 5000); // Check every 5 seconds
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [
-    paymentMessage,
-    booking?.payment_status,
-    refetchBooking,
-    router,
-    reference,
-  ]);
+  }, [paymentMessage, refetchBooking, router, reference]);
 
   const validatePhoneNumber = (phone: string) => {
     const phoneRegex = /^254\d{9}$/;
@@ -81,12 +99,12 @@ function BookingPayment() {
 
   const handlePayment = async () => {
     if (!validatePhoneNumber(phoneNumber)) {
-      toast.error("Please enter a valid phone number (e.g., 2547XXXXXXXX)");
+      toast.error("Please enter a valid phone number (e.g., 254712345678)");
       return;
     }
 
     setIsProcessingPayment(true);
-    setPaymentMessage("Initiating payment...");
+    setPaymentMessage("Sending payment request...");
 
     try {
       const payload = {
@@ -97,30 +115,39 @@ function BookingPayment() {
       await apiActions.post("/api/v1/mpesa/pay/", payload);
 
       setPaymentMessage(
-        "Payment request sent! Please complete the payment on your phone by entering your M-Pesa PIN. You will be automatically redirected when done."
+        "Payment request sent! Please complete the transaction on your phone. We'll redirect you automatically when done."
       );
-      toast.success("STK Push sent to your phone!");
+      toast.success("STK Push sent! Check your phone.");
     } catch (error: any) {
       setIsProcessingPayment(false);
       setPaymentMessage("");
       toast.error(
         error.response?.data?.error ||
-          "Failed to initiate payment. Please try again."
+          "Failed to send payment request. Try again."
       );
     }
   };
 
   const handleCheckStatus = async () => {
     setIsCheckingStatus(true);
-    await refetchBooking();
-    if (booking?.payment_status === "COMPLETED") {
-      router.push(`/payment/${reference}/success`);
-    } else if (booking?.payment_status === "FAILED") {
-      router.push(`/payment/${reference}/failure`);
-    } else {
-      toast.error("Payment still pending. Please wait or try again shortly.");
+    try {
+      await refetchBooking();
+      const latest = bookingRef.current;
+
+      if (latest?.payment_status === "COMPLETED") {
+        toast.success("Payment confirmed!");
+        router.push(`/payment/${reference}/success`);
+      } else if (latest?.payment_status === "FAILED") {
+        toast.error("Payment failed.");
+        router.push(`/payment/${reference}/failure`);
+      } else {
+        alert("Payment still processing... Please wait a little longer.");
+      }
+    } catch (error: any) {
+      toast.error("Failed to check status. Try again.");
+    } finally {
+      setIsCheckingStatus(false);
     }
-    setIsCheckingStatus(false);
   };
 
   const getStatusColor = (status: string) => {
@@ -251,7 +278,7 @@ function BookingPayment() {
           </div>
         </div>
 
-        {/* Payment Section */}
+        {/* Payment Card */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
             <CreditCard className="h-5 w-5" />
@@ -265,37 +292,32 @@ function BookingPayment() {
             </span>
           </div>
 
-          <div className="space-y-2 text-sm text-gray-600 mb-6">
-            <div className="flex justify-between">
-              <span>Payment Status:</span>
-              <span
-                className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(
-                  booking.payment_status
-                )}`}
-              >
-                {booking.payment_status}
-              </span>
-            </div>
+          <div className="flex justify-between text-sm mb-6">
+            <span>Payment Status:</span>
+            <span
+              className={`px-2 py-1 rounded font-medium ${getStatusColor(
+                booking.payment_status
+              )}`}
+            >
+              {booking.payment_status}
+            </span>
           </div>
 
+          {/* Only show payment form if still PENDING */}
           {booking.payment_status === "PENDING" && (
             <>
               <div className="mb-6">
-                <label
-                  htmlFor="phoneNumber"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   M-Pesa Phone Number
                 </label>
                 <div className="flex items-center gap-2">
                   <Phone className="h-5 w-5 text-gray-500" />
                   <input
                     type="text"
-                    id="phoneNumber"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="2547XXXXXXXX"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="254712345678"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
                   />
                 </div>
               </div>
@@ -303,6 +325,9 @@ function BookingPayment() {
               {paymentMessage && (
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
                   <p className="text-blue-700 font-medium">{paymentMessage}</p>
+                  <p className="text-sm text-blue-600 mt-2">
+                    Polling every 5 seconds for status...
+                  </p>
                 </div>
               )}
 
@@ -313,11 +338,11 @@ function BookingPayment() {
                   className="w-full py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400 flex items-center justify-center gap-2"
                 >
                   {isProcessingPayment ? (
-                    <>Processing...</>
+                    "Sending request..."
                   ) : (
                     <>
                       <CreditCard className="h-5 w-5" />
-                      Pay with M-Pesa KES {booking.amount}
+                      Pay with M-Pesa • KES {booking.amount}
                     </>
                   )}
                 </button>
@@ -326,50 +351,49 @@ function BookingPayment() {
                   <button
                     onClick={handleCheckStatus}
                     disabled={isCheckingStatus}
-                    className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    {isCheckingStatus ? (
-                      <>Checking...</>
-                    ) : (
-                      <>
-                        <RefreshCw className="h-5 w-5" />
-                        Check Payment Status
-                      </>
-                    )}
+                    {isCheckingStatus
+                      ? "Checking..."
+                      : "Check Payment Status Manually"}
                   </button>
                 )}
               </div>
             </>
           )}
 
-          {/* Success/Failed States */}
+          {/* Success Message (when completed) */}
           {booking.payment_status === "COMPLETED" && (
-            <div className="text-center p-6 bg-green-50 rounded-lg border border-green-200">
-              <div className="text-green-600 font-bold text-xl mb-2">
-                Payment Completed Successfully!
-              </div>
-              {booking.mpesa_receipt_number && (
-                <p className="text-sm">
-                  Receipt: {booking.mpesa_receipt_number}
-                </p>
-              )}
+            <div className="text-center p-8 bg-green-50 rounded-lg border border-green-200">
+              <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-green-800 mb-2">
+                Payment Successful!
+              </h3>
+              <p className="text-green-700 mb-6">
+                Your tickets are confirmed and ready.
+              </p>
               <button
                 onClick={() => router.push(`/payment/${reference}/success`)}
-                className="mt-4 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="px-8 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium"
               >
-                View Tickets
+                View Your Tickets
               </button>
             </div>
           )}
 
+          {/* Failed Message */}
           {booking.payment_status === "FAILED" && (
-            <div className="text-center p-6 bg-red-50 rounded-lg border border-red-200">
-              <div className="text-red-600 font-bold text-xl mb-2">
+            <div className="text-center p-8 bg-red-50 rounded-lg border border-red-200">
+              <XCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-red-800 mb-2">
                 Payment Failed
-              </div>
+              </h3>
+              <p className="text-red-700 mb-6">
+                Please try again or contact support.
+              </p>
               <button
                 onClick={() => router.push(`/payment/${reference}/failure`)}
-                className="mt-4 px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700"
+                className="px-8 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium"
               >
                 View Details
               </button>
