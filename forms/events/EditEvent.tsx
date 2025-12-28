@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
-// components/events/CreateEvent.tsx
+// forms/events/EditEvent.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -12,13 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
-import { createEvent } from "@/services/events";
+import { updateEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
 
-interface CreateEventProps {
-  companyCode: string;
+interface EditEventProps {
+  event: any;
   closeModal: () => void;
-  refetchEvents: () => void;
+  refetchEvent: () => void;
 }
 
 const validationSchema = Yup.object({
@@ -30,7 +30,7 @@ const validationSchema = Yup.object({
   end_time: Yup.string().nullable(),
   venue: Yup.string().required("Venue is required"),
   image: Yup.mixed<File>()
-    .required("Event image is required")
+    .nullable()
     .test(
       "fileSize",
       "File too large (max 5MB)",
@@ -45,12 +45,14 @@ const validationSchema = Yup.object({
     ),
 });
 
-export default function CreateEvent({
-  companyCode,
+export default function EditEvent({
+  event,
   closeModal,
-  refetchEvents,
-}: CreateEventProps) {
-  const [imagePreview, setimagePreview] = useState<string | null>(null);
+  refetchEvent,
+}: EditEventProps) {
+  const [imagePreview, setimagePreview] = useState<string | null>(
+    event.image || null
+  );
   const axiosAuth = useAxiosAuth();
 
   return (
@@ -58,9 +60,9 @@ export default function CreateEvent({
       {/* Header */}
       <div className="flex items-center justify-between p-8 border-b">
         <div>
-          <h2 className="text-4xl font-bold">Create New Event</h2>
+          <h2 className="text-4xl font-bold">Edit Event: {event.name}</h2>
           <p className="text-muted-foreground mt-2">
-            Bring your sherehe to life
+            Update your sherehe details
           </p>
         </div>
         <button
@@ -75,14 +77,15 @@ export default function CreateEvent({
       <div className="flex-1 overflow-y-auto p-8 bg-white">
         <Formik
           initialValues={{
-            name: "",
-            description: "",
-            start_date: "",
-            start_time: "",
-            end_date: "",
-            end_time: "",
-            venue: "",
+            name: event.name || "",
+            description: event.description || "",
+            start_date: event.start_date || "",
+            start_time: event.start_time || "",
+            end_date: event.end_date || "",
+            end_time: event.end_time || "",
+            venue: event.venue || "",
             image: null as File | null,
+            is_closed: event.is_closed || false,
           }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
@@ -96,27 +99,32 @@ export default function CreateEvent({
               if (values.end_date) formData.append("end_date", values.end_date);
               if (values.end_time) formData.append("end_time", values.end_time);
               formData.append("venue", values.venue);
-              formData.append("company", companyCode);
-              if (values.image) formData.append("image", values.image);
+              formData.append("is_closed", values.is_closed.toString());
 
-              await createEvent(formData, { headers: axiosAuth.headers });
+              if (values.image) {
+                formData.append("image", values.image);
+              }
 
-              toast.success("Event created successfully!");
-              refetchEvents();
+              await updateEvent(event.event_code, formData, {
+                headers: axiosAuth.headers,
+              });
+
+              toast.success("Event updated successfully!");
+              refetchEvent();
               closeModal();
             } catch (error: any) {
-              console.error("Create event error:", error);
+              console.error("Update event error:", error);
               toast.error(
                 error.response?.data?.detail ||
                   error.response?.data?.non_field_errors?.[0] ||
-                  "Failed to create event. Please try again."
+                  "Failed to update event. Please try again."
               );
             } finally {
               setSubmitting(false);
             }
           }}
         >
-          {({ setFieldValue, values, errors, touched, isSubmitting }) => (
+          {({ setFieldValue, errors, touched, isSubmitting }) => (
             <Form className="space-y-10">
               {/* Event Name & Description */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -133,7 +141,7 @@ export default function CreateEvent({
                   />
                   {errors.name && touched.name && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.name}
+                      {errors.name as string}
                     </p>
                   )}
                 </div>
@@ -151,7 +159,7 @@ export default function CreateEvent({
                   />
                   {errors.venue && touched.venue && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.venue}
+                      {errors.venue as string}
                     </p>
                   )}
                 </div>
@@ -171,7 +179,7 @@ export default function CreateEvent({
                 />
                 {errors.description && touched.description && (
                   <p className="text-destructive text-sm mt-1">
-                    {errors.description}
+                    {errors.description as string}
                   </p>
                 )}
               </div>
@@ -198,7 +206,7 @@ export default function CreateEvent({
                   </div>
                   {errors.start_date && touched.start_date && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.start_date}
+                      {errors.start_date as string}
                     </p>
                   )}
                 </div>
@@ -230,7 +238,7 @@ export default function CreateEvent({
                   className="text-lg font-medium flex items-center gap-2"
                 >
                   <Upload className="h-5 w-5" />
-                  Event image <span className="text-destructive">*</span>
+                  Event image (Optional - leave blank to keep current)
                 </Label>
                 <div className="mt-4">
                   <input
@@ -266,6 +274,19 @@ export default function CreateEvent({
                 )}
               </div>
 
+              {/* Status */}
+              <div className="flex items-center space-x-3">
+                <Field
+                  type="checkbox"
+                  id="is_closed"
+                  name="is_closed"
+                  className="h-6 w-6 rounded border-gray-300 text-[var(--mainRed)] focus:ring-[var(--mainRed)]"
+                />
+                <Label htmlFor="is_closed" className="text-lg font-medium">
+                  Event Closed
+                </Label>
+              </div>
+
               {/* Submit */}
               <div className="flex justify-end gap-4 pt-8">
                 <Button
@@ -283,7 +304,7 @@ export default function CreateEvent({
                   disabled={isSubmitting}
                   className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 px-10"
                 >
-                  {isSubmitting ? "Creating Event..." : "Create Event"}
+                  {isSubmitting ? "Updating Event..." : "Update Event"}
                 </Button>
               </div>
             </Form>

@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import EventsDisplayTable from "@/components/events/EventsDisplayTable";
 import UpdateCompany from "@/forms/company/UpdateCompany";
+import CreateEvent from "@/forms/events/CreateEvent";
 import { useState } from "react";
 
 export default function CompanyDetailPage() {
@@ -29,6 +30,7 @@ export default function CompanyDetailPage() {
   const { reference } = useParams<{ reference: string }>();
   const { isLoading, data: company, refetch } = useFetchCompany(reference);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
 
   if (isLoading) return <DashboardSkeleton />;
 
@@ -207,7 +209,7 @@ export default function CompanyDetailPage() {
               </div>
               <Button
                 size="lg"
-                onClick={() => router.push("./events/new")}
+                onClick={() => setIsCreateEventModalOpen(true)}
                 disabled={!hasRequiredDetails}
                 className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 shadow-lg"
               >
@@ -277,6 +279,17 @@ export default function CompanyDetailPage() {
                 />
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Create Event Modal */}
+        {isCreateEventModalOpen && (
+          <div className="fixed inset-0 z-50 flex flex-col bg-white">
+            <CreateEvent
+              companyCode={company.company_code}
+              closeModal={() => setIsCreateEventModalOpen(false)}
+              refetchEvents={refetch}
+            />
           </div>
         )}
       </div>

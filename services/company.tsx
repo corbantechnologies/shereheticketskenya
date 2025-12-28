@@ -3,6 +3,13 @@
 import { apiActions, apiMultipartActions } from "@/tools/axios";
 import { AxiosResponse } from "axios";
 
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
 interface createCompany {
   name: string;
 }
@@ -16,7 +23,7 @@ interface Event {
   end_date: string;
   venue: string;
   company: string;
-  poster: string;
+  image: string;
   ticket_types: {
     name: string;
     price: string;
@@ -71,11 +78,9 @@ export const createCompany = async (
 export const getCompanies = async (headers: {
   headers: { Authorization: string };
 }): Promise<Company[]> => {
-  const response: AxiosResponse<Company[]> = await apiActions.get(
-    `/api/v1/company/`,
-    headers
-  );
-  return response.data;
+  const response: AxiosResponse<PaginatedResponse<Company>> =
+    await apiActions.get(`/api/v1/company/`, headers);
+  return response.data.results || [];
 };
 
 export const getCompany = async (

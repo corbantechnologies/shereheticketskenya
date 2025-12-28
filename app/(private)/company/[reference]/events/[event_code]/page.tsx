@@ -23,25 +23,33 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  Calendar,
-  MapPin,
-  Ticket,
-  Users,
-  Edit3,
-  XCircle,
-  PartyPopper,
   AlertCircle,
   X,
+  Plus,
+  Edit3,
+  Ticket,
+  Calendar,
+  XCircle,
+  MapPin,
+  Users,
+  PartyPopper,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
+import EditEvent from "@/forms/events/EditEvent";
+import EditTicketType from "@/forms/tickettypes/EditTicketType";
+import EventBookingsTable from "@/components/events/EventBookingsTable";
 
 export default function EventDetailPage() {
   const router = useRouter();
   const { event_code } = useParams<{ event_code: string }>();
   const { isLoading, data: event, refetch } = useFetchEvent(event_code);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);
+  const [isEditTicketModalOpen, setIsEditTicketModalOpen] = useState(false);
+  const [selectedTicketType, setSelectedTicketType] = useState<any>(null);
   const authHeaders = useAxiosAuth();
   const [isClosing, setIsClosing] = useState(false);
 
@@ -56,6 +64,23 @@ export default function EventDetailPage() {
     (sum, t) => sum + (t.bookings?.length || 0),
     0
   );
+
+  // Flatten bookings from all ticket types
+  const allBookings = ticketTypes
+    .flatMap((type: any) =>
+      (type.bookings || []).map((booking: any) => ({
+        ...booking,
+        ticket_type_info: {
+          name: type.name,
+          price: type.price,
+          ticket_type_code: type.ticket_type_code,
+        },
+      }))
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
   const handleCloseEvent = async () => {
     try {
@@ -74,7 +99,7 @@ export default function EventDetailPage() {
   return (
     <>
       <div className="min-h-screen bg-background">
-        {/* Hero Header with Event Poster/Gradient */}
+        {/* Hero Header with Event image/Gradient */}
         <div className="relative h-96 overflow-hidden">
           {event.image ? (
             <img
@@ -288,6 +313,19 @@ export default function EventDetailPage() {
             <TabsContent value="tickets" className="mt-8">
               <Card className="shadow-lg border-none ring-1 ring-black/5">
                 <CardContent className="pt-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">Ticket Types</h3>
+                    {!event.is_closed && (
+                      <Button
+                        onClick={() => setIsCreateTicketModalOpen(true)}
+                        className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Ticket Type
+                      </Button>
+                    )}
+                  </div>
+
                   {ticketTypes.length > 0 ? (
                     <div className="space-y-6">
                       {ticketTypes.map((type) => (
@@ -305,21 +343,47 @@ export default function EventDetailPage() {
                                 : "Unlimited"}
                             </p>
                           </div>
-                          <div className="text-right">
-                            <p className="text-3xl font-bold">
-                              KSh {type.price}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {type.bookings?.length || 0} sold
-                            </p>
+                          <div className="text-right flex items-center gap-4">
+                            <div>
+                              <p className="text-3xl font-bold">
+                                KSh {type.price}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {type.bookings?.length || 0} sold
+                              </p>
+                            </div>
+                            {!event.is_closed && (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => {
+                                  setSelectedTicketType(type);
+                                  setIsEditTicketModalOpen(true);
+                                }}
+                                className="h-10 w-10 text-muted-foreground hover:text-[var(--mainBlue)]"
+                              >
+                                <Edit3 className="h-5 w-5" />
+                              </Button>
+                            )}
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center py-12 text-muted-foreground">
-                      No ticket types created yet.
-                    </p>
+                    <div className="text-center py-12">
+                      <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                      <p className="text-muted-foreground text-lg mb-6">
+                        No ticket types created yet.
+                      </p>
+                      {!event.is_closed && (
+                        <Button
+                          onClick={() => setIsCreateTicketModalOpen(true)}
+                          variant="outline"
+                        >
+                          Create Your First Ticket Type
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -327,9 +391,14 @@ export default function EventDetailPage() {
 
             <TabsContent value="bookings" className="mt-8">
               <Card className="shadow-lg border-none ring-1 ring-black/5">
-                <CardContent className="pt-12 text-center text-muted-foreground">
-                  <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-xl">Bookings list coming soon...</p>
+                <CardContent className="pt-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">Bookings</h3>
+                    <Badge variant="outline" className="text-base px-4 py-1">
+                      {allBookings.length} Total
+                    </Badge>
+                  </div>
+                  <EventBookingsTable bookings={allBookings} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -358,26 +427,68 @@ export default function EventDetailPage() {
             />
 
             <div className="relative flex flex-col h-full w-full bg-white">
-              <div className="flex items-center justify-between p-6">
-                <div>
-                  <h2 className="text-3xl font-bold">
-                    Edit Event: {event.name}
-                  </h2>
-                  <p className="text-muted-foreground mt-2">
-                    Update event details, dates, venue, and more.
-                  </p>
-                </div>
+              <EditEvent
+                event={event}
+                closeModal={() => setIsEditModalOpen(false)}
+                refetchEvent={refetch}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Create Ticket Type Modal */}
+        {isCreateTicketModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={() => setIsCreateTicketModalOpen(false)}
+            />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+              <div className="flex items-center justify-between p-6 border-b">
+                <h2 className="text-2xl font-bold">Add New Ticket Type</h2>
                 <button
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="p-3 rounded-lg hover:bg-muted transition"
+                  onClick={() => setIsCreateTicketModalOpen(false)}
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
+              <div className="p-8">
+                <CreateTicketType
+                  event={event}
+                  closeModal={() => setIsCreateTicketModalOpen(false)}
+                  refetch={refetch}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
-              <div className="flex-1 overflow-y-auto p-6 pb-20 text-center text-muted-foreground">
-                <Calendar className="h-20 w-20 mx-auto mb-6 opacity-50" />
-                <p className="text-2xl">Event Update Form Coming Soon...</p>
+        {/* Edit Ticket Type Modal */}
+        {isEditTicketModalOpen && selectedTicketType && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={() => setIsEditTicketModalOpen(false)}
+            />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+              <div className="flex items-center justify-between p-6 border-b">
+                <h2 className="text-2xl font-bold">Edit Ticket Type</h2>
+                <button
+                  onClick={() => setIsEditTicketModalOpen(false)}
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              <div className="p-8">
+                <EditTicketType
+                  ticketType={selectedTicketType}
+                  closeModal={() => setIsEditTicketModalOpen(false)}
+                  refetch={refetch}
+                />
               </div>
             </div>
           </div>

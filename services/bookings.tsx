@@ -1,10 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { apiActions } from "@/tools/axios";
 import { AxiosResponse } from "axios";
 
-const results: any[] = [];
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
 
 interface makeBooking {
   ticket_type: string;
@@ -64,7 +68,7 @@ interface Booking {
       created_at: string;
       updated_at: string;
       reference: string;
-    }
+    };
   }[];
   ticket_type_info: {
     name: string;
@@ -78,9 +82,8 @@ export const makeBooking = async (formData: makeBooking | FormData) => {
 };
 
 export const getBookings = async (): Promise<Booking[]> => {
-  const response: AxiosResponse<Booking[]> = await apiActions.get(
-    `/api/v1/bookings/`
-  );
+  const response: AxiosResponse<PaginatedResponse<Booking>> =
+    await apiActions.get(`/api/v1/bookings/`);
   return response.data.results || [];
 };
 

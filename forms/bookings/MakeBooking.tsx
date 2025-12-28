@@ -7,7 +7,6 @@ import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { makeBooking } from "@/services/bookings";
 import toast from "react-hot-toast";
 import { apiActions } from "@/tools/axios";
 
@@ -32,7 +31,6 @@ interface Event {
   end_time: string;
   venue: string;
   company: string;
-  poster: string;
   created_at: string;
   updated_at: string;
   cancellation_policy: string;
@@ -131,7 +129,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                 try {
                   const formData = new FormData();
                   formData.append("ticket_type", values.ticket_type);
-                  formData.append("quantity", values.quantity);
+                  formData.append("quantity", values.quantity.toString());
                   formData.append("name", values.name);
                   formData.append("email", values.email);
                   formData.append("phone", values.phone);
