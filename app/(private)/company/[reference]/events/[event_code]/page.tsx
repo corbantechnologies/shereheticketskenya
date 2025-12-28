@@ -32,16 +32,19 @@ import {
   PartyPopper,
   AlertCircle,
   X,
+  Plus,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
 
 export default function EventDetailPage() {
   const router = useRouter();
   const { event_code } = useParams<{ event_code: string }>();
   const { isLoading, data: event, refetch } = useFetchEvent(event_code);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);
   const authHeaders = useAxiosAuth();
   const [isClosing, setIsClosing] = useState(false);
 
@@ -288,6 +291,19 @@ export default function EventDetailPage() {
             <TabsContent value="tickets" className="mt-8">
               <Card className="shadow-lg border-none ring-1 ring-black/5">
                 <CardContent className="pt-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">Ticket Types</h3>
+                    {!event.is_closed && (
+                      <Button
+                        onClick={() => setIsCreateTicketModalOpen(true)}
+                        className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Ticket Type
+                      </Button>
+                    )}
+                  </div>
+
                   {ticketTypes.length > 0 ? (
                     <div className="space-y-6">
                       {ticketTypes.map((type) => (
@@ -317,9 +333,20 @@ export default function EventDetailPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center py-12 text-muted-foreground">
-                      No ticket types created yet.
-                    </p>
+                    <div className="text-center py-12">
+                      <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                      <p className="text-muted-foreground text-lg mb-6">
+                        No ticket types created yet.
+                      </p>
+                      {!event.is_closed && (
+                        <Button
+                          onClick={() => setIsCreateTicketModalOpen(true)}
+                          variant="outline"
+                        >
+                          Create Your First Ticket Type
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -378,6 +405,35 @@ export default function EventDetailPage() {
               <div className="flex-1 overflow-y-auto p-6 pb-20 text-center text-muted-foreground">
                 <Calendar className="h-20 w-20 mx-auto mb-6 opacity-50" />
                 <p className="text-2xl">Event Update Form Coming Soon...</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Create Ticket Type Modal */}
+        {isCreateTicketModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={() => setIsCreateTicketModalOpen(false)}
+            />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+              <div className="flex items-center justify-between p-6 border-b">
+                <h2 className="text-2xl font-bold">Add New Ticket Type</h2>
+                <button
+                  onClick={() => setIsCreateTicketModalOpen(false)}
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              <div className="p-8">
+                <CreateTicketType
+                  event={event}
+                  closeModal={() => setIsCreateTicketModalOpen(false)}
+                  refetch={refetch}
+                />
               </div>
             </div>
           </div>

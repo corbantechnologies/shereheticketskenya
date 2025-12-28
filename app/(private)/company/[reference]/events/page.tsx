@@ -6,13 +6,18 @@ import { useFetchCompany } from "@/hooks/company/actions";
 import { DashboardSkeleton } from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Calendar, AlertCircle, X } from "lucide-react";
+import { Plus, Calendar, AlertCircle } from "lucide-react";
 import EventsDisplayTable from "@/components/events/EventsDisplayTable";
+import CreateEvent from "@/forms/events/CreateEvent";
 import { useState } from "react";
 
 export default function CompanyEventsPage() {
   const { reference } = useParams<{ reference: string }>();
-  const { isLoading, data: company } = useFetchCompany(reference);
+  const {
+    isLoading,
+    data: company,
+    refetch: refetchCompany,
+  } = useFetchCompany(reference);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   if (isLoading) return <DashboardSkeleton />;
@@ -26,11 +31,15 @@ export default function CompanyEventsPage() {
   const hasRequiredDetails =
     company.country && company.city && company.address && company.phone;
 
+  const handleEventCreated = () => {
+    refetchCompany();
+  };
+
   return (
     <>
       <div className="min-h-screen bg-background pb-12">
-        {/* Page Header */}
-        <div className="bg-card/50 backdrop-blur-sm sticky top-0 z-30">
+        {/* Header */}
+        <div className="bg-card/50 backdrop-blur-sm sticky top-0 z-30 border-b">
           <div className="px-6 py-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
@@ -54,28 +63,23 @@ export default function CompanyEventsPage() {
           </div>
         </div>
 
-        {/* Full-width Content */}
+        {/* Content */}
         <div className="p-6 space-y-10">
-          {/* Locked State Alert */}
           {!hasRequiredDetails && (
-            <Card className="border-none bg-muted/40 shadow-inner">
+            <Card className="bg-muted/40 shadow-inner">
               <CardContent className="py-16 text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-muted rounded-full mb-6">
-                  <AlertCircle className="h-10 w-10 text-muted-foreground" />
-                </div>
+                <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-2xl font-semibold mb-3">
                   Event Creation Locked
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto text-lg">
-                  Please complete your company profile (country, city, address,
-                  phone) before creating events.
+                  Complete your company profile first to create events.
                 </p>
               </CardContent>
             </Card>
           )}
 
-          {/* Events Table */}
-          <Card className="shadow-xl border-none ring-1 ring-black/5">
+          <Card className="shadow-xl">
             <CardContent className="p-0">
               {events.length > 0 ? (
                 <EventsDisplayTable
@@ -105,45 +109,14 @@ export default function CompanyEventsPage() {
         </div>
       </div>
 
-      {/* Full-Screen Create Event Modal Placeholder */}
+      {/* Full-Screen Create Event Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex flex-col bg-white">
-          <div
-            className="absolute inset-0 bg-black/70"
-            onClick={() => setIsCreateModalOpen(false)}
+          <CreateEvent
+            companyCode={company.company_code}
+            closeModal={() => setIsCreateModalOpen(false)}
+            refetchEvents={handleEventCreated}
           />
-
-          <div className="relative flex flex-col h-full w-full bg-white">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6">
-              <div>
-                <h2 className="text-3xl font-bold">Create New Event</h2>
-                <p className="text-muted-foreground mt-2">
-                  Fill in the details to start planning your sherehe.
-                </p>
-              </div>
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="p-3 rounded-lg hover:bg-muted transition"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            {/* Modal Body - Placeholder until CreateEvent form is ready */}
-            <div className="flex-1 overflow-y-auto p-6 pb-20 flex items-center justify-center">
-              <div className="text-center">
-                <Calendar className="h-20 w-20 text-[var(--mainBlue)] mx-auto mb-6 opacity-50" />
-                <p className="text-2xl text-muted-foreground">
-                  Create Event Form Coming Soon...
-                </p>
-                <p className="text-muted-foreground mt-4 max-w-md">
-                  We&apos;re building a beautiful, full-featured event creation
-                  experience.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </>
