@@ -20,8 +20,8 @@ export default function Footer() {
             <h3 className="text-2xl font-bold text-white">Sherehe Tickets</h3>
             <p className="text-sm leading-relaxed">
               Your premier platform for discovering and booking the most
-              exciting events in Kenya. From concerts to conferences, we&apos;ve got
-              you covered.
+              exciting events in Kenya. From concerts to conferences, we&apos;ve
+              got you covered.
             </p>
             <div className="flex gap-4 pt-2">
               <Link href="#" className="hover:text-white transition-colors">
@@ -57,18 +57,12 @@ export default function Footer() {
                 </Link>
               </li> */}
               <li>
-                <Link
-                  href="/cities"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Cities
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/today"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Happening Today
                 </Link>
               </li>
@@ -96,18 +90,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/pricing"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/resources"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Resources
                 </Link>
               </li>
@@ -141,13 +129,18 @@ export default function Footer() {
           </p>
           <div className="flex gap-6">
             <Link
-              href="/privacy"
+              href="/terms-and-conditions"
               className="hover:text-white transition-colors"
+              target="_blank"
             >
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-white transition-colors">
               Terms of Service
+            </Link>
+            <Link
+              href="https://corbantechnologies.org"
+              className="hover:text-white transition-colors"
+              target="_blank"
+            >
+              Powered by Corban Technologies LTD
             </Link>
           </div>
         </div>
