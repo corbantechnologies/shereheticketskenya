@@ -58,7 +58,7 @@ export default function Footer() {
               </li> */}
               <li>
                 <Link
-                  href="/cities"
+                  href="/"
                   className="hover:text-white transition-colors"
                 >
                   Cities
@@ -66,7 +66,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/today"
+                  href="/"
                   className="hover:text-white transition-colors"
                 >
                   Happening Today
@@ -97,7 +97,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/pricing"
+                  href="/"
                   className="hover:text-white transition-colors"
                 >
                   Pricing
@@ -105,7 +105,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/resources"
+                  href="/"
                   className="hover:text-white transition-colors"
                 >
                   Resources
