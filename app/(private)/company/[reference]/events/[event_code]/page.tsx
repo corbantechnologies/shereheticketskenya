@@ -22,19 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Calendar,
-  MapPin,
-  Ticket,
-  Users,
-  Edit3,
-  XCircle,
-  PartyPopper,
-  AlertCircle,
-  X,
-  Plus,
-  Edit3,
-} from "lucide-react";
+import { AlertCircle, X, Plus, Edit3, Ticket, Calendar, XCircle, MapPin, Users, PartyPopper } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
