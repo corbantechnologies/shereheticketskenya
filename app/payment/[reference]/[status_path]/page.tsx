@@ -182,7 +182,7 @@ export default function BookingPaymentStatusPage() {
                   <strong>Total Paid:</strong>{" "}
                   <span className="text-2xl font-bold text-foreground">
                     {booking.currency || "KES"}{" "}
-                    {parseFloat(booking.amount).toLocaleString()}
+                    {booking.amount}
                   </span>
                 </p>
                 {booking.mpesa_receipt_number && (

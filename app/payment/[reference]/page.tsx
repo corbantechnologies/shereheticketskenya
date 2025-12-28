@@ -236,8 +236,7 @@ function BookingPayment() {
             <div className="flex items-center justify-between text-lg mb-6">
               <span className="font-medium">Total Amount:</span>
               <span className="font-bold text-2xl">
-                {booking.currency || "KES"}{" "}
-                {booking.amount}
+                {booking.currency || "KES"} {booking.amount}
               </span>
             </div>
             <div className="space-y-2 text-sm text-gray-600 mb-6">
@@ -296,7 +295,7 @@ function BookingPayment() {
                     <>
                       <CreditCard className="h-5 w-5" />
                       Pay with M-Pesa {booking.currency || "KES"}{" "}
-                      {parseFloat(booking.amount).toLocaleString()}
+                      {booking.amount}
                     </>
                   )}
                 </button>
