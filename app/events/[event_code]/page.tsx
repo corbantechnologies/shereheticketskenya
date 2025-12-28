@@ -58,7 +58,7 @@ export default function EventDetailPage() {
   };
 
   const defaultImage =
-    "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=800&h=400&fit=crop"; // You can replace with a real fallback
+    "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=800&h=400&fit=crop";
 
   if (isLoadingEvent) {
     return <LoadingSpinner />;
@@ -219,7 +219,7 @@ export default function EventDetailPage() {
                     <>
                       {event.ticket_types.map((ticket: any) => (
                         <div
-                          key={ticket.ticket_type_code}
+                          key={ticket.reference}
                           className="border border-border rounded-xl p-6 hover:border-[var(--mainRed)]/50 transition-colors cursor-pointer"
                           onClick={() => setShowBookingModal(true)}
                         >

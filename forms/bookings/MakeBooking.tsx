@@ -7,20 +7,46 @@ import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { makeBooking } from "@/services/bookings";
 
 interface TicketType {
-  identity: string;
   name: string;
   price: string;
-  quantity_available?: number | null;
+  quantity_available: number;
+  is_limited: boolean;
+  ticket_type_code: string;
+  reference: string;
 }
 
 interface Event {
+  reference: string;
   event_code: string;
   name: string;
-  ticket_types: TicketType[];
-}
+  description: string;
+  image: string;
+  start_date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
+  venue: string;
+  company: string;
+  poster: string;
+  created_at: string;
+  updated_at: string;
+  cancellation_policy: string;
+  capacity: number;
+  is_closed: boolean;
 
+  ticket_types: {
+    name: string;
+    price: string;
+    quantity_available: number;
+    is_limited: boolean;
+    ticket_type_code: string;
+    reference: string;
+    bookings: string[];
+  }[];
+}
 interface MakeBookingProps {
   event: Event;
   closeModal: () => void;
@@ -38,7 +64,7 @@ const validationSchema = Yup.object({
       function (value) {
         const ticketType = this.parent.ticket_type;
         const ticket = this.options.context?.ticket_types?.find(
-          (t: TicketType) => t.identity === ticketType
+          (t: TicketType) => t.reference === ticketType
         );
         return (
           !ticket?.quantity_available || value! <= ticket.quantity_available
@@ -53,7 +79,6 @@ const validationSchema = Yup.object({
 export default function MakeBooking({
   event,
   closeModal,
-  refetchEvent,
 }: MakeBookingProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -64,8 +89,8 @@ export default function MakeBooking({
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
           <div>
@@ -105,13 +130,17 @@ export default function MakeBooking({
               onSubmit={async (values, { setSubmitting }) => {
                 setLoading(true);
                 try {
-                  // TODO: Replace with actual API call when ready
-                  console.log("Booking submitted:", values);
-                  // Simulate success
-                  alert("Booking successful! Redirecting to payment...");
-                  if (refetchEvent) refetchEvent();
+                  const formData = new FormData();
+                  formData.append("ticket_type", values.ticket_type);
+                  formData.append("quantity", values.quantity);
+                  formData.append("name", values.name);
+                  formData.append("email", values.email);
+                  formData.append("phone", values.phone);
+
+                  const response = await makeBooking(formData);
+                  router.push(`/payment/${response?.data?.reference}`);
+                  setLoading(false);
                   closeModal();
-                  // router.push(`/payment/some-reference`);
                 } catch (error) {
                   console.error(error);
                   alert("Booking failed. Please try again.");
@@ -123,7 +152,7 @@ export default function MakeBooking({
             >
               {({ values, setFieldValue, isSubmitting }) => {
                 const selectedTicket = event.ticket_types.find(
-                  (t) => t.identity === values.ticket_type
+                  (t) => t.reference === values.ticket_type
                 );
                 const maxQuantity = selectedTicket?.quantity_available || 20;
 
@@ -142,8 +171,8 @@ export default function MakeBooking({
                         <option value="">Select a ticket type</option>
                         {event.ticket_types.map((ticket) => (
                           <option
-                            key={ticket.identity}
-                            value={ticket.identity}
+                            key={ticket.reference}
+                            value={ticket.ticket_type_code}
                             disabled={
                               ticket.quantity_available !== null &&
                               ticket.quantity_available <= 0

@@ -20,15 +20,17 @@ interface Event {
   updated_at: string;
   cancellation_policy: string;
   capacity: number;
+  is_closed: boolean;
+
   ticket_types: {
     name: string;
     price: string;
     quantity_available: number;
     is_limited: boolean;
     ticket_type_code: string;
+    reference: string;
     bookings: string[];
   }[];
-  is_closed: boolean;
 }
 
 interface createEvent {
@@ -38,7 +40,7 @@ interface createEvent {
   end_date: string;
   venue: string;
   company: string;
-  poster: string;
+  poster: File;
 }
 
 interface updateEvent {
@@ -48,7 +50,7 @@ interface updateEvent {
   end_date: string;
   venue: string;
   company: string;
-  poster: string;
+  poster: File;
   is_closed: boolean;
 }
 
@@ -68,12 +70,12 @@ export const getEvent = async (event_code: string): Promise<Event> => {
 
 // Authenticated
 export const createEvent = async (
-  data: createEvent,
+  formData: createEvent | FormData,
   headers: { headers: { Authorization: string } }
 ): Promise<Event> => {
   const response: AxiosResponse<Event> = await apiActions.post(
     `/api/v1/events/`,
-    data,
+    formData,
     headers
   );
   return response.data;
@@ -81,12 +83,12 @@ export const createEvent = async (
 
 export const updateEvent = async (
   event_code: string,
-  data: updateEvent,
+  formData: updateEvent | FormData,
   headers: { headers: { Authorization: string } }
 ): Promise<Event> => {
   const response: AxiosResponse<Event> = await apiActions.patch(
     `/api/v1/events/${event_code}/`,
-    data,
+    formData,
     headers
   );
   return response.data;
