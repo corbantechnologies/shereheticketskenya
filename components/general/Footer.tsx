@@ -57,18 +57,12 @@ export default function Footer() {
                 </Link>
               </li> */}
               <li>
-                <Link
-                  href="/"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Cities
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Happening Today
                 </Link>
               </li>
@@ -96,18 +90,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/"
-                  className="hover:text-white transition-colors"
-                >
+                <Link href="/" className="hover:text-white transition-colors">
                   Resources
                 </Link>
               </li>
@@ -143,11 +131,16 @@ export default function Footer() {
             <Link
               href="/terms-and-conditions"
               className="hover:text-white transition-colors"
+              target="_blank"
             >
-              Privacy Policy
-            </Link>
-            <Link href="/terms-and-conditions" className="hover:text-white transition-colors">
               Terms of Service
+            </Link>
+            <Link
+              href="https://corbantechnologies.org"
+              className="hover:text-white transition-colors"
+              target="_blank"
+            >
+              Powered by Corban Technologies LTD
             </Link>
           </div>
         </div>
