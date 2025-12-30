@@ -10,6 +10,8 @@ import EventCard from "@/components/events/EventsCard";
 export default function EventsPage() {
   const { isLoading, data: events = [] } = useFetchEvents();
 
+  const openEvents = events.filter((event: any) => !event.is_closed);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -38,11 +40,11 @@ export default function EventsPage() {
         <div className="mb-12 text-center">
           <h2 className="text-4xl font-bold mb-4">Upcoming Events</h2>
           <p className="text-xl text-muted-foreground">
-            {events.length} amazing events waiting for you
+            {openEvents.length} amazing events waiting for you
           </p>
         </div>
 
-        {events.length === 0 ? (
+        {openEvents.length === 0 ? (
           <div className="text-center py-20">
             <Calendar className="h-24 w-24 text-muted-foreground mx-auto mb-6 opacity-50" />
             <h3 className="text-2xl font-semibold mb-3">No Events Yet</h3>
@@ -52,7 +54,7 @@ export default function EventsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {events.map((event: any) => (
+            {openEvents.map((event: any) => (
               <EventCard key={event.event_code} event={event} />
             ))}
           </div>
