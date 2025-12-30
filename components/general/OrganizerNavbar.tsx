@@ -8,8 +8,6 @@ import {
   LogOut,
   Home,
   Calendar,
-  Settings,
-  BarChart3,
   Building2,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -52,7 +50,6 @@ export default function OrganizerNavbar({ company }: OrganizerNavbarProps) {
 
   const isActive = (href: string) => {
     return href === pathname;
-
   };
 
   return (
@@ -100,7 +97,11 @@ export default function OrganizerNavbar({ company }: OrganizerNavbarProps) {
               </a>
             ))}
             <button
-              onClick={() => signOut()}
+              onClick={() =>
+                signOut({
+                  callbackUrl: "/login",
+                })
+              }
               className="flex items-center gap-2 text-gray-600 hover:text-(--mainRed) transition-colors"
             >
               <LogOut className="w-5 h-5" />
