@@ -31,7 +31,7 @@ export default function Navbar() {
             Categories
           </Link> */}
           <Link
-            href="/organizer"
+            href="/organizers"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
             For Organizers
@@ -71,7 +71,7 @@ export default function Navbar() {
               Categories
             </Link>
             <Link
-              href="/organizer"
+              href="/organizers"
               className="text-lg font-medium"
               onClick={() => setMobileOpen(false)}
             >
