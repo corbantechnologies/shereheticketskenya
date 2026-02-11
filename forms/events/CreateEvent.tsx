@@ -8,7 +8,6 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
@@ -35,13 +34,13 @@ const validationSchema = Yup.object({
       "fileSize",
       "File too large (max 5MB)",
       (value) =>
-        !value || (value instanceof File && value.size <= 5 * 1024 * 1024)
+        !value || (value instanceof File && value.size <= 5 * 1024 * 1024),
     )
     .test(
       "fileType",
       "Only image files allowed",
       (value) =>
-        !value || (value instanceof File && value.type.startsWith("image/"))
+        !value || (value instanceof File && value.type.startsWith("image/")),
     ),
 });
 
@@ -94,8 +93,8 @@ export default function CreateEvent({
               console.error("Create event error:", error);
               toast.error(
                 error.response?.data?.detail ||
-                error.response?.data?.non_field_errors?.[0] ||
-                "Failed to create event. Please try again."
+                  error.response?.data?.non_field_errors?.[0] ||
+                  "Failed to create event. Please try again.",
               );
             } finally {
               setSubmitting(false);
@@ -107,15 +106,18 @@ export default function CreateEvent({
               {/* Event Name & Description */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
-                  <Label htmlFor="name" className="text-lg font-medium">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Event Name <span className="text-destructive">*</span>
-                  </Label>
+                  </label>
                   <Field
                     as={Input}
                     id="name"
                     name="name"
                     placeholder="e.g. New Year's Bash 2026"
-                    className="mt-2 text-lg"
+                    className="mt-2 text-sm"
                   />
                   {errors.name && touched.name && (
                     <p className="text-destructive text-sm mt-1">
@@ -125,15 +127,18 @@ export default function CreateEvent({
                 </div>
 
                 <div>
-                  <Label htmlFor="venue" className="text-lg font-medium">
+                  <label
+                    htmlFor="venue"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Venue <span className="text-destructive">*</span>
-                  </Label>
+                  </label>
                   <Field
                     as={Input}
                     id="venue"
                     name="venue"
                     placeholder="e.g. Ngong Racecourse, Nairobi"
-                    className="mt-2 text-lg"
+                    className="mt-2 text-sm"
                   />
                   {errors.venue && touched.venue && (
                     <p className="text-destructive text-sm mt-1">
@@ -144,16 +149,19 @@ export default function CreateEvent({
               </div>
 
               <div>
-                <Label htmlFor="description" className="text-lg font-medium">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Description <span className="text-destructive">*</span>
-                </Label>
+                </label>
                 <Field
                   as={Textarea}
                   id="description"
                   name="description"
                   placeholder="Tell attendees what makes this event special..."
                   rows={6}
-                  className="mt-2 text-base"
+                  className="mt-2 text-sm"
                 />
                 {errors.description && touched.description && (
                   <p className="text-destructive text-sm mt-1">
@@ -165,11 +173,11 @@ export default function CreateEvent({
               {/* Dates & Times */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <Label className="text-lg font-medium flex items-center gap-2">
+                  <label className="block text-sm font-medium text-gray-700">
                     <Calendar className="h-5 w-5" />
                     Start Date & Time{" "}
                     <span className="text-destructive">*</span>
-                  </Label>
+                  </label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     <Field
                       type="date"
@@ -190,10 +198,10 @@ export default function CreateEvent({
                 </div>
 
                 <div>
-                  <Label className="text-lg font-medium flex items-center gap-2">
+                  <label className="block text-sm font-medium text-gray-700">
                     <Calendar className="h-5 w-5" />
                     End Date & Time (Optional)
-                  </Label>
+                  </label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     <Field
                       type="date"
@@ -211,13 +219,13 @@ export default function CreateEvent({
 
               {/* image Upload */}
               <div>
-                <Label
+                <label
                   htmlFor="image"
-                  className="text-lg font-medium flex items-center gap-2"
+                  className="block text-sm font-medium text-gray-700"
                 >
                   <Upload className="h-5 w-5" />
                   Event image <span className="text-destructive">*</span>
-                </Label>
+                </label>
                 <div className="mt-4">
                   <input
                     id="image"
@@ -242,7 +250,7 @@ export default function CreateEvent({
 
                 {imagePreview && (
                   <div className="mt-6">
-                    <p className="text-sm font-medium mb-3">Preview:</p>
+                    <p className="text-sm  mb-3">Preview:</p>
                     <img
                       src={imagePreview}
                       alt="Event image preview"
