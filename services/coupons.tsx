@@ -96,19 +96,24 @@ export const updateCoupon = async (
     return response.data;
 };
 
-// Public
-export const getCoupons = async (): Promise<Coupon[]> => {
+export const getCoupons = async (
+    headers: { headers: { Authorization: string } }
+): Promise<Coupon[]> => {
     const response: AxiosResponse<PaginatedResponse<Coupon>> =
-        await apiActions.get(`/api/v1/coupons/`);
+        await apiActions.get(`/api/v1/coupons/`, headers);
     return response.data.results ?? [];
 };
 
-export const getCoupon = async (reference: string): Promise<Coupon> => {
+export const getCoupon = async (reference: string, headers: { headers: { Authorization: string } }): Promise<Coupon> => {
     const response: AxiosResponse<Coupon> = await apiActions.get(
-        `/api/v1/coupons/${reference}/`
+        `/api/v1/coupons/${reference}/`,
+        headers
     );
     return response.data;
 };
+
+// Public
+
 
 export const validateCoupon = async (
     formData: validateCoupon | FormData,
