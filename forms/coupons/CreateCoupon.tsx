@@ -19,7 +19,7 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
 
     return (
         <div className="w-full">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">Create Coupon</h2>
+            {/* Header removed as it is handled by the Modal component */}
 
             <Formik
                 initialValues={{

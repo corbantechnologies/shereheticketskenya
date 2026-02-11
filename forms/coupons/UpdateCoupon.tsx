@@ -26,7 +26,7 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
 
     return (
         <div className="w-full">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">Update Coupon</h2>
+            {/* Header removed as it is handled by the Modal component */}
 
             <Formik
                 initialValues={{
@@ -54,32 +54,9 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
                         formData.append("is_active", values.is_active.toString());
 
                         // Handle array of ticket types
-                        // For update, we might need to handle this carefully if the backend expects a list of IDs to *replace* existing ones.
-                        // Usually DRF sets references effectively replacing the list for M2M if sent as list.
-                        // If sending as FormData, likely need multiple append calls with same key 'ticket_type'?
-                        // Or 'ticket_type[]'?
-                        // Based on CreateCoupon, I used multiple appends. I'll do the same here.
-
-                        // First, clear existing? No, standard HTTP PUT/PATCH replacing M2M usually works by sending the full new list.
-                        // If the backend serializer handles `ticket_type` field with appropriate ManyRelatedField, sending list of PKs works.
-
-                        // However, FormData with multiple keys of same name is the standard way to send lists.
                         values.ticket_type.forEach((tt: string) => {
                             formData.append("ticket_type", tt);
                         });
-                        // If the list is empty, we might need to send something to clear it? 
-                        // If formik value is empty array, loop won't run.
-                        // If backend allows empty list to clear, we might need to send an empty list explicitly?
-                        // Often with FormData, sending nothing for a field might mean "no change" if partial update (PATCH).
-                        // But if we want to *clear* the selection, failing to send any 'ticket_type' might result in no change.
-                        // Let's assume for now the user will select at least one, or if they unselect all, we might need a specific handling.
-                        // But re-reading CreateCoupon, I did the loop.
-                        // If I want to clear all ticket types, I should probably send an empty list. 
-                        // But FormData doesn't really support "empty list".
-                        // If I send 'ticket_type': '' (empty string), backend might error if it expects UUID.
-
-                        // Let's stick to the loop for now. If no ticket types selected, maybe it means it applies to none (which is weird for a coupon) or all? 
-                        // If the model allows blank=True, then it's fine.
 
                         await updateCoupon(coupon.reference, formData, { headers });
                         toast.success("Coupon updated successfully.");

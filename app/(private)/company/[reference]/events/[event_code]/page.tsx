@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   AlertCircle,
-  X,
   Plus,
   Edit3,
   Ticket,
@@ -44,6 +43,7 @@ import EventBookingsTable from "@/components/events/EventBookingsTable";
 import { useFetchCoupons } from "@/hooks/coupons/actions";
 import CreateCoupon from "@/forms/coupons/CreateCoupon";
 import UpdateCoupon from "@/forms/coupons/UpdateCoupon";
+import Modal from "@/components/ui/modal";
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -511,140 +511,74 @@ export default function EventDetailPage() {
           </Tabs>
         </div>
 
-        {/* Full-Screen Edit Event Modal Placeholder */}
-        {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex flex-col bg-white">
-            <div
-              className="absolute inset-0 bg-black/70"
-              onClick={() => setIsEditModalOpen(false)}
-            />
-
-            <div className="relative flex flex-col h-full w-full bg-white">
-              <EditEvent
-                event={event}
-                closeModal={() => setIsEditModalOpen(false)}
-                refetchEvent={refetch}
-              />
-            </div>
-          </div>
-        )}
+        {/* Full-Screen Edit Event Modal */}
+        <Modal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+        >
+          <EditEvent
+            event={event}
+            closeModal={() => setIsEditModalOpen(false)}
+            refetchEvent={refetch}
+          />
+        </Modal>
 
         {/* Create Ticket Type Modal */}
-        {isCreateTicketModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setIsCreateTicketModalOpen(false)}
-            />
-
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h2 className="text-2xl font-bold">Add New Ticket Type</h2>
-                <button
-                  onClick={() => setIsCreateTicketModalOpen(false)}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="p-8">
-                <CreateTicketType
-                  event={event}
-                  closeModal={() => setIsCreateTicketModalOpen(false)}
-                  refetch={refetch}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <Modal
+          isOpen={isCreateTicketModalOpen}
+          onClose={() => setIsCreateTicketModalOpen(false)}
+          title="Add New Ticket Type"
+        >
+          <CreateTicketType
+            event={event}
+            closeModal={() => setIsCreateTicketModalOpen(false)}
+            refetch={refetch}
+          />
+        </Modal>
 
         {/* Edit Ticket Type Modal */}
-        {isEditTicketModalOpen && selectedTicketType && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setIsEditTicketModalOpen(false)}
+        <Modal
+          isOpen={isEditTicketModalOpen && !!selectedTicketType}
+          onClose={() => setIsEditTicketModalOpen(false)}
+          title="Edit Ticket Type"
+        >
+          {selectedTicketType && (
+            <EditTicketType
+              ticketType={selectedTicketType}
+              closeModal={() => setIsEditTicketModalOpen(false)}
+              refetch={refetch}
             />
-
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h2 className="text-2xl font-bold">Edit Ticket Type</h2>
-                <button
-                  onClick={() => setIsEditTicketModalOpen(false)}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="p-8">
-                <EditTicketType
-                  ticketType={selectedTicketType}
-                  closeModal={() => setIsEditTicketModalOpen(false)}
-                  refetch={refetch}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+          )}
+        </Modal>
 
         {/* Create Coupon Modal */}
-        {isCreateCouponModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setIsCreateCouponModalOpen(false)}
-            />
-
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h2 className="text-2xl font-bold">Add New Coupon</h2>
-                <button
-                  onClick={() => setIsCreateCouponModalOpen(false)}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="p-8">
-                <CreateCoupon
-                  event={event}
-                  closeModal={() => setIsCreateCouponModalOpen(false)}
-                  refetch={refetchCoupons}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <Modal
+          isOpen={isCreateCouponModalOpen}
+          onClose={() => setIsCreateCouponModalOpen(false)}
+          title="Add New Coupon"
+        >
+          <CreateCoupon
+            event={event}
+            closeModal={() => setIsCreateCouponModalOpen(false)}
+            refetch={refetchCoupons}
+          />
+        </Modal>
 
         {/* Edit Coupon Modal */}
-        {isEditCouponModalOpen && selectedCoupon && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setIsEditCouponModalOpen(false)}
+        <Modal
+          isOpen={isEditCouponModalOpen && !!selectedCoupon}
+          onClose={() => setIsEditCouponModalOpen(false)}
+          title="Edit Coupon"
+        >
+          {selectedCoupon && (
+            <UpdateCoupon
+              coupon={selectedCoupon}
+              event={event} // Passing event to allow adding ticket types
+              closeModal={() => setIsEditCouponModalOpen(false)}
+              refetch={refetchCoupons}
             />
-
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h2 className="text-2xl font-bold">Edit Coupon</h2>
-                <button
-                  onClick={() => setIsEditCouponModalOpen(false)}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="p-8">
-                <UpdateCoupon
-                  coupon={selectedCoupon}
-                  event={event} // Passing event to allow adding ticket types
-                  closeModal={() => setIsEditCouponModalOpen(false)}
-                  refetch={refetchCoupons}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+          )}
+        </Modal>
       </div>
     </>
   );

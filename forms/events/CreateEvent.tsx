@@ -108,8 +108,8 @@ export default function CreateEvent({
               console.error("Create event error:", error);
               toast.error(
                 error.response?.data?.detail ||
-                  error.response?.data?.non_field_errors?.[0] ||
-                  "Failed to create event. Please try again."
+                error.response?.data?.non_field_errors?.[0] ||
+                "Failed to create event. Please try again."
               );
             } finally {
               setSubmitting(false);
@@ -133,7 +133,7 @@ export default function CreateEvent({
                   />
                   {errors.name && touched.name && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.name}
+                      {errors.name as string}
                     </p>
                   )}
                 </div>
@@ -151,7 +151,7 @@ export default function CreateEvent({
                   />
                   {errors.venue && touched.venue && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.venue}
+                      {errors.venue as string}
                     </p>
                   )}
                 </div>
@@ -171,7 +171,7 @@ export default function CreateEvent({
                 />
                 {errors.description && touched.description && (
                   <p className="text-destructive text-sm mt-1">
-                    {errors.description}
+                    {errors.description as string}
                   </p>
                 )}
               </div>
@@ -198,7 +198,7 @@ export default function CreateEvent({
                   </div>
                   {errors.start_date && touched.start_date && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.start_date}
+                      {errors.start_date as string}
                     </p>
                   )}
                 </div>
