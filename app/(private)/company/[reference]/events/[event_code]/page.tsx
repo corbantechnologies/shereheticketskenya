@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 // app/(private)/company/[reference]/events/[event_code]/page.tsx
 "use client";
