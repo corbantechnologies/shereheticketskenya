@@ -67,7 +67,7 @@ export default function BookingDetailPage() {
       setLoading(false);
 
       // If page is loaded and payment already completed (e.g. user refreshes)
-      if (booking?.payment_status === "COMPLETED") {
+      if (["COMPLETED", "CONFIRMED"].includes(booking?.payment_status || "")) {
         toast.success("Payment already completed!");
         router.push(`/events/${event_code}/${reference}/tickets`);
       } else if (booking?.payment_status === "FAILED") {
@@ -92,7 +92,7 @@ export default function BookingDetailPage() {
 
         const currentStatus = latestBooking?.payment_status;
 
-        if (currentStatus === "COMPLETED") {
+        if (["COMPLETED", "CONFIRMED"].includes(currentStatus || "")) {
           clearInterval(interval);
           setPaymentMessage("Payment Successful! Redirecting...");
           toast.success("Payment Received!");
@@ -105,8 +105,7 @@ export default function BookingDetailPage() {
         ) {
           clearInterval(interval);
           setPaymentMessage(
-            `Payment ${
-              currentStatus ? currentStatus.toLowerCase() : "failed"
+            `Payment ${currentStatus ? currentStatus.toLowerCase() : "failed"
             }. Please try again.`,
           );
           toast.error(`Payment ${currentStatus || "failed"}`);
@@ -304,14 +303,13 @@ export default function BookingDetailPage() {
 
           {paymentMessage && (
             <div
-              className={`p-3 rounded-md text-sm text-center mb-6 ${
-                paymentMessage.includes("Successful")
+              className={`p-3 rounded-md text-sm text-center mb-6 ${paymentMessage.includes("Successful")
                   ? "bg-green-50 text-green-700"
                   : paymentMessage.includes("failed") ||
-                      paymentMessage.includes("timed out")
+                    paymentMessage.includes("timed out")
                     ? "bg-red-50 text-red-700"
                     : "bg-blue-50 text-blue-700 animate-pulse"
-              }`}
+                }`}
             >
               {paymentMessage}
             </div>
@@ -346,7 +344,7 @@ export default function BookingDetailPage() {
                     toast.error("Failed to initiate payment");
                     setPaymentMessage(
                       error.response?.data?.error ||
-                        "Failed to initiate payment. Please try again.",
+                      "Failed to initiate payment. Please try again.",
                     );
                     setSubmitting(false);
                   }
@@ -362,11 +360,10 @@ export default function BookingDetailPage() {
                           as={Input}
                           id="phone_number"
                           name="phone_number"
-                          className={`pl-9 ${
-                            errors.phone_number && touched.phone_number
+                          className={`pl-9 ${errors.phone_number && touched.phone_number
                               ? "border-red-500"
                               : ""
-                          }`}
+                            }`}
                           placeholder="2547..."
                         />
                       </div>
@@ -407,7 +404,7 @@ export default function BookingDetailPage() {
           )}
 
           {/* Success Message (when completed) */}
-          {booking.payment_status === "COMPLETED" && (
+          {["COMPLETED", "CONFIRMED"].includes(booking.payment_status) && (
             <div className="text-center p-8 bg-green-50 rounded-lg border border-green-200">
               <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
               <h3 className="text-2xl font-bold text-green-800 mb-2">
