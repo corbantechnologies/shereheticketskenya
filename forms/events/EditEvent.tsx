@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Upload, Calendar } from "lucide-react";
+import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
@@ -57,24 +57,10 @@ export default function EditEvent({
 
   return (
     <div className="h-full bg-white flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-8 border-b">
-        <div>
-          <h2 className="text-4xl font-bold">Edit Event: {event.name}</h2>
-          <p className="text-muted-foreground mt-2">
-            Update your sherehe details
-          </p>
-        </div>
-        <button
-          onClick={closeModal}
-          className="p-3 rounded-lg hover:bg-muted transition"
-        >
-          <X className="h-7 w-7" />
-        </button>
-      </div>
+      {/* Removed Header as it's handled by Modal */}
 
       {/* Scrollable Form */}
-      <div className="flex-1 overflow-y-auto p-8 bg-white">
+      <div className="flex-1 p-1">
         <Formik
           initialValues={{
             name: event.name || "",
@@ -116,8 +102,8 @@ export default function EditEvent({
               console.error("Update event error:", error);
               toast.error(
                 error.response?.data?.detail ||
-                  error.response?.data?.non_field_errors?.[0] ||
-                  "Failed to update event. Please try again."
+                error.response?.data?.non_field_errors?.[0] ||
+                "Failed to update event. Please try again."
               );
             } finally {
               setSubmitting(false);
@@ -125,7 +111,8 @@ export default function EditEvent({
           }}
         >
           {({ setFieldValue, errors, touched, isSubmitting }) => (
-            <Form className="space-y-10">
+            <Form className="space-y-6">
+              <h2 className="text-3xl font-bold mb-4">Edit Event: {event.name}</h2>
               {/* Event Name & Description */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>

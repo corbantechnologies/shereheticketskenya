@@ -6,6 +6,7 @@ import { apiActions } from "@/tools/axios";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
 interface EditTicketTypeProps {
   closeModal: () => void;
@@ -23,9 +24,7 @@ function EditTicketType({
 
   return (
     <div className="w-full">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">
-        Edit Ticket Type
-      </h2>
+      {/* Header removed as it is handled by the Modal component */}
 
       <Formik
         initialValues={{
@@ -119,21 +118,21 @@ function EditTicketType({
             </div>
 
             <div className="flex justify-end space-x-2 mt-6">
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                 disabled={loading}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
                 disabled={loading}
               >
                 {loading ? "Updating..." : "Update Ticket Type"}
-              </button>
+              </Button>
             </div>
           </Form>
         )}

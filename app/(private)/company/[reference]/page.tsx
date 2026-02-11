@@ -18,12 +18,12 @@ import {
   Ticket,
   AlertCircle,
   Plus,
-  X,
 } from "lucide-react";
 import EventsDisplayTable from "@/components/events/EventsDisplayTable";
 import UpdateCompany from "@/forms/company/UpdateCompany";
 import CreateEvent from "@/forms/events/CreateEvent";
 import { useState } from "react";
+import Modal from "@/components/ui/modal";
 
 export default function CompanyDetailPage() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function CompanyDetailPage() {
     company.country && company.city && company.address && company.phone;
 
   const totalTicketTypes = events.reduce(
-    (acc, e) => acc + (e.ticket_types?.length || 0),
+    (acc: number, e: any) => acc + (e.ticket_types?.length || 0),
     0
   );
 
@@ -245,53 +245,31 @@ export default function CompanyDetailPage() {
         </div>
 
         {/* Full-Screen Edit Modal */}
-        {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex flex-col bg-white">
-            <div
-              className="absolute inset-0 bg-black/70"
-              onClick={() => setIsEditModalOpen(false)}
-            />
-
-            <div className="relative flex flex-col h-full w-full bg-white">
-              <div className="flex items-center justify-between p-6 border-b">
-                <div>
-                  <h2 className="text-3xl font-bold">Update Company Details</h2>
-                  <p className="text-muted-foreground mt-2">
-                    Complete your company profile to unlock full dashboard
-                    features.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="p-3 rounded-lg hover:bg-muted transition"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-6 pb-20">
-                <UpdateCompany
-                  company={company}
-                  refetch={() => {
-                    refetch();
-                    setIsEditModalOpen(false);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <Modal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          title="Update Company Details"
+        >
+          <UpdateCompany
+            company={company}
+            refetch={() => {
+              refetch();
+            }}
+            closeDialog={() => setIsEditModalOpen(false)}
+          />
+        </Modal>
 
         {/* Create Event Modal */}
-        {isCreateEventModalOpen && (
-          <div className="fixed inset-0 z-50 flex flex-col bg-white">
-            <CreateEvent
-              companyCode={company.company_code}
-              closeModal={() => setIsCreateEventModalOpen(false)}
-              refetchEvents={refetch}
-            />
-          </div>
-        )}
+        <Modal
+          isOpen={isCreateEventModalOpen}
+          onClose={() => setIsCreateEventModalOpen(false)}
+        >
+          <CreateEvent
+            companyCode={company.company_code}
+            closeModal={() => setIsCreateEventModalOpen(false)}
+            refetchEvents={refetch}
+          />
+        </Modal>
       </div>
     </>
   );

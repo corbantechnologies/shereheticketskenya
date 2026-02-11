@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Upload, Calendar } from "lucide-react";
+import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { createEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
@@ -55,21 +55,7 @@ export default function CreateEvent({
 
   return (
     <div className="h-full bg-white flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-8 border-b">
-        <div>
-          <h2 className="text-4xl font-bold">Create New Event</h2>
-          <p className="text-muted-foreground mt-2">
-            Bring your sherehe to life
-          </p>
-        </div>
-        <button
-          onClick={closeModal}
-          className="p-3 rounded-lg hover:bg-muted transition"
-        >
-          <X className="h-7 w-7" />
-        </button>
-      </div>
+      {/* Header Removed */}
 
       {/* Scrollable Form */}
       <div className="flex-1 overflow-y-auto p-8 bg-white">
@@ -108,8 +94,8 @@ export default function CreateEvent({
               console.error("Create event error:", error);
               toast.error(
                 error.response?.data?.detail ||
-                  error.response?.data?.non_field_errors?.[0] ||
-                  "Failed to create event. Please try again."
+                error.response?.data?.non_field_errors?.[0] ||
+                "Failed to create event. Please try again."
               );
             } finally {
               setSubmitting(false);
@@ -133,7 +119,7 @@ export default function CreateEvent({
                   />
                   {errors.name && touched.name && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.name}
+                      {errors.name as string}
                     </p>
                   )}
                 </div>
@@ -151,7 +137,7 @@ export default function CreateEvent({
                   />
                   {errors.venue && touched.venue && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.venue}
+                      {errors.venue as string}
                     </p>
                   )}
                 </div>
@@ -171,7 +157,7 @@ export default function CreateEvent({
                 />
                 {errors.description && touched.description && (
                   <p className="text-destructive text-sm mt-1">
-                    {errors.description}
+                    {errors.description as string}
                   </p>
                 )}
               </div>
@@ -198,7 +184,7 @@ export default function CreateEvent({
                   </div>
                   {errors.start_date && touched.start_date && (
                     <p className="text-destructive text-sm mt-1">
-                      {errors.start_date}
+                      {errors.start_date as string}
                     </p>
                   )}
                 </div>

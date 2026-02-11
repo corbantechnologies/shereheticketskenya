@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   AlertCircle,
-  X,
   Plus,
   Edit3,
   Ticket,
@@ -41,15 +40,23 @@ import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
 import EditEvent from "@/forms/events/EditEvent";
 import EditTicketType from "@/forms/tickettypes/EditTicketType";
 import EventBookingsTable from "@/components/events/EventBookingsTable";
+import { useFetchCoupons } from "@/hooks/coupons/actions";
+import CreateCoupon from "@/forms/coupons/CreateCoupon";
+import UpdateCoupon from "@/forms/coupons/UpdateCoupon";
+import Modal from "@/components/ui/modal";
 
 export default function EventDetailPage() {
   const router = useRouter();
   const { event_code } = useParams<{ event_code: string }>();
   const { isLoading, data: event, refetch } = useFetchEvent(event_code);
+  const { data: coupons, refetch: refetchCoupons } = useFetchCoupons(event_code);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);
   const [isEditTicketModalOpen, setIsEditTicketModalOpen] = useState(false);
+  const [isCreateCouponModalOpen, setIsCreateCouponModalOpen] = useState(false);
+  const [isEditCouponModalOpen, setIsEditCouponModalOpen] = useState(false);
   const [selectedTicketType, setSelectedTicketType] = useState<any>(null);
+  const [selectedCoupon, setSelectedCoupon] = useState<any>(null);
   const authHeaders = useAxiosAuth();
   const [isClosing, setIsClosing] = useState(false);
 
@@ -264,11 +271,12 @@ export default function EventDetailPage() {
 
           {/* Tabs: Overview, Tickets, Bookings, Analytics */}
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-muted/30 p-1 rounded-xl">
+            <TabsList className="grid w-full grid-cols-5 bg-muted/30 p-1 rounded-xl">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="tickets">Ticket Types</TabsTrigger>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="coupons">Coupons</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="mt-8">
@@ -415,84 +423,162 @@ export default function EventDetailPage() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            <TabsContent value="coupons" className="mt-8">
+              <Card className="shadow-lg border-none ring-1 ring-black/5">
+                <CardContent className="pt-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">Coupons</h3>
+                    {!event.is_closed && (
+                      <Button
+                        onClick={() => setIsCreateCouponModalOpen(true)}
+                        className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Coupon
+                      </Button>
+                    )}
+                  </div>
+
+                  {coupons && coupons.length > 0 ? (
+                    <div className="space-y-6">
+                      {coupons.map((coupon) => (
+                        <div
+                          key={coupon.id}
+                          className="flex items-center justify-between p-6 rounded-2xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <div>
+                            <div className="flex items-center gap-3">
+                              <h4 className="text-xl font-semibold">
+                                {coupon.code}
+                              </h4>
+                              <Badge variant={coupon.is_active ? "default" : "secondary"}>
+                                {coupon.is_active ? "Active" : "Inactive"}
+                              </Badge>
+                            </div>
+
+                            <p className="text-muted-foreground mt-1">
+                              {coupon.discount_type === "FIXED"
+                                ? `KSh ${coupon.discount_value} OFF`
+                                : `${coupon.discount_value}% OFF`}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Valid: {format(new Date(coupon.valid_from), "MMM d, yyyy")} - {format(new Date(coupon.valid_to), "MMM d, yyyy")}
+                            </p>
+                          </div>
+                          <div className="text-right flex items-center gap-4">
+                            <div>
+                              <p className="text-sm font-medium">
+                                Usage: {coupon.usage_count} / {coupon.usage_limit || "∞"}
+                              </p>
+                            </div>
+                            {!event.is_closed && (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => {
+                                  setSelectedCoupon(coupon);
+                                  setIsEditCouponModalOpen(true);
+                                }}
+                                className="h-10 w-10 text-muted-foreground hover:text-[var(--mainBlue)]"
+                              >
+                                <Edit3 className="h-5 w-5" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                      <p className="text-muted-foreground text-lg mb-6">
+                        No coupons created yet.
+                      </p>
+                      {!event.is_closed && (
+                        <Button
+                          onClick={() => setIsCreateCouponModalOpen(true)}
+                          variant="outline"
+                        >
+                          Create Your First Coupon
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </div>
 
-        {/* Full-Screen Edit Event Modal Placeholder */}
-        {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex flex-col bg-white">
-            <div
-              className="absolute inset-0 bg-black/70"
-              onClick={() => setIsEditModalOpen(false)}
-            />
-
-            <div className="relative flex flex-col h-full w-full bg-white">
-              <EditEvent
-                event={event}
-                closeModal={() => setIsEditModalOpen(false)}
-                refetchEvent={refetch}
-              />
-            </div>
-          </div>
-        )}
+        {/* Full-Screen Edit Event Modal */}
+        <Modal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+        >
+          <EditEvent
+            event={event}
+            closeModal={() => setIsEditModalOpen(false)}
+            refetchEvent={refetch}
+          />
+        </Modal>
 
         {/* Create Ticket Type Modal */}
-        {isCreateTicketModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setIsCreateTicketModalOpen(false)}
-            />
-
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h2 className="text-2xl font-bold">Add New Ticket Type</h2>
-                <button
-                  onClick={() => setIsCreateTicketModalOpen(false)}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="p-8">
-                <CreateTicketType
-                  event={event}
-                  closeModal={() => setIsCreateTicketModalOpen(false)}
-                  refetch={refetch}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <Modal
+          isOpen={isCreateTicketModalOpen}
+          onClose={() => setIsCreateTicketModalOpen(false)}
+          title="Add New Ticket Type"
+        >
+          <CreateTicketType
+            event={event}
+            closeModal={() => setIsCreateTicketModalOpen(false)}
+            refetch={refetch}
+          />
+        </Modal>
 
         {/* Edit Ticket Type Modal */}
-        {isEditTicketModalOpen && selectedTicketType && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setIsEditTicketModalOpen(false)}
+        <Modal
+          isOpen={isEditTicketModalOpen && !!selectedTicketType}
+          onClose={() => setIsEditTicketModalOpen(false)}
+          title="Edit Ticket Type"
+        >
+          {selectedTicketType && (
+            <EditTicketType
+              ticketType={selectedTicketType}
+              closeModal={() => setIsEditTicketModalOpen(false)}
+              refetch={refetch}
             />
+          )}
+        </Modal>
 
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h2 className="text-2xl font-bold">Edit Ticket Type</h2>
-                <button
-                  onClick={() => setIsEditTicketModalOpen(false)}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <div className="p-8">
-                <EditTicketType
-                  ticketType={selectedTicketType}
-                  closeModal={() => setIsEditTicketModalOpen(false)}
-                  refetch={refetch}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Create Coupon Modal */}
+        <Modal
+          isOpen={isCreateCouponModalOpen}
+          onClose={() => setIsCreateCouponModalOpen(false)}
+          title="Add New Coupon"
+        >
+          <CreateCoupon
+            event={event}
+            closeModal={() => setIsCreateCouponModalOpen(false)}
+            refetch={refetchCoupons}
+          />
+        </Modal>
+
+        {/* Edit Coupon Modal */}
+        <Modal
+          isOpen={isEditCouponModalOpen && !!selectedCoupon}
+          onClose={() => setIsEditCouponModalOpen(false)}
+          title="Edit Coupon"
+        >
+          {selectedCoupon && (
+            <UpdateCoupon
+              coupon={selectedCoupon}
+              event={event} // Passing event to allow adding ticket types
+              closeModal={() => setIsEditCouponModalOpen(false)}
+              refetch={refetchCoupons}
+            />
+          )}
+        </Modal>
       </div>
     </>
   );
