@@ -4,12 +4,12 @@ import { useQuery } from "@tanstack/react-query"
 import useAxiosAuth from "../authentication/useAxiosAuth"
 import { getCoupons, getCoupon } from "@/services/coupons"
 
-export function useFetchCoupons() {
-    const header = useAxiosAuth()
+export function useFetchCoupons(event_code?: string) {
+    const { headers } = useAxiosAuth();
 
     return useQuery({
-        queryKey: ["coupons"],
-        queryFn: () => getCoupons(header),
+        queryKey: ["coupons", event_code],
+        queryFn: () => getCoupons({ headers }, { event: event_code }),
     })
 }
 

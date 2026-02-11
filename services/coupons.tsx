@@ -97,10 +97,16 @@ export const updateCoupon = async (
 };
 
 export const getCoupons = async (
-    headers: { headers: { Authorization: string } }
+    headers: { headers: { Authorization: string } },
+    filters?: { event?: string }
 ): Promise<Coupon[]> => {
+    const params = new URLSearchParams();
+    if (filters?.event) {
+        params.append("event", filters.event);
+    }
+
     const response: AxiosResponse<PaginatedResponse<Coupon>> =
-        await apiActions.get(`/api/v1/coupons/`, headers);
+        await apiActions.get(`/api/v1/coupons/?${params.toString()}`, headers);
     return response.data.results ?? [];
 };
 
