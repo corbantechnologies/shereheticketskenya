@@ -64,16 +64,17 @@ const validationSchema = Yup.object({
       function (value) {
         const ticketType = this.parent.ticket_type;
         const ticket = this.options.context?.ticket_types?.find(
-          (t: TicketType) => t.reference === ticketType
+          (t: TicketType) => t.reference === ticketType,
         );
         return (
           !ticket?.quantity_available || value! <= ticket.quantity_available
         );
-      }
+      },
     ),
   name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email address"),
   phone: Yup.string().required("Phone number is required"),
+  coupon: Yup.string().optional(),
 });
 
 export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
@@ -82,7 +83,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
 
   const hasAvailableTickets = event.ticket_types.some(
     (ticket) =>
-      ticket.quantity_available === null || ticket.quantity_available > 0
+      ticket.quantity_available === null || ticket.quantity_available > 0,
   );
 
   return (
@@ -121,6 +122,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                 name: "",
                 email: "",
                 phone: "",
+                coupon: "",
               }}
               validationSchema={validationSchema}
               context={{ ticket_types: event.ticket_types }}
@@ -133,10 +135,13 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                   formData.append("name", values.name);
                   formData.append("email", values.email);
                   formData.append("phone", values.phone);
+                  if (values.coupon) {
+                    formData.append("coupon", values.coupon);
+                  }
 
                   const response = await apiActions.post(
                     `/api/v1/bookings/create/event/`,
-                    formData
+                    formData,
                   );
                   router.push(`/payment/${response?.data?.reference}`);
                   setLoading(false);
@@ -152,7 +157,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
             >
               {({ values, setFieldValue, isSubmitting }) => {
                 const selectedTicket = event.ticket_types.find(
-                  (t) => t.reference === values.ticket_type
+                  (t) => t.reference === values.ticket_type,
                 );
                 const maxQuantity = selectedTicket?.quantity_available || 20;
 
@@ -204,7 +209,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                             onClick={() =>
                               setFieldValue(
                                 "quantity",
-                                Math.max(1, values.quantity - 1)
+                                Math.max(1, values.quantity - 1),
                               )
                             }
                             className="w-12 h-12 border border-input rounded-lg hover:bg-muted"
@@ -224,7 +229,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                             onClick={() =>
                               setFieldValue(
                                 "quantity",
-                                Math.min(maxQuantity, values.quantity + 1)
+                                Math.min(maxQuantity, values.quantity + 1),
                               )
                             }
                             className="w-12 h-12 border border-input rounded-lg hover:bg-muted"
@@ -240,6 +245,23 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                         />
                       </div>
                     )}
+
+                    {/* Coupon Field */}
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        Coupon Code
+                      </label>
+                      <Field
+                        name="coupon"
+                        className="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-primary"
+                        placeholder="Enter coupon code"
+                      />
+                      <ErrorMessage
+                        name="coupon"
+                        component="p"
+                        className="text-destructive text-sm mt-1"
+                      />
+                    </div>
 
                     {/* Total Cost */}
                     {values.ticket_type &&
