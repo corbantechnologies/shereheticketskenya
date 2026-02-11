@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Modal from "@/components/ui/modal";
 
 export default function CompanyEventsPage() {
   const { reference } = useParams<{ reference: string }>();
@@ -129,7 +130,7 @@ export default function CompanyEventsPage() {
             {/* Toolbar */}
             <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
 
-              {/* Tabs - Pill style or Underline style? Screenshot looked like Tabs. */}
+              {/* Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
                 <TabsList className="bg-transparent p-0 space-x-6">
                   <TabsTrigger
@@ -231,15 +232,16 @@ export default function CompanyEventsPage() {
       </div>
 
       {/* Full-Screen Create Event Modal */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-white">
-          <CreateEvent
-            companyCode={company.company_code}
-            closeModal={() => setIsCreateModalOpen(false)}
-            refetchEvents={handleEventCreated}
-          />
-        </div>
-      )}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      >
+        <CreateEvent
+          companyCode={company.company_code}
+          closeModal={() => setIsCreateModalOpen(false)}
+          refetchEvents={handleEventCreated}
+        />
+      </Modal>
     </>
   );
 }
