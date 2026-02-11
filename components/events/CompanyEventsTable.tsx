@@ -27,8 +27,8 @@ interface Event {
     name: string;
     start_date: string;
     venue: string | null;
-    start_time: string | null;
-    end_time: string | null;
+    start_time?: string | null;
+    end_time?: string | null;
     is_closed: boolean;
 }
 
@@ -47,7 +47,7 @@ export default function CompanyEventsTable({
         router.push(`/company/${companyReference}/events/${eventCode}`);
     };
 
-    const formatTime = (time: string | null) => {
+    const formatTime = (time?: string | null) => {
         if (!time) return "00:00am";
         // Assuming time is in HH:mm:ss format
         const [hours, minutes] = time.split(":");
