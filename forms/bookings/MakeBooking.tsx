@@ -9,6 +9,9 @@ import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { apiActions } from "@/tools/axios";
+import { Coupon, validateCoupon } from "@/services/coupons";
+import { Loader2 } from "lucide-react";
+import { AxiosError } from "axios";
 
 interface TicketType {
   name: string;
@@ -64,25 +67,29 @@ const validationSchema = Yup.object({
       function (value) {
         const ticketType = this.parent.ticket_type;
         const ticket = this.options.context?.ticket_types?.find(
-          (t: TicketType) => t.reference === ticketType
+          (t: TicketType) => t.reference === ticketType,
         );
         return (
           !ticket?.quantity_available || value! <= ticket.quantity_available
         );
-      }
+      },
     ),
   name: Yup.string().required("Name is required"),
   email: Yup.string().email("Invalid email address"),
   phone: Yup.string().required("Phone number is required"),
+  coupon: Yup.string().optional(),
 });
 
 export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
   const [loading, setLoading] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validatedCoupon, setValidatedCoupon] = useState<Coupon | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
   const router = useRouter();
 
   const hasAvailableTickets = event.ticket_types.some(
     (ticket) =>
-      ticket.quantity_available === null || ticket.quantity_available > 0
+      ticket.quantity_available === null || ticket.quantity_available > 0,
   );
 
   return (
@@ -121,6 +128,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                 name: "",
                 email: "",
                 phone: "",
+                coupon: "",
               }}
               validationSchema={validationSchema}
               context={{ ticket_types: event.ticket_types }}
@@ -133,12 +141,15 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                   formData.append("name", values.name);
                   formData.append("email", values.email);
                   formData.append("phone", values.phone);
+                  if (values.coupon) {
+                    formData.append("coupon", values.coupon);
+                  }
 
                   const response = await apiActions.post(
                     `/api/v1/bookings/create/event/`,
-                    formData
+                    formData,
                   );
-                  router.push(`/payment/${response?.data?.reference}`);
+                  router.push(`/events/${event.event_code}/${response?.data?.reference}`);
                   setLoading(false);
                   closeModal();
                 } catch (error) {
@@ -152,9 +163,67 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
             >
               {({ values, setFieldValue, isSubmitting }) => {
                 const selectedTicket = event.ticket_types.find(
-                  (t) => t.reference === values.ticket_type
+                  (t) => t.reference === values.ticket_type,
                 );
                 const maxQuantity = selectedTicket?.quantity_available || 20;
+
+                const handleValidateCoupon = async () => {
+                  if (!values.coupon) {
+                    setCouponError("Please enter a coupon code");
+                    return;
+                  }
+
+                  setIsValidating(true);
+                  setCouponError(null);
+                  setValidatedCoupon(null);
+
+                  try {
+                    const coupon = await validateCoupon({
+                      code: values.coupon,
+                      event_code: event.event_code,
+                      ticket_type_code: values.ticket_type
+                        ? event.ticket_types.find(
+                            (t) => t.reference === values.ticket_type,
+                          )?.ticket_type_code || ""
+                        : "",
+                    });
+
+                    setValidatedCoupon(coupon);
+                    toast.success("Coupon applied successfully!");
+                  } catch (error) {
+                    console.error("Coupon validation error:", error);
+                    const err = error as AxiosError<{ error: string }>;
+                    setCouponError(
+                      err.response?.data?.error ||
+                        "Invalid coupon code. Please try again.",
+                    );
+                    setValidatedCoupon(null);
+                  } finally {
+                    setIsValidating(false);
+                  }
+                };
+
+                // Calculate Totals
+                const subTotal =
+                  selectedTicket && values.quantity > 0
+                    ? parseFloat(selectedTicket.price) * values.quantity
+                    : 0;
+
+                let discountAmount = 0;
+                if (validatedCoupon && subTotal > 0) {
+                  const discountValue = parseFloat(
+                    validatedCoupon.discount_value,
+                  );
+                  if (validatedCoupon.discount_type === "fixed") {
+                    discountAmount = discountValue;
+                  } else if (validatedCoupon.discount_type === "percentage") {
+                    discountAmount = (subTotal * discountValue) / 100;
+                  }
+                }
+
+                // Ensure discount doesn't exceed subtotal
+                discountAmount = Math.min(discountAmount, subTotal);
+                const total = Math.max(0, subTotal - discountAmount);
 
                 return (
                   <Form className="space-y-6">
@@ -204,7 +273,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                             onClick={() =>
                               setFieldValue(
                                 "quantity",
-                                Math.max(1, values.quantity - 1)
+                                Math.max(1, values.quantity - 1),
                               )
                             }
                             className="w-12 h-12 border border-input rounded-lg hover:bg-muted"
@@ -224,7 +293,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                             onClick={() =>
                               setFieldValue(
                                 "quantity",
-                                Math.min(maxQuantity, values.quantity + 1)
+                                Math.min(maxQuantity, values.quantity + 1),
                               )
                             }
                             className="w-12 h-12 border border-input rounded-lg hover:bg-muted"
@@ -241,17 +310,85 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                       </div>
                     )}
 
+                    {/* Coupon Field */}
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        Coupon Code
+                      </label>
+                      <div className="flex gap-2">
+                        <div className="flex-1">
+                          <Field
+                            name="coupon"
+                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring focus:border-primary ${
+                              couponError
+                                ? "border-destructive"
+                                : "border-input"
+                            }`}
+                            placeholder="Enter coupon code"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleValidateCoupon}
+                          disabled={isValidating || !values.coupon}
+                          className="h-[50px] px-6"
+                        >
+                          {isValidating ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Apply"
+                          )}
+                        </Button>
+                      </div>
+                      {couponError && (
+                        <p className="text-destructive text-sm mt-1">
+                          {couponError}
+                        </p>
+                      )}
+                      {validatedCoupon && (
+                        <p className="text-green-600 text-sm mt-1">
+                          Coupon applied: {validatedCoupon.code} (
+                          {validatedCoupon.discount_type === "percentage"
+                            ? `${validatedCoupon.discount_value}% off`
+                            : `KES ${parseFloat(
+                                validatedCoupon.discount_value,
+                              ).toLocaleString()} off`}
+                          )
+                        </p>
+                      )}
+                      <ErrorMessage
+                        name="coupon"
+                        component="p"
+                        className="text-destructive text-sm mt-1"
+                      />
+                    </div>
+
                     {/* Total Cost */}
                     {values.ticket_type &&
                       values.quantity > 0 &&
                       selectedTicket && (
-                        <div className="bg-muted/50 p-4 rounded-lg">
-                          <p className="text-xl font-bold">
-                            Total: KES{" "}
-                            {(
-                              parseFloat(selectedTicket.price) * values.quantity
-                            ).toLocaleString()}
-                          </p>
+                        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              Subtotal:
+                            </span>
+                            <span>KES {subTotal.toLocaleString()}</span>
+                          </div>
+
+                          {discountAmount > 0 && (
+                            <div className="flex justify-between text-sm text-green-600">
+                              <span>Discount:</span>
+                              <span>
+                                - KES {discountAmount.toLocaleString()}
+                              </span>
+                            </div>
+                          )}
+
+                          <div className="flex justify-between text-xl font-bold pt-2 border-t border-border">
+                            <span>Total:</span>
+                            <span>KES {total.toLocaleString()}</span>
+                          </div>
                         </div>
                       )}
 

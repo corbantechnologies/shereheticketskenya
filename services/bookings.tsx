@@ -89,7 +89,15 @@ export const getBookings = async (): Promise<Booking[]> => {
 
 export const getBooking = async (reference: string): Promise<Booking> => {
   const response: AxiosResponse<Booking> = await apiActions.get(
-    `/api/v1/bookings/${reference}/`
+    `/api/v1/bookings/${reference}/`,
   );
+  return response.data;
+};
+
+export const payBookingSTKPush = async (data: {
+  booking_code: string;
+  phone_number: string;
+}) => {
+  const response = await apiActions.post(`/api/v1/mpesa/pay/`, data);
   return response.data;
 };
