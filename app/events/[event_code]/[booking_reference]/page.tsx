@@ -67,10 +67,10 @@ export default function BookingDetailPage() {
       setLoading(false);
 
       // If page is loaded and payment already completed (e.g. user refreshes)
-      if (booking?.status === "COMPLETED") {
+      if (booking?.payment_status === "COMPLETED") {
         toast.success("Payment already completed!");
         router.push(`/events/${event_code}/${reference}/tickets`);
-      } else if (booking?.status === "FAILED") {
+      } else if (booking?.payment_status === "FAILED") {
         toast.error("Payment failed previously.");
         // We stay on page to allow retry
       }
@@ -90,7 +90,7 @@ export default function BookingDetailPage() {
         // Correct way with refetch:
         // refetch() returns a promise that resolves to the query result.
 
-        const currentStatus = latestBooking?.status;
+        const currentStatus = latestBooking?.payment_status;
 
         if (currentStatus === "COMPLETED") {
           clearInterval(interval);
@@ -207,10 +207,10 @@ export default function BookingDetailPage() {
               </h2>
               <span
                 className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(
-                  booking.status,
+                  booking.payment_status,
                 )}`}
               >
-                {booking.status}
+                {booking.payment_status}
               </span>
             </div>
             <p className="text-gray-600 mb-4">Reference: {booking.reference}</p>
@@ -295,10 +295,10 @@ export default function BookingDetailPage() {
             <span>Payment Status:</span>
             <span
               className={`px-2 py-1 rounded font-medium ${getStatusColor(
-                booking.status,
+                booking.payment_status,
               )}`}
             >
-              {booking.status}
+              {booking.payment_status}
             </span>
           </div>
 
@@ -318,7 +318,7 @@ export default function BookingDetailPage() {
           )}
 
           {/* Only show payment form if still PENDING or FAILED */}
-          {(booking.status === "PENDING" || booking.status === "FAILED") &&
+          {(booking.payment_status === "PENDING" || booking.payment_status === "FAILED") &&
             !isPolling && (
               <Formik
                 initialValues={{
@@ -407,7 +407,7 @@ export default function BookingDetailPage() {
           )}
 
           {/* Success Message (when completed) */}
-          {booking.status === "COMPLETED" && (
+          {booking.payment_status === "COMPLETED" && (
             <div className="text-center p-8 bg-green-50 rounded-lg border border-green-200">
               <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
               <h3 className="text-2xl font-bold text-green-800 mb-2">
