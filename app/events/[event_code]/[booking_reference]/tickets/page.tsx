@@ -68,7 +68,7 @@ export default function TicketsPage() {
     );
   }
 
-  if (booking.status !== "COMPLETED") {
+  if (booking.payment_status !== "COMPLETED") {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <div className="text-center">
@@ -169,8 +169,8 @@ export default function TicketsPage() {
                                 <Calendar className="w-4 h-4 text-[#045e32]" />
                                 {event?.start_date
                                   ? new Date(
-                                      event.start_date,
-                                    ).toLocaleDateString()
+                                    event.start_date,
+                                  ).toLocaleDateString()
                                   : "--/--/----"}
                               </p>
                             </div>
@@ -182,11 +182,11 @@ export default function TicketsPage() {
                                 <Clock className="w-4 h-4 text-[#045e32]" />
                                 {event?.start_time
                                   ? new Date(
-                                      `1970-01-01T${event.start_time}`,
-                                    ).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })
+                                    `1970-01-01T${event.start_time}`,
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })
                                   : "--:--"}
                               </p>
                             </div>
@@ -236,7 +236,7 @@ export default function TicketsPage() {
               <Button
                 variant="outline"
                 className="w-full sm:w-auto gap-2"
-                onClick={() => {}}
+                onClick={() => { }}
               >
                 <Share2 className="w-4 h-4" /> Share
               </Button>
