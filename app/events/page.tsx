@@ -23,23 +23,23 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative h-96 flex items-center justify-center text-white overflow-hidden">
+      <div className="relative h-64 md:h-96 flex items-center justify-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--mainBlue)] via-[var(--mainBlue)]/90 to-[var(--mainRed)]" />
         <div className="relative z-10 text-center px-6">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 drop-shadow-2xl">
+          <h1 className="text-4xl md:text-7xl font-bold mb-4 md:mb-6 drop-shadow-2xl">
             Discover Events
           </h1>
-          <p className="text-xl md:text-2xl max-w-4xl mx-auto opacity-95">
+          <p className="text-lg md:text-2xl max-w-4xl mx-auto opacity-95">
             Find and book tickets to the best sherehe in town
           </p>
         </div>
       </div>
 
       {/* Events Grid */}
-      <div className="p-6 md:p-12">
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl font-bold mb-4">Upcoming Events</h2>
-          <p className="text-xl text-muted-foreground">
+      <div className="p-4 md:p-12">
+        <div className="mb-8 md:mb-12 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Upcoming Events</h2>
+          <p className="text-lg md:text-xl text-muted-foreground">
             {openEvents.length} amazing events waiting for you
           </p>
         </div>

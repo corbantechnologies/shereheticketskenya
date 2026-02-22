@@ -24,6 +24,12 @@ export default function Navbar() {
           >
             Events
           </Link>
+          <Link
+            href="/about"
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            About
+          </Link>
           {/* <Link
             href="/categories"
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
@@ -62,6 +68,13 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               Events
+            </Link>
+            <Link
+              href="/about"
+              className="text-lg font-medium"
+              onClick={() => setMobileOpen(false)}
+            >
+              About
             </Link>
             <Link
               href="/categories"

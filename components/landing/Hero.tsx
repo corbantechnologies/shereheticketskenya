@@ -19,10 +19,10 @@ export default function Hero() {
           <span>The #1 Event Platform in Kenya</span>
         </div>
 
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground mb-6 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-          Discover & Book <br />
+        <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground mb-6 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+          Discover & Book <br className="hidden sm:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--mainBlue)] to-[var(--mainRed)]">
-            Unforgettable Events
+             Unforgettable Events
           </span>
         </h1>
 
