@@ -11,14 +11,12 @@ import {
   MapPin,
   Users,
   ArrowLeft,
-  Share2,
 } from "lucide-react";
 import { LoadingSpinner } from "@/components/general/LoadingComponents";
 import { useFetchEvent } from "@/hooks/events/actions";
 import TicketTypeChip from "@/components/events/TicketTypeChip";
 import MakeBooking from "@/forms/bookings/MakeBooking";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
 
 export default function EventDetailPage() {
   const { event_code } = useParams<{ event_code: string }>();
@@ -30,25 +28,6 @@ export default function EventDetailPage() {
     data: event,
     refetch: refetchEvent,
   } = useFetchEvent(event_code);
-
-  const handleShare = async () => {
-    const shareData = {
-      title: event?.name || "Event",
-      text: `Check out this event: ${event?.name}`,
-      url: window.location.href,
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success("Event link copied to clipboard!");
-      }
-    } catch (error) {
-      console.error("Error sharing event:", error);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -105,20 +84,13 @@ export default function EventDetailPage() {
 
       {/* Sticky Top Bar */}
       <div className="bg-white shadow-sm sticky top-0 z-40 border-b border-border">
-        <div className="px-6 py-4 flex items-center justify-between">
+        <div className="px-6 py-4 flex items-center justify-start">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 px-4 py-2 text-foreground hover:bg-muted rounded-md transition"
           >
             <ArrowLeft className="w-5 h-5" />
             Back to Events
-          </button>
-          <button
-            onClick={handleShare}
-            className="flex items-center gap-2 px-4 py-2 border border-border text-foreground hover:bg-muted rounded-md transition"
-          >
-            <Share2 className="w-5 h-5" />
-            Share Event
           </button>
         </div>
       </div>
