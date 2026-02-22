@@ -124,15 +124,26 @@ export default function EventDetailPage() {
       </div>
 
       {/* Hero Banner */}
-      <div className="relative h-96 overflow-hidden">
-        <img
-          src={event.image || defaultImage}
-          alt={event.name}
-          className="w-full h-full object-cover"
+      <div className="relative h-[60vh] md:h-96 w-full overflow-hidden bg-black/90">
+        {/* Blurred Background Layer for filling space */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center blur-2xl opacity-40 scale-110"
+          style={{ backgroundImage: `url(${event.image || defaultImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className=" mx-auto">
+        
+        {/* Main Image Layer (Full Visibility) */}
+        <div className="relative h-full w-full flex items-center justify-center z-10 p-4">
+          <img
+            src={event.image || defaultImage}
+            alt={event.name}
+            className="max-h-full max-w-full object-contain drop-shadow-2xl"
+          />
+        </div>
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-20" />
+        
+        <div className="absolute bottom-0 left-0 right-0 p-8 z-30">
+          <div className="mx-auto max-w-7xl">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
               {event.name}
             </h1>

@@ -20,19 +20,19 @@ function EventCard({ event }: { event: any }) {
   return (
     <Link href={`/events/${event.event_code}`}>
       <div className="group bg-card rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer border border-border">
-        <div className="relative h-64 overflow-hidden">
+        <div className="relative aspect-square overflow-hidden bg-muted">
           {event.image ? (
             <img
               src={event.image}
               alt={event.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[var(--mainBlue)] to-[var(--mainRed)] opacity-80" />
           )}
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-black/5" />
           <div className="absolute top-4 right-4">
-            <Badge className="bg-white/90 text-foreground backdrop-blur-sm px-4 py-1.5 text-sm font-medium">
+            <Badge className="bg-white/90 text-foreground shadow-sm backdrop-blur-sm px-4 py-1.5 text-sm font-medium">
               {priceText}
             </Badge>
           </div>
