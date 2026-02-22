@@ -42,11 +42,11 @@ export default function Features() {
   return (
     <section className="py-24 bg-muted/30">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16 max-w-2xl mx-auto">
+        <div className="text-center mb-12 md:mb-16 max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold mb-4">
             Why Choose Sherehe?
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base md:text-lg">
             We make it easier than ever to discover, book, and enjoy the best
             events happening around you.
           </p>

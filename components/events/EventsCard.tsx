@@ -18,9 +18,9 @@ function EventCard({ event }: { event: any }) {
     : "Free";
 
   return (
-    <Link href={`/events/${event.event_code}`}>
-      <div className="group bg-card rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer border border-border">
-        <div className="relative aspect-square overflow-hidden bg-muted">
+    <Link href={`/events/${event.event_code}`} className="flex h-full">
+      <div className="group bg-card rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer border border-border flex flex-col w-full">
+        <div className="relative aspect-square overflow-hidden bg-muted flex-shrink-0">
           {event.image ? (
             <img
               src={event.image}
@@ -38,8 +38,8 @@ function EventCard({ event }: { event: any }) {
           </div>
         </div>
 
-        <div className="p-8">
-          <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-[var(--mainBlue)] transition-colors">
+        <div className="p-8 flex flex-col flex-grow">
+          <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-[var(--mainBlue)] transition-colors line-clamp-1">
             {event.name}
           </h3>
 
@@ -47,7 +47,7 @@ function EventCard({ event }: { event: any }) {
             {event.description || "No description available."}
           </p>
 
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-sm mb-8">
             <div className="flex items-center gap-3 text-foreground/80">
               <Calendar className="h-5 w-5 text-[var(--mainBlue)]" />
               <span>
@@ -56,7 +56,7 @@ function EventCard({ event }: { event: any }) {
             </div>
             <div className="flex items-center gap-3 text-foreground/80">
               <MapPin className="h-5 w-5 text-[var(--mainBlue)]" />
-              <span>{event.venue || "Venue TBA"}</span>
+              <span className="line-clamp-1">{event.venue || "Venue TBA"}</span>
             </div>
             <div className="flex items-center gap-3 text-foreground/80">
               <Ticket className="h-5 w-5 text-[var(--mainRed)]" />
@@ -64,7 +64,7 @@ function EventCard({ event }: { event: any }) {
             </div>
           </div>
 
-          <Button className="w-full mt-8 bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 shadow-md">
+          <Button className="w-full mt-auto bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 shadow-md">
             View Details & Book
           </Button>
         </div>

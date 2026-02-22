@@ -10,10 +10,10 @@ export default function CTA() {
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay opacity-20" />
 
       <div className="container relative z-10 mx-auto px-6 text-center">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
           Ready to Experience the Magic?
         </h2>
-        <p className="text-white/80 text-xl max-w-2xl mx-auto mb-10">
+        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-10">
           Join thousands of event-goers and organizers on Kenya&apos;s
           fastest-growing platform.
         </p>
