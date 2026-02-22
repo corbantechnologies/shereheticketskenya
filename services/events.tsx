@@ -49,6 +49,7 @@ interface createEvent {
   venue: string;
   company: string; // Pick company code
   image: File;
+  cancellation_policy: string;
 }
 
 interface updateEvent {
@@ -62,6 +63,7 @@ interface updateEvent {
   company: string; // Pick company code
   image: File;
   is_closed: boolean;
+  cancellation_policy: string;
 }
 
 export const getEvents = async (): Promise<Event[]> => {

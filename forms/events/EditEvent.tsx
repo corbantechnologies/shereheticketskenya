@@ -29,6 +29,7 @@ const validationSchema = Yup.object({
   end_date: Yup.date().nullable(),
   end_time: Yup.string().nullable(),
   venue: Yup.string().required("Venue is required"),
+  cancellation_policy: Yup.string().required("Cancellation policy is required"),
   image: Yup.mixed<File>()
     .nullable()
     .test(
@@ -70,6 +71,7 @@ export default function EditEvent({
             end_date: event.end_date || "",
             end_time: event.end_time || "",
             venue: event.venue || "",
+            cancellation_policy: event.cancellation_policy || "",
             image: null as File | null,
             is_closed: event.is_closed || false,
           }}
@@ -85,6 +87,7 @@ export default function EditEvent({
               if (values.end_date) formData.append("end_date", values.end_date);
               if (values.end_time) formData.append("end_time", values.end_time);
               formData.append("venue", values.venue);
+              formData.append("cancellation_policy", values.cancellation_policy);
               formData.append("is_closed", values.is_closed.toString());
 
               if (values.image) {
@@ -167,6 +170,25 @@ export default function EditEvent({
                 {errors.description && touched.description && (
                   <p className="text-destructive text-sm mt-1">
                     {errors.description as string}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="cancellation_policy" className="text-lg font-medium">
+                  Cancellation Policy <span className="text-destructive">*</span>
+                </Label>
+                <Field
+                  as={Textarea}
+                  id="cancellation_policy"
+                  name="cancellation_policy"
+                  placeholder="Describe your policy for ticket cancellations and refunds..."
+                  rows={4}
+                  className="mt-2 text-base"
+                />
+                {errors.cancellation_policy && touched.cancellation_policy && (
+                  <p className="text-destructive text-sm mt-1">
+                    {errors.cancellation_policy as string}
                   </p>
                 )}
               </div>
