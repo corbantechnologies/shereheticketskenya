@@ -22,6 +22,12 @@ function EditTicketType({
   const axios = useAxiosAuth();
   const [loading, setLoading] = useState(false);
 
+  // Helper to format date for datetime-local input (YYYY-MM-DDTHH:mm)
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "";
+    return new Date(dateString).toISOString().slice(0, 16);
+  };
+
   return (
     <div className="w-full">
       {/* Header removed as it is handled by the Modal component */}
@@ -32,6 +38,9 @@ function EditTicketType({
           price: ticketType?.price || "",
           quantity_available: ticketType?.quantity_available || "",
           is_limited: ticketType?.is_limited || false,
+          sales_start: formatDate(ticketType?.sales_start),
+          sales_end: formatDate(ticketType?.sales_end),
+          is_active: ticketType?.is_active ?? true,
         }}
         onSubmit={async (values) => {
           setLoading(true);
@@ -49,6 +58,19 @@ function EditTicketType({
                 : ""
             );
             formData.append("is_limited", values.is_limited.toString());
+
+            if (values.sales_start) {
+              formData.append("sales_start", new Date(values.sales_start).toISOString());
+            } else {
+              formData.append("sales_start", "");
+            }
+
+            if (values.sales_end) {
+              formData.append("sales_end", new Date(values.sales_end).toISOString());
+            } else {
+              formData.append("sales_end", "");
+            }
+            formData.append("is_active", values.is_active.toString());
 
             await apiActions?.patch(
               `/api/v1/tickettypes/${ticketType.ticket_type_code}/`,
@@ -114,6 +136,40 @@ function EditTicketType({
               />
               <label className="ml-2 block text-sm text-gray-900">
                 Is Limited
+              </label>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Sales Start (Optional)
+                </label>
+                <Field
+                  type="datetime-local"
+                  name="sales_start"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Sales End (Optional)
+                </label>
+                <Field
+                  type="datetime-local"
+                  name="sales_end"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <Field
+                type="checkbox"
+                name="is_active"
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+              <label className="ml-2 block text-sm text-gray-900">
+                Is Active
               </label>
             </div>
 

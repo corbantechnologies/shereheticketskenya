@@ -2,6 +2,7 @@
 
 import { apiActions } from "@/tools/axios";
 import { AxiosResponse } from "axios";
+import { TicketType } from "./tickettypes";
 
 interface PaginatedResponse<T> {
   count: number;
@@ -26,17 +27,9 @@ interface Event {
   updated_at: string;
   cancellation_policy: string;
   capacity: number;
+  is_published: boolean;
   is_closed: boolean;
-
-  ticket_types: {
-    name: string;
-    price: string;
-    quantity_available: number;
-    is_limited: boolean;
-    ticket_type_code: string;
-    reference: string;
-    bookings: string[];
-  }[];
+  ticket_types: TicketType[];
 }
 
 interface createEvent {
@@ -49,6 +42,7 @@ interface createEvent {
   venue: string;
   company: string; // Pick company code
   image: File;
+  is_published: boolean;
   cancellation_policy: string;
 }
 
@@ -62,6 +56,7 @@ interface updateEvent {
   venue: string;
   company: string; // Pick company code
   image: File;
+  is_published: boolean;
   is_closed: boolean;
   cancellation_policy: string;
 }
