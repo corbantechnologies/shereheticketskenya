@@ -98,11 +98,11 @@ export default function EventDetailPage() {
       {/* Hero Banner */}
       <div className="relative h-[60vh] md:h-96 w-full overflow-hidden bg-black/90">
         {/* Blurred Background Layer for filling space */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center blur-2xl opacity-40 scale-110"
           style={{ backgroundImage: `url(${event.image || defaultImage})` }}
         />
-        
+
         {/* Main Image Layer (Full Visibility) */}
         <div className="relative h-full w-full flex items-center justify-center z-10 p-4">
           <img
@@ -113,7 +113,7 @@ export default function EventDetailPage() {
         </div>
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-20" />
-        
+
         <div className="absolute bottom-0 left-0 right-0 p-8 z-30">
           <div className="mx-auto max-w-7xl">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
@@ -223,50 +223,93 @@ export default function EventDetailPage() {
                 <div className="space-y-5">
                   {event.ticket_types && event.ticket_types.length > 0 ? (
                     <>
-                      {event.ticket_types.map((ticket: any) => (
-                        <div
-                          key={ticket.reference}
-                          className="border border-border rounded-xl p-6 hover:border-[var(--mainRed)]/50 transition-colors cursor-pointer"
-                          onClick={() => setShowBookingModal(true)}
-                        >
-                          <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <h4 className="text-xl font-bold">
-                                {ticket.name}
-                              </h4>
-                              <p className="text-3xl font-bold text-[var(--mainRed)] mt-2">
-                                KES {parseFloat(ticket.price).toLocaleString()}
-                              </p>
+                      {event.ticket_types.map((ticket: any) => {
+                        const isEligible = ticket.status === "ON_SALE" || !ticket.status;
+
+                        const getStatusColor = (status: string) => {
+                          switch (status) {
+                            case "ON_SALE": return "bg-green-100 text-green-800 border-green-200";
+                            case "SOLD_OUT": return "bg-red-100 text-red-800 border-red-200";
+                            case "UPCOMING": return "bg-blue-100 text-blue-800 border-blue-200";
+                            case "PAUSED": return "bg-yellow-100 text-yellow-800 border-yellow-200";
+                            case "ENDED": return "bg-gray-100 text-gray-800 border-gray-200";
+                            default: return "bg-muted text-muted-foreground border-border";
+                          }
+                        };
+
+                        const formatStatusName = (status: string) => {
+                          if (!status) return "AVAILABLE";
+                          return status.replace("_", " ");
+                        };
+
+                        return (
+                          <div
+                            key={ticket.reference}
+                            className={`border border-border rounded-xl p-6 transition-colors ${isEligible
+                              ? "hover:border-[var(--mainRed)]/50 cursor-pointer"
+                              : "opacity-60 cursor-not-allowed bg-muted/30"
+                              }`}
+                            onClick={() => {
+                              if (isEligible) setShowBookingModal(true);
+                            }}
+                          >
+                            <div className="flex justify-between items-start mb-3">
+                              <div>
+                                <h4 className="text-xl font-bold flex items-center gap-3">
+                                  {ticket.name}
+                                  {ticket.status && ticket.status !== "ON_SALE" && (
+                                    <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${getStatusColor(ticket.status)}`}>
+                                      {formatStatusName(ticket.status)}
+                                    </span>
+                                  )}
+                                </h4>
+                                <p className="text-3xl font-bold text-[var(--mainRed)] mt-2">
+                                  KES {parseFloat(ticket.price).toLocaleString()}
+                                </p>
+                              </div>
+                              <TicketTypeChip
+                                ticketType={ticket}
+                                isLowestPrice={
+                                  parseFloat(ticket.price) === getLowestPrice()
+                                }
+                              />
                             </div>
-                            <TicketTypeChip
-                              ticketType={ticket}
-                              isLowestPrice={
-                                parseFloat(ticket.price) === getLowestPrice()
-                              }
-                            />
+                            <div className="flex justify-between items-center mt-3">
+                              {ticket.quantity_available !== null ? (
+                                ticket.quantity_available <= 10 ? (
+                                  <p className="text-orange-600 font-semibold">
+                                    Only {ticket.quantity_available} tickets left!
+                                  </p>
+                                ) : (
+                                  <p className="text-muted-foreground">
+                                    {ticket.quantity_available} tickets available
+                                  </p>
+                                )
+                              ) : (
+                                <p className="text-muted-foreground">
+                                  Unlimited tickets
+                                </p>
+                              )}
+
+                              {/* Show status label explicitly if not active */}
+                              {!isEligible && (
+                                <p className="text-sm font-medium text-red-600/80">
+                                  Currently unavailable for booking
+                                </p>
+                              )}
+                            </div>
                           </div>
-                          {ticket.quantity_available !== null ? (
-                            ticket.quantity_available <= 10 ? (
-                              <p className="text-orange-600 font-semibold mt-3">
-                                Only {ticket.quantity_available} tickets left!
-                              </p>
-                            ) : (
-                              <p className="text-muted-foreground mt-3">
-                                {ticket.quantity_available} tickets available
-                              </p>
-                            )
-                          ) : (
-                            <p className="text-muted-foreground mt-3">
-                              Unlimited tickets
-                            </p>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
+
                       <Button
                         onClick={() => setShowBookingModal(true)}
-                        className="w-full bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 text-white text-lg py-6 shadow-lg"
+                        disabled={!event.ticket_types.some((t: any) => t.status === "ON_SALE" || !t.status)}
+                        className="w-full bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 text-white text-lg py-6 shadow-lg disabled:opacity-50"
                       >
-                        Get Tickets
+                        {event.ticket_types.some((t: any) => t.status === "ON_SALE" || !t.status)
+                          ? "Get Tickets"
+                          : "No Tickets Available"}
                       </Button>
                       <p className="text-center text-sm text-muted-foreground mt-4">
                         Secure payment processing
