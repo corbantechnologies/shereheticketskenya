@@ -162,8 +162,9 @@ export default function TicketsPage() {
                             {/* QR Code Placeholder - In real app display actual QR Image */}
                             {ticket.qr_code ? (
                               <img
-                                src={ticket.qr_code}
+                                src={ticket.qr_code.replace("http://", "https://")}
                                 alt="Ticket QR"
+                                crossOrigin="anonymous"
                                 className="w-32 h-32 object-contain"
                               />
                             ) : (
