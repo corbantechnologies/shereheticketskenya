@@ -124,25 +124,25 @@ export default function EventDetailPage() {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-20" />
 
-        <div className="absolute bottom-0 left-0 right-0 p-8 z-30">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 z-30">
           <div className="mx-auto max-w-7xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
               {event.name}
             </h1>
-            <div className="flex flex-wrap gap-6 text-white/90 text-lg">
+            <div className="flex flex-wrap gap-4 sm:gap-6 text-white/90 text-base sm:text-lg">
               <div className="flex items-center gap-2">
-                <Calendar className="w-6 h-6" />
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
                 <span>{formatDate(event.start_date)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-6 h-6" />
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
                 <span>
                   {formatTime(event.start_time)}
                   {event.end_time && ` - ${formatTime(event.end_time)}`}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-6 h-6" />
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
                 <span>{event.venue || "Venue TBA"}</span>
               </div>
             </div>
@@ -151,22 +151,22 @@ export default function EventDetailPage() {
       </div>
 
       {/* Main Content */}
-      <div className=" mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className=" mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
           {/* Left Column - Event Info */}
-          <div className="lg:col-span-2 space-y-10">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-10">
             {/* About */}
-            <div className="bg-card rounded-xl shadow-md p-8">
-              <h2 className="text-2xl font-bold mb-4">About This Event</h2>
-              <p className="text-foreground/80 text-lg leading-relaxed">
+            <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4">About This Event</h2>
+              <p className="text-foreground/80 text-base sm:text-lg leading-relaxed">
                 {event.description || "No description provided yet."}
               </p>
             </div>
 
             {/* Event Details */}
-            <div className="bg-card rounded-xl shadow-md p-8">
-              <h2 className="text-2xl font-bold mb-6">Event Details</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6">Event Details</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                 <div className="flex items-start gap-4">
                   <Calendar className="w-6 h-6 text-[var(--mainBlue)] mt-1" />
                   <div>
@@ -210,9 +210,9 @@ export default function EventDetailPage() {
             </div>
 
             {/* Cancellation Policy */}
-            <div className="bg-card rounded-xl shadow-md p-8">
-              <h2 className="text-2xl font-bold mb-4">Cancellation Policy</h2>
-              <p className="text-foreground/80 text-lg leading-relaxed">
+            <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4">Cancellation Policy</h2>
+              <p className="text-foreground/80 text-base sm:text-lg leading-relaxed">
                 {event.cancellation_policy ||
                   "No cancellation policy specified for this event."}
               </p>
@@ -222,15 +222,15 @@ export default function EventDetailPage() {
           {/* Right Column - Ticket Selection */}
           <div className="lg:col-span-1">
             {event.is_closed ? (
-              <div className="sticky top-24 bg-card rounded-xl shadow-md p-8 text-center">
-                <p className="text-xl text-muted-foreground">
+              <div className="lg:sticky top-24 bg-card rounded-xl shadow-md p-5 sm:p-8 text-center">
+                <p className="text-lg sm:text-xl text-muted-foreground">
                   This event is closed. No tickets are available.
                 </p>
               </div>
             ) : (
-              <div className="sticky top-24 bg-card rounded-xl shadow-md p-8">
-                <h2 className="text-2xl font-bold mb-6">Select Tickets</h2>
-                <div className="space-y-5">
+              <div className="lg:sticky top-24 bg-card rounded-xl shadow-md p-5 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-6">Select Tickets</h2>
+                <div className="space-y-4 sm:space-y-5">
                   {event.ticket_types && event.ticket_types.length > 0 ? (
                     <>
                       {event.ticket_types.map((ticket: any) => {
@@ -257,7 +257,7 @@ export default function EventDetailPage() {
                         return (
                           <div
                             key={ticket.reference}
-                            className={`border border-border rounded-xl p-6 transition-colors ${isEligible
+                            className={`border border-border rounded-xl p-4 sm:p-6 transition-colors ${isEligible
                               ? "hover:border-[var(--mainRed)]/50 cursor-pointer"
                               : "opacity-60 cursor-not-allowed bg-muted/30"
                               }`}
@@ -265,9 +265,9 @@ export default function EventDetailPage() {
                               if (isEligible) setShowBookingModal(true);
                             }}
                           >
-                            <div className="flex justify-between items-start mb-3">
+                            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-3 sm:mb-4">
                               <div>
-                                <h4 className={`text-xl font-bold flex items-center gap-3 ${isStruckThrough ? "line-through text-muted-foreground" : ""}`}>
+                                <h4 className={`text-lg sm:text-xl font-bold flex flex-wrap items-center gap-2 sm:gap-3 ${isStruckThrough ? "line-through text-muted-foreground" : ""}`}>
                                   {ticket.name}
                                   {ticket.status && ticket.status !== "ON_SALE" && (
                                     <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${getStatusColor(ticket.status)} decoration-0 no-underline`}>
@@ -275,7 +275,7 @@ export default function EventDetailPage() {
                                     </span>
                                   )}
                                 </h4>
-                                <p className={`text-3xl font-bold mt-2 ${isStruckThrough ? "line-through text-muted-foreground" : "text-[var(--mainRed)]"}`}>
+                                <p className={`text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 ${isStruckThrough ? "line-through text-muted-foreground" : "text-[var(--mainRed)]"}`}>
                                   KES {parseFloat(ticket.price).toLocaleString()}
                                 </p>
                               </div>
@@ -286,7 +286,7 @@ export default function EventDetailPage() {
                                 }
                               />
                             </div>
-                            <div className="flex justify-between items-center mt-3">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 gap-2">
                               {ticket.quantity_available !== null ? (
                                 ticket.quantity_available <= 10 ? (
                                   <p className="text-orange-600 font-semibold">
@@ -321,7 +321,7 @@ export default function EventDetailPage() {
                       <Button
                         onClick={() => setShowBookingModal(true)}
                         disabled={!event.ticket_types.some((t: any) => t.status === "ON_SALE" || !t.status)}
-                        className="w-full bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 text-white text-lg py-6 shadow-lg disabled:opacity-50"
+                        className="w-full bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 text-white text-base sm:text-lg py-5 sm:py-6 shadow-lg disabled:opacity-50"
                       >
                         {event.ticket_types.some((t: any) => t.status === "ON_SALE" || !t.status)
                           ? "Get Tickets"
