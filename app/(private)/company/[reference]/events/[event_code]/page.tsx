@@ -546,6 +546,7 @@ export default function EventDetailPage() {
           {selectedTicketType && (
             <EditTicketType
               ticketType={selectedTicketType}
+              event={event}
               closeModal={() => setIsEditTicketModalOpen(false)}
               refetch={refetch}
             />
