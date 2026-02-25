@@ -97,77 +97,79 @@ export default function EventBookingsTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-muted/30">
-            <TableRow>
-              <TableHead className="font-bold">Booking Code</TableHead>
-              <TableHead className="font-bold">Attendee</TableHead>
-              <TableHead className="font-bold">Ticket Type</TableHead>
-              <TableHead className="font-bold text-center">Qty</TableHead>
-              <TableHead className="font-bold">Amount</TableHead>
-              <TableHead className="font-bold">Status</TableHead>
-              <TableHead className="font-bold">Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedBookings.length > 0 ? (
-              paginatedBookings.map((booking) => (
-                <TableRow
-                  key={booking.reference}
-                  className="hover:bg-muted/10 transition-colors"
-                >
-                  <TableCell className="font-mono text-xs text-muted-foreground">
-                    {booking.booking_code}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-base">
-                        {booking.name}
-                      </span>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Mail className="h-3 w-3" /> {booking.email}
+      <div className="rounded-xl border shadow-sm overflow-w-full">
+        <div className="overflow-x-auto whitespace-nowrap">
+          <Table>
+            <TableHeader className="bg-muted/30">
+              <TableRow>
+                <TableHead className="font-bold">Booking Code</TableHead>
+                <TableHead className="font-bold">Attendee</TableHead>
+                <TableHead className="font-bold">Ticket Type</TableHead>
+                <TableHead className="font-bold text-center">Qty</TableHead>
+                <TableHead className="font-bold">Amount</TableHead>
+                <TableHead className="font-bold">Status</TableHead>
+                <TableHead className="font-bold">Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedBookings.length > 0 ? (
+                paginatedBookings.map((booking) => (
+                  <TableRow
+                    key={booking.reference}
+                    className="hover:bg-muted/10 transition-colors"
+                  >
+                    <TableCell className="font-mono text-xs text-muted-foreground">
+                      {booking.booking_code}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-base">
+                          {booking.name}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Phone className="h-3 w-3" /> {booking.phone}
-                        </span>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Mail className="h-3 w-3" /> {booking.email}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Phone className="h-3 w-3" /> {booking.phone}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-normal">
-                      {booking.ticket_type_info?.name || "Standard"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center font-semibold">
-                    {booking.quantity}
-                  </TableCell>
-                  <TableCell className="font-bold">
-                    {booking.currency} {booking.amount}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusBadgeVariant(booking.status)}>
-                      {booking.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {format(new Date(booking.created_at), "MMM d, yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="font-normal">
+                        {booking.ticket_type_info?.name || "Standard"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center font-semibold">
+                      {booking.quantity}
+                    </TableCell>
+                    <TableCell className="font-bold">
+                      {booking.currency} {booking.amount}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadgeVariant(booking.status)}>
+                        {booking.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {format(new Date(booking.created_at), "MMM d, yyyy")}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="h-32 text-center text-muted-foreground"
+                  >
+                    No bookings found matching your criteria.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="h-32 text-center text-muted-foreground"
-                >
-                  No bookings found matching your criteria.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Pagination */}
