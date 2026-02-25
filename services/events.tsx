@@ -54,6 +54,7 @@ interface updateEvent {
   end_date: string; // Optional
   end_time: string; // Optional
   venue: string;
+  capacity: number; // Optional
   company: string; // Pick company code
   image: File;
   is_published: boolean;

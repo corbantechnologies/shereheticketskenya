@@ -71,6 +71,7 @@ const validationSchema = Yup.object({
       }
     ),
   venue: Yup.string().required("Venue is required"),
+  capacity: Yup.number().nullable().min(1, "Capacity must be at least 1"),
   cancellation_policy: Yup.string().required("Cancellation policy is required"),
   image: Yup.mixed<File>()
     .nullable()
@@ -113,6 +114,7 @@ export default function EditEvent({
             end_date: event.end_date || "",
             end_time: event.end_time || "",
             venue: event.venue || "",
+            capacity: event.capacity || "",
             cancellation_policy: event.cancellation_policy || "",
             image: null as File | null,
             is_closed: event.is_closed || false,
@@ -129,6 +131,9 @@ export default function EditEvent({
               if (values.end_date) formData.append("end_date", values.end_date);
               if (values.end_time) formData.append("end_time", values.end_time);
               formData.append("venue", values.venue);
+              if (values.capacity) {
+                formData.append("capacity", values.capacity.toString());
+              }
               formData.append("cancellation_policy", values.cancellation_policy);
               formData.append("is_closed", values.is_closed.toString());
 
@@ -168,7 +173,7 @@ export default function EditEvent({
               <div className="bg-gray-50/30 p-4 rounded-xl border border-gray-200 space-y-6">
                 <h3 className="text-base font-semibold text-gray-900 border-b pb-2">Basic Details</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div>
+                  <div className="lg:col-span-2">
                     <Label htmlFor="name" className="text-sm font-medium text-gray-700">
                       Event Name <span className="text-destructive">*</span>
                     </Label>
@@ -197,6 +202,23 @@ export default function EditEvent({
                     />
                     {errors.venue && touched.venue && (
                       <p className="text-destructive text-sm mt-1">{errors.venue as string}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="capacity" className="text-sm font-medium text-gray-700 flex items-center">
+                      Total Capacity <span className="text-muted-foreground text-xs font-normal ml-2">(Optional)</span>
+                    </Label>
+                    <Field
+                      as={Input}
+                      type="number"
+                      id="capacity"
+                      name="capacity"
+                      placeholder="e.g. 500"
+                      className="mt-2 text-sm bg-white"
+                    />
+                    {errors.capacity && touched.capacity && (
+                      <p className="text-destructive text-sm mt-1">{errors.capacity as string}</p>
                     )}
                   </div>
                 </div>
