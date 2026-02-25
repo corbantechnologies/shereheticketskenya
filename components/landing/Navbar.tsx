@@ -93,10 +93,10 @@ export default function Navbar() {
           </nav>
           <div className="flex flex-col gap-3 pt-4 border-t border-border">
             <Button variant="outline" className="w-full justify-start" asChild>
-              <Link href="/auth/login">Log In</Link>
+              <Link href="/login">Log In</Link>
             </Button>
             <Button className="w-full justify-start md:justify-center" asChild>
-              <Link href="/auth/register">Sign Up</Link>
+              <Link href="/register">Sign Up</Link>
             </Button>
           </div>
         </div>
