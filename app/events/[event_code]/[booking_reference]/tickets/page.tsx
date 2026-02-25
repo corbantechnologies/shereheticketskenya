@@ -45,17 +45,27 @@ export default function TicketsPage() {
 
     setIsDownloading(true);
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff"
+      const { toPng } = await import("html-to-image");
+      const { jsPDF } = await import("jspdf");
+
+      const dataUrl = await toPng(element, {
+        cacheBust: true,
+        backgroundColor: "#ffffff",
+        pixelRatio: 2,
       });
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.download = `sherehe-tickets-${reference}.png`;
-      link.href = dataUrl;
-      link.click();
+
+      const pdfWidth = element.offsetWidth;
+      const pdfHeight = element.offsetHeight;
+
+      const pdf = new jsPDF({
+        orientation: pdfWidth > pdfHeight ? "landscape" : "portrait",
+        unit: "pt",
+        format: [pdfWidth, pdfHeight]
+      });
+
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`sherehe-tickets-${reference}.pdf`);
+
       toast.success("Tickets downloaded successfully!");
     } catch (error) {
       console.error("Download failed:", error);
