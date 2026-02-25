@@ -49,7 +49,6 @@ export default function TicketsPage() {
       const { jsPDF } = await import("jspdf");
 
       const dataUrl = await toPng(element, {
-        cacheBust: true,
         backgroundColor: "#ffffff",
         pixelRatio: 2,
       });
