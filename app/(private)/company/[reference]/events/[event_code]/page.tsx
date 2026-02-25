@@ -4,8 +4,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useFetchEvent } from "@/hooks/events/actions";
-import { closeEvent } from "@/services/events";
+import { useFetchCompanyEvent } from "@/hooks/events/actions";
+import { closeEvent, publishEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
 import { DashboardSkeleton } from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ import {
   Ticket,
   Calendar,
   XCircle,
+  Globe,
   MapPin,
   Users,
   PartyPopper,
@@ -41,7 +42,6 @@ import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
 import EditEvent from "@/forms/events/EditEvent";
 import EditTicketType from "@/forms/tickettypes/EditTicketType";
 import EventBookingsTable from "@/components/events/EventBookingsTable";
-import { useFetchCoupons } from "@/hooks/coupons/actions";
 import CreateCoupon from "@/forms/coupons/CreateCoupon";
 import UpdateCoupon from "@/forms/coupons/UpdateCoupon";
 import Modal from "@/components/ui/modal";
@@ -49,8 +49,7 @@ import Modal from "@/components/ui/modal";
 export default function EventDetailPage() {
   const router = useRouter();
   const { event_code } = useParams<{ event_code: string }>();
-  const { isLoading, data: event, refetch } = useFetchEvent(event_code);
-  const { data: coupons, refetch: refetchCoupons } = useFetchCoupons(event_code);
+  const { isLoading, data: event, refetch } = useFetchCompanyEvent(event_code);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);
   const [isEditTicketModalOpen, setIsEditTicketModalOpen] = useState(false);
@@ -60,6 +59,7 @@ export default function EventDetailPage() {
   const [selectedCoupon, setSelectedCoupon] = useState<any>(null);
   const authHeaders = useAxiosAuth();
   const [isClosing, setIsClosing] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   if (isLoading) return <DashboardSkeleton />;
 
@@ -67,6 +67,7 @@ export default function EventDetailPage() {
     return <div className="p-12 text-center text-2xl">Event not found.</div>;
   }
 
+  const coupons = event.coupons || [];
   const ticketTypes = event.ticket_types || [];
   const totalTicketsSold = ticketTypes.reduce(
     (sum, t) => sum + (t.bookings?.length || 0),
@@ -104,6 +105,20 @@ export default function EventDetailPage() {
     }
   };
 
+  const handlePublishEvent = async () => {
+    try {
+      setIsPublishing(true);
+      await publishEvent(event_code, authHeaders);
+      await refetch();
+      toast.success("Event published successfully.");
+    } catch (error) {
+      console.error("Failed to publish event:", error);
+      toast.error("Failed to publish event. Please try again.");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen bg-background">
@@ -134,6 +149,39 @@ export default function EventDetailPage() {
             <div className="flex gap-3">
               {!event.is_closed && (
                 <>
+                  {!event.is_published && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="default"
+                          disabled={isPublishing}
+                          className="shadow-lg bg-blue-500 hover:bg-blue-600"
+                        >
+                          <Globe className="mr-2 h-4 w-4" />
+                          {isPublishing ? "Publishing..." : "Publish Event"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-white text-black">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Publish this event?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will make &quot;{event.name}&quot; visible strictly on your platform. You can unpublish it later by editing the event settings.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handlePublishEvent}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            Yes, Publish Event
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                   <Button
                     size="default"
                     onClick={() => setIsEditModalOpen(true)}
@@ -189,10 +237,10 @@ export default function EventDetailPage() {
                 </h1>
                 <div className="flex flex-wrap items-center gap-4 text-lg">
                   <Badge
-                    variant={event.is_closed ? "destructive" : "default"}
+                    variant={event.is_closed ? "destructive" : (event.is_published ? "default" : "secondary")}
                     className="text-base px-4 py-1"
                   >
-                    {event.is_closed ? "Closed" : "Open"}
+                    {event.is_closed ? "Closed" : (event.is_published ? "Published" : "Draft")}
                   </Badge>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
@@ -247,10 +295,10 @@ export default function EventDetailPage() {
                   <AlertCircle className="h-5 w-5 text-[var(--mainBlue)]" />
                 </div>
                 <Badge
-                  variant={event.is_closed ? "destructive" : "default"}
+                  variant={event.is_closed ? "destructive" : (event.is_published ? "default" : "secondary")}
                   className="text-lg"
                 >
-                  {event.is_closed ? "Closed" : "Active"}
+                  {event.is_closed ? "Closed" : (event.is_published ? "Published" : "Draft")}
                 </Badge>
               </CardContent>
             </Card>
@@ -546,6 +594,7 @@ export default function EventDetailPage() {
           {selectedTicketType && (
             <EditTicketType
               ticketType={selectedTicketType}
+              event={event}
               closeModal={() => setIsEditTicketModalOpen(false)}
               refetch={refetch}
             />
@@ -561,7 +610,7 @@ export default function EventDetailPage() {
           <CreateCoupon
             event={event}
             closeModal={() => setIsCreateCouponModalOpen(false)}
-            refetch={refetchCoupons}
+            refetch={refetch}
           />
         </Modal>
 
@@ -576,7 +625,7 @@ export default function EventDetailPage() {
               coupon={selectedCoupon}
               event={event} // Passing event to allow adding ticket types
               closeModal={() => setIsEditCouponModalOpen(false)}
-              refetch={refetchCoupons}
+              refetch={refetch}
             />
           )}
         </Modal>

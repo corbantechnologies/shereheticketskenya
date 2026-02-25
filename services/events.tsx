@@ -2,6 +2,8 @@
 
 import { apiActions } from "@/tools/axios";
 import { AxiosResponse } from "axios";
+import { TicketType } from "./tickettypes";
+import { Coupon } from "./coupons";
 
 interface PaginatedResponse<T> {
   count: number;
@@ -26,17 +28,10 @@ interface Event {
   updated_at: string;
   cancellation_policy: string;
   capacity: number;
+  is_published: boolean;
   is_closed: boolean;
-
-  ticket_types: {
-    name: string;
-    price: string;
-    quantity_available: number;
-    is_limited: boolean;
-    ticket_type_code: string;
-    reference: string;
-    bookings: string[];
-  }[];
+  ticket_types: TicketType[];
+  coupons: Coupon[];
 }
 
 interface createEvent {
@@ -49,6 +44,7 @@ interface createEvent {
   venue: string;
   company: string; // Pick company code
   image: File;
+  is_published: boolean;
   cancellation_policy: string;
 }
 
@@ -60,8 +56,10 @@ interface updateEvent {
   end_date: string; // Optional
   end_time: string; // Optional
   venue: string;
+  capacity: number; // Optional
   company: string; // Pick company code
   image: File;
+  is_published: boolean;
   is_closed: boolean;
   cancellation_policy: string;
 }
@@ -80,6 +78,26 @@ export const getEvent = async (event_code: string): Promise<Event> => {
 };
 
 // Authenticated
+export const getCompanyEvents = async (
+  headers: { headers: { Authorization: string } }
+): Promise<Event[]> => {
+  const response: AxiosResponse<PaginatedResponse<Event>> =
+    await apiActions.get(`/api/v1/events/`, headers);
+  return response.data.results ?? [];
+};
+
+export const getCompanyEvent = async (
+  event_code: string,
+  headers: { headers: { Authorization: string } }
+): Promise<Event> => {
+  const response: AxiosResponse<Event> = await apiActions.get(
+    `/api/v1/events/${event_code}/`,
+    headers
+  );
+  return response.data;
+};
+
+
 export const createEvent = async (
   formData: createEvent | FormData,
   headers: { headers: { Authorization: string } }
@@ -100,6 +118,18 @@ export const updateEvent = async (
   const response: AxiosResponse<Event> = await apiActions.patch(
     `/api/v1/events/${event_code}/`,
     formData,
+    headers
+  );
+  return response.data;
+};
+
+export const publishEvent = async (
+  event_code: string,
+  headers: { headers: { Authorization: string } }
+): Promise<Event> => {
+  const response: AxiosResponse<Event> = await apiActions.patch(
+    `/api/v1/events/${event_code}/`,
+    { is_published: true },
     headers
   );
   return response.data;

@@ -1,7 +1,8 @@
 "use client";
 
-import { getEvents, getEvent } from "@/services/events";
+import { getEvents, getEvent, getCompanyEvents, getCompanyEvent } from "@/services/events";
 import { useQuery } from "@tanstack/react-query";
+import useAxiosAuth from "../authentication/useAxiosAuth";
 
 export function useFetchEvents() {
   return useQuery({
@@ -17,3 +18,23 @@ export function useFetchEvent(event_code: string) {
     enabled: !!event_code,
   });
 }
+
+
+export function useFetchCompanyEvents() {
+  const token = useAxiosAuth();
+  return useQuery({
+    queryKey: ["company-events"],
+    queryFn: () => getCompanyEvents(token),
+  });
+}
+
+export function useFetchCompanyEvent(event_code: string) {
+  const token = useAxiosAuth();
+  return useQuery({
+    queryKey: ["company-event", event_code],
+    queryFn: () => getCompanyEvent(event_code, token),
+    enabled: !!event_code,
+  });
+}
+
+
