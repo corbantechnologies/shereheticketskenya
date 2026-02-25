@@ -39,17 +39,6 @@ function EditTicketType({
       .nullable()
       .transform((value, originalValue) => String(originalValue).trim() === "" ? null : value)
       .test(
-        "is-required-if-limited",
-        "Quantity is required when limited",
-        function (value) {
-          const { is_limited } = this.parent;
-          if (is_limited) {
-            return value !== null && value !== undefined;
-          }
-          return true;
-        }
-      )
-      .test(
         "min-quantity",
         "Quantity must be at least 1",
         function (value) {
@@ -216,7 +205,7 @@ function EditTicketType({
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Quantity Available {values.is_limited && <span className="text-gray-500 text-xs">(Required if limited)</span>}
+                Quantity Available {values.is_limited && <span className="text-gray-500 text-xs">(Optional, defaults to event capacity)</span>}
               </label>
               <Field
                 type="number"
