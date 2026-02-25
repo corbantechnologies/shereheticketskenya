@@ -48,6 +48,16 @@ export default function EventDetailPage() {
     });
   };
 
+  const formatTicketDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
+
   const getLowestPrice = () => {
     if (!event?.ticket_types || event.ticket_types.length === 0) return null;
     const prices = event.ticket_types.map((ticket: any) =>
@@ -242,6 +252,8 @@ export default function EventDetailPage() {
                           return status.replace("_", " ");
                         };
 
+                        const isStruckThrough = ticket.status === "SOLD_OUT" || ticket.status === "ENDED";
+
                         return (
                           <div
                             key={ticket.reference}
@@ -255,15 +267,15 @@ export default function EventDetailPage() {
                           >
                             <div className="flex justify-between items-start mb-3">
                               <div>
-                                <h4 className="text-xl font-bold flex items-center gap-3">
+                                <h4 className={`text-xl font-bold flex items-center gap-3 ${isStruckThrough ? "line-through text-muted-foreground" : ""}`}>
                                   {ticket.name}
                                   {ticket.status && ticket.status !== "ON_SALE" && (
-                                    <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${getStatusColor(ticket.status)}`}>
+                                    <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${getStatusColor(ticket.status)} decoration-0 no-underline`}>
                                       {formatStatusName(ticket.status)}
                                     </span>
                                   )}
                                 </h4>
-                                <p className="text-3xl font-bold text-[var(--mainRed)] mt-2">
+                                <p className={`text-3xl font-bold mt-2 ${isStruckThrough ? "line-through text-muted-foreground" : "text-[var(--mainRed)]"}`}>
                                   KES {parseFloat(ticket.price).toLocaleString()}
                                 </p>
                               </div>
@@ -294,7 +306,11 @@ export default function EventDetailPage() {
                               {/* Show status label explicitly if not active */}
                               {!isEligible && (
                                 <p className="text-sm font-medium text-red-600/80">
-                                  Currently unavailable for booking
+                                  {ticket.status === "UPCOMING" && ticket.sales_start
+                                    ? `Sales start on ${formatTicketDate(ticket.sales_start)}`
+                                    : ticket.status === "ENDED" && ticket.sales_end
+                                      ? `Sales ended on ${formatTicketDate(ticket.sales_end)}`
+                                      : "Currently unavailable for booking"}
                                 </p>
                               )}
                             </div>
