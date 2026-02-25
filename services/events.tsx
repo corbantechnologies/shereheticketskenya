@@ -3,6 +3,7 @@
 import { apiActions } from "@/tools/axios";
 import { AxiosResponse } from "axios";
 import { TicketType } from "./tickettypes";
+import { Coupon } from "./coupons";
 
 interface PaginatedResponse<T> {
   count: number;
@@ -30,6 +31,7 @@ interface Event {
   is_published: boolean;
   is_closed: boolean;
   ticket_types: TicketType[];
+  coupons: Coupon[];
 }
 
 interface createEvent {

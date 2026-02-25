@@ -42,7 +42,6 @@ import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
 import EditEvent from "@/forms/events/EditEvent";
 import EditTicketType from "@/forms/tickettypes/EditTicketType";
 import EventBookingsTable from "@/components/events/EventBookingsTable";
-import { useFetchCoupons } from "@/hooks/coupons/actions";
 import CreateCoupon from "@/forms/coupons/CreateCoupon";
 import UpdateCoupon from "@/forms/coupons/UpdateCoupon";
 import Modal from "@/components/ui/modal";
@@ -51,7 +50,6 @@ export default function EventDetailPage() {
   const router = useRouter();
   const { event_code } = useParams<{ event_code: string }>();
   const { isLoading, data: event, refetch } = useFetchCompanyEvent(event_code);
-  const { data: coupons, refetch: refetchCoupons } = useFetchCoupons(event_code);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);
   const [isEditTicketModalOpen, setIsEditTicketModalOpen] = useState(false);
@@ -69,6 +67,7 @@ export default function EventDetailPage() {
     return <div className="p-12 text-center text-2xl">Event not found.</div>;
   }
 
+  const coupons = event.coupons || [];
   const ticketTypes = event.ticket_types || [];
   const totalTicketsSold = ticketTypes.reduce(
     (sum, t) => sum + (t.bookings?.length || 0),
@@ -611,7 +610,7 @@ export default function EventDetailPage() {
           <CreateCoupon
             event={event}
             closeModal={() => setIsCreateCouponModalOpen(false)}
-            refetch={refetchCoupons}
+            refetch={refetch}
           />
         </Modal>
 
@@ -626,7 +625,7 @@ export default function EventDetailPage() {
               coupon={selectedCoupon}
               event={event} // Passing event to allow adding ticket types
               closeModal={() => setIsEditCouponModalOpen(false)}
-              refetch={refetchCoupons}
+              refetch={refetch}
             />
           )}
         </Modal>
