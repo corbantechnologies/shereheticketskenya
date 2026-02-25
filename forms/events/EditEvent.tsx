@@ -24,10 +24,52 @@ interface EditEventProps {
 const validationSchema = Yup.object({
   name: Yup.string().required("Event name is required"),
   description: Yup.string().required("Description is required"),
-  start_date: Yup.date().required("Start date is required"),
+  start_date: Yup.date()
+    .required("Start date is required")
+    .test(
+      "is-future",
+      "Start date cannot be in the past",
+      function (value) {
+        if (!value) return true;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return new Date(value) >= today;
+      }
+    ),
   start_time: Yup.string(),
-  end_date: Yup.date().nullable(),
-  end_time: Yup.string().nullable(),
+  end_date: Yup.date()
+    .nullable()
+    .test(
+      "is-after-start",
+      "End date cannot be before start date",
+      function (value) {
+        const { start_date } = this.parent;
+        if (!value || !start_date) return true;
+        const start = new Date(start_date);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(value);
+        end.setHours(0, 0, 0, 0);
+        return end >= start;
+      }
+    ),
+  end_time: Yup.string()
+    .nullable()
+    .test(
+      "is-greater",
+      "End time must be after start time on the same day",
+      function (value) {
+        const { start_date, end_date, start_time } = this.parent;
+        if (start_date && end_date && start_time && value) {
+          const isSameDay =
+            new Date(start_date).toDateString() ===
+            new Date(end_date).toDateString();
+          if (isSameDay) {
+            return value > start_time;
+          }
+        }
+        return true;
+      }
+    ),
   venue: Yup.string().required("Venue is required"),
   cancellation_policy: Yup.string().required("Cancellation policy is required"),
   image: Yup.mixed<File>()
@@ -202,22 +244,31 @@ export default function EditEvent({
                     <span className="text-destructive">*</span>
                   </Label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
-                    <Field
-                      type="date"
-                      name="start_date"
-                      className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring"
-                    />
-                    <Field
-                      type="time"
-                      name="start_time"
-                      className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring"
-                    />
+                    <div>
+                      <Field
+                        type="date"
+                        name="start_date"
+                        className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring w-full"
+                      />
+                      {errors.start_date && touched.start_date && (
+                        <p className="text-destructive text-sm mt-1">
+                          {errors.start_date as string}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <Field
+                        type="time"
+                        name="start_time"
+                        className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring w-full"
+                      />
+                      {errors.start_time && touched.start_time && (
+                        <p className="text-destructive text-sm mt-1">
+                          {errors.start_time as string}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  {errors.start_date && touched.start_date && (
-                    <p className="text-destructive text-sm mt-1">
-                      {errors.start_date as string}
-                    </p>
-                  )}
                 </div>
 
                 <div>
@@ -226,16 +277,30 @@ export default function EditEvent({
                     End Date & Time (Optional)
                   </Label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
-                    <Field
-                      type="date"
-                      name="end_date"
-                      className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring"
-                    />
-                    <Field
-                      type="time"
-                      name="end_time"
-                      className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring"
-                    />
+                    <div>
+                      <Field
+                        type="date"
+                        name="end_date"
+                        className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring w-full"
+                      />
+                      {errors.end_date && touched.end_date && (
+                        <p className="text-destructive text-sm mt-1">
+                          {errors.end_date as string}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <Field
+                        type="time"
+                        name="end_time"
+                        className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring w-full"
+                      />
+                      {errors.end_time && touched.end_time && (
+                        <p className="text-destructive text-sm mt-1">
+                          {errors.end_time as string}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

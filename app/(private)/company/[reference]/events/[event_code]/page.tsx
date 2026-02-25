@@ -4,7 +4,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useFetchEvent } from "@/hooks/events/actions";
+import { useFetchCompanyEvent } from "@/hooks/events/actions";
 import { closeEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
 import { DashboardSkeleton } from "@/components/general/LoadingComponents";
@@ -49,7 +49,7 @@ import Modal from "@/components/ui/modal";
 export default function EventDetailPage() {
   const router = useRouter();
   const { event_code } = useParams<{ event_code: string }>();
-  const { isLoading, data: event, refetch } = useFetchEvent(event_code);
+  const { isLoading, data: event, refetch } = useFetchCompanyEvent(event_code);
   const { data: coupons, refetch: refetchCoupons } = useFetchCoupons(event_code);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);

@@ -75,6 +75,26 @@ export const getEvent = async (event_code: string): Promise<Event> => {
 };
 
 // Authenticated
+export const getCompanyEvents = async (
+  headers: { headers: { Authorization: string } }
+): Promise<Event[]> => {
+  const response: AxiosResponse<PaginatedResponse<Event>> =
+    await apiActions.get(`/api/v1/events/`, headers);
+  return response.data.results ?? [];
+};
+
+export const getCompanyEvent = async (
+  event_code: string,
+  headers: { headers: { Authorization: string } }
+): Promise<Event> => {
+  const response: AxiosResponse<Event> = await apiActions.get(
+    `/api/v1/events/${event_code}/`,
+    headers
+  );
+  return response.data;
+};
+
+
 export const createEvent = async (
   formData: createEvent | FormData,
   headers: { headers: { Authorization: string } }

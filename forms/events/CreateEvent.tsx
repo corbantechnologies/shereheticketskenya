@@ -24,7 +24,18 @@ interface CreateEventProps {
 const validationSchema = Yup.object({
   name: Yup.string().required("Event name is required"),
   description: Yup.string().required("Description is required"),
-  start_date: Yup.date().required("Start date is required"),
+  start_date: Yup.date()
+    .required("Start date is required")
+    .test(
+      "is-future",
+      "Start date cannot be in the past",
+      function (value) {
+        if (!value) return true;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return new Date(value) >= today;
+      }
+    ),
   venue: Yup.string().required("Venue is required"),
 });
 
