@@ -122,10 +122,10 @@ function CreateTicketType({ closeModal, refetch, event }: any) {
             formData.append("is_limited", values.is_limited.toString());
 
             if (values.sales_start) {
-              formData.append("sales_start", new Date(values.sales_start).toISOString());
+              formData.append("sales_start", new Date(values.sales_start).toISOString().split('T')[0]);
             }
             if (values.sales_end) {
-              formData.append("sales_end", new Date(values.sales_end).toISOString());
+              formData.append("sales_end", new Date(values.sales_end).toISOString().split('T')[0]);
             }
             formData.append("is_active", values.is_active.toString());
 
@@ -206,13 +206,13 @@ function CreateTicketType({ closeModal, refetch, event }: any) {
               </label>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Sales Start (Optional)
                 </label>
                 <Field
-                  type="datetime-local"
+                  type="date"
                   name="sales_start"
                   className={`mt-1 block w-full border ${errors.sales_start && touched.sales_start ? "border-red-500" : "border-gray-300"
                     } rounded-md shadow-sm p-2 bg-white`}
@@ -226,7 +226,7 @@ function CreateTicketType({ closeModal, refetch, event }: any) {
                   Sales End (Optional)
                 </label>
                 <Field
-                  type="datetime-local"
+                  type="date"
                   name="sales_end"
                   className={`mt-1 block w-full border ${errors.sales_end && touched.sales_end ? "border-red-500" : "border-gray-300"
                     } rounded-md shadow-sm p-2 bg-white`}

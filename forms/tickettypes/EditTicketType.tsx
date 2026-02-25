@@ -26,10 +26,10 @@ function EditTicketType({
   const axios = useAxiosAuth();
   const [loading, setLoading] = useState(false);
 
-  // Helper to format date for datetime-local input (YYYY-MM-DDTHH:mm)
+  // Helper to format date for date input (YYYY-MM-DD)
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "";
-    return new Date(dateString).toISOString().slice(0, 16);
+    return new Date(dateString).toISOString().slice(0, 10);
   };
 
   const validationSchema = Yup.object().shape({
@@ -138,13 +138,13 @@ function EditTicketType({
             formData.append("is_limited", values.is_limited.toString());
 
             if (values.sales_start) {
-              formData.append("sales_start", new Date(values.sales_start).toISOString());
+              formData.append("sales_start", new Date(values.sales_start).toISOString().split('T')[0]);
             } else {
               formData.append("sales_start", "");
             }
 
             if (values.sales_end) {
-              formData.append("sales_end", new Date(values.sales_end).toISOString());
+              formData.append("sales_end", new Date(values.sales_end).toISOString().split('T')[0]);
             } else {
               formData.append("sales_end", "");
             }
@@ -229,13 +229,13 @@ function EditTicketType({
               </label>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Sales Start (Optional)
                 </label>
                 <Field
-                  type="datetime-local"
+                  type="date"
                   name="sales_start"
                   className={`mt-1 block w-full border ${errors.sales_start && touched.sales_start ? "border-red-500" : "border-gray-300"
                     } rounded-md shadow-sm p-2 bg-white`}
@@ -249,7 +249,7 @@ function EditTicketType({
                   Sales End (Optional)
                 </label>
                 <Field
-                  type="datetime-local"
+                  type="date"
                   name="sales_end"
                   className={`mt-1 block w-full border ${errors.sales_end && touched.sales_end ? "border-red-500" : "border-gray-300"
                     } rounded-md shadow-sm p-2 bg-white`}

@@ -320,7 +320,7 @@ export default function EventDetailPage() {
 
           {/* Tabs: Overview, Tickets, Bookings, Analytics */}
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 bg-muted/30 p-1 rounded-xl">
+            <TabsList className="flex overflow-x-auto whitespace-nowrap scrollbar-hide w-full lg:grid lg:grid-cols-5 bg-muted/30 p-1 rounded-xl">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="tickets">Ticket Types</TabsTrigger>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>

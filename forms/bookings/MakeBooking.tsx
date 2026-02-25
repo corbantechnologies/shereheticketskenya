@@ -20,6 +20,7 @@ interface TicketType {
   is_limited: boolean;
   ticket_type_code: string;
   reference: string;
+  status?: string;
 }
 
 interface Event {
@@ -48,6 +49,7 @@ interface Event {
     ticket_type_code: string;
     reference: string;
     bookings: string[];
+    status?: string;
   }[];
 }
 interface MakeBookingProps {
@@ -87,10 +89,12 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
   const [couponError, setCouponError] = useState<string | null>(null);
   const router = useRouter();
 
-  const hasAvailableTickets = event.ticket_types.some(
-    (ticket) =>
-      ticket.quantity_available === null || ticket.quantity_available > 0,
-  );
+  const hasAvailableTickets = event.ticket_types.some((ticket) => {
+    if (ticket.status) {
+      return ticket.status === "ON_SALE";
+    }
+    return ticket.quantity_available === null || ticket.quantity_available > 0;
+  });
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
@@ -183,8 +187,8 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                       event_code: event.event_code,
                       ticket_type_code: values.ticket_type
                         ? event.ticket_types.find(
-                            (t) => t.reference === values.ticket_type,
-                          )?.ticket_type_code || ""
+                          (t) => t.reference === values.ticket_type,
+                        )?.ticket_type_code || ""
                         : "",
                     });
 
@@ -195,7 +199,7 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                     const err = error as AxiosError<{ error: string }>;
                     setCouponError(
                       err.response?.data?.error ||
-                        "Invalid coupon code. Please try again.",
+                      "Invalid coupon code. Please try again.",
                     );
                     setValidatedCoupon(null);
                   } finally {
@@ -243,14 +247,15 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                             key={ticket.reference}
                             value={ticket.ticket_type_code}
                             disabled={
-                              ticket.quantity_available !== null &&
-                              ticket.quantity_available <= 0
+                              (ticket.status && ticket.status !== "ON_SALE") ||
+                              (!ticket.status && ticket.quantity_available !== null && ticket.quantity_available <= 0)
                             }
                           >
                             {ticket.name} - KES{" "}
                             {parseFloat(ticket.price).toLocaleString()}
                             {ticket.quantity_available !== null &&
                               ` (${ticket.quantity_available} available)`}
+                            {ticket.status && ticket.status !== "ON_SALE" && ` - ${ticket.status.replace("_", " ")}`}
                           </option>
                         ))}
                       </Field>
@@ -319,11 +324,10 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                         <div className="flex-1">
                           <Field
                             name="coupon"
-                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring focus:border-primary ${
-                              couponError
+                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring focus:border-primary ${couponError
                                 ? "border-destructive"
                                 : "border-input"
-                            }`}
+                              }`}
                             placeholder="Enter coupon code"
                           />
                         </div>
@@ -352,8 +356,8 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                           {validatedCoupon.discount_type === "percentage"
                             ? `${validatedCoupon.discount_value}% off`
                             : `KES ${parseFloat(
-                                validatedCoupon.discount_value,
-                              ).toLocaleString()} off`}
+                              validatedCoupon.discount_value,
+                            ).toLocaleString()} off`}
                           )
                         </p>
                       )}
