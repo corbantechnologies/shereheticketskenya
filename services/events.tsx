@@ -32,6 +32,7 @@ interface Event {
   is_closed: boolean;
   ticket_types: TicketType[];
   coupons: Coupon[];
+  tickets_sold: number;
 }
 
 interface createEvent {

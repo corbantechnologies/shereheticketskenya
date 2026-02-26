@@ -69,10 +69,7 @@ export default function EventDetailPage() {
 
   const coupons = event.coupons || [];
   const ticketTypes = event.ticket_types || [];
-  const totalTicketsSold = ticketTypes.reduce(
-    (sum, t) => sum + (t.bookings?.length || 0),
-    0
-  );
+  const totalTicketsSold = event.tickets_sold;
 
   // Flatten bookings from all ticket types
   const allBookings = ticketTypes
