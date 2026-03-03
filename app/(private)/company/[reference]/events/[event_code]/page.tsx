@@ -321,7 +321,7 @@ export default function EventDetailPage() {
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="tickets">Ticket Types</TabsTrigger>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              {/* <TabsTrigger value="analytics">Analytics</TabsTrigger> */}
               <TabsTrigger value="coupons">Coupons</TabsTrigger>
             </TabsList>
 
