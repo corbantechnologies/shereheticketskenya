@@ -402,9 +402,10 @@ export default function EventDetailPage() {
                               <p className="text-3xl font-bold">
                                 KSh {type.price}
                               </p>
-                              <p className="text-sm text-muted-foreground">
+                              {/* TODO: Add tickets sold */}
+                              {/* <p className="text-sm text-muted-foreground">
                                 {type.bookings?.length || 0} sold
-                              </p>
+                              </p> */}
                             </div>
                             {!event.is_closed && (
                               <Button
