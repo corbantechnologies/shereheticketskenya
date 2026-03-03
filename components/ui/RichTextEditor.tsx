@@ -142,7 +142,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
         immediatelyRender: false,
         editorProps: {
             attributes: {
-                className: `prose prose-sm sm:prose-base max-w-none focus:outline-none min-h-[220px] p-5 bg-white text-gray-700
+                className: `prose prose-sm sm:prose-base max-w-none focus:outline-none p-5 bg-white text-gray-700 min-h-[220px]
                 [&_p]:leading-relaxed [&_p]:mb-3 
                 [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:mb-4 [&_ul_li]:mb-1
                 [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-4 [&_ol_li]:mb-1
@@ -162,10 +162,10 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
     }
 
     return (
-        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-[var(--mainRed)] focus-within:border-[var(--mainRed)] focus-within:shadow-md bg-white">
+        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-[var(--mainRed)] focus-within:border-[var(--mainRed)] focus-within:shadow-md bg-white flex flex-col min-h-[220px]">
             <MenuBar editor={editor} />
-            <div className="max-h-[450px] overflow-y-auto cursor-text" onClick={() => editor?.chain().focus().run()}>
-                <EditorContent editor={editor} />
+            <div className="flex-1 overflow-y-auto cursor-text text-sm flex flex-col" onClick={() => editor?.chain().focus().run()}>
+                <EditorContent editor={editor} className="flex-1 flex flex-col [&>div]:flex-1" />
             </div>
         </div>
     );
