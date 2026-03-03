@@ -4,8 +4,9 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Button } from './button';
-import { Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Quote, Undo, Redo, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link as LinkIcon } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Quote, Undo, Redo, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link as LinkIcon, Indent as IndentIcon, Outdent as OutdentIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Extension } from '@tiptap/core';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
@@ -39,6 +40,106 @@ const ToolbarButton = ({
         {children}
     </Button>
 );
+
+export interface IndentOptions {
+    types: string[];
+    indentClasses: string[];
+}
+
+// Custom extension for Indentation
+const Indent = Extension.create<IndentOptions>({
+    name: 'indent',
+
+    addOptions() {
+        return {
+            types: ['paragraph', 'heading', 'blockquote'],
+            indentClasses: ['pl-0', 'pl-4', 'pl-8', 'pl-12', 'pl-16', 'pl-20', 'pl-24', 'pl-28'],
+        };
+    },
+
+    addGlobalAttributes() {
+        return [
+            {
+                types: this.options.types,
+                attributes: {
+                    indent: {
+                        default: 0,
+                        parseHTML: (element) => {
+                            const indentClass = this.options.indentClasses.find((cls) => element.classList.contains(cls));
+                            if (indentClass) {
+                                return this.options.indentClasses.indexOf(indentClass);
+                            }
+                            return 0;
+                        },
+                        renderHTML: (attributes) => {
+                            if (attributes.indent === 0) {
+                                return {};
+                            }
+                            return { class: this.options.indentClasses[attributes.indent] };
+                        },
+                    },
+                },
+            },
+        ];
+    },
+
+    addCommands() {
+        return {
+            indent:
+                () =>
+                    ({ tr, state, dispatch }) => {
+                        const { selection } = state;
+                        let transactionChanged = false;
+
+                        tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+                            if (this.options.types.includes(node.type.name)) {
+                                const currentIndent = node.attrs.indent || 0;
+                                if (currentIndent < this.options.indentClasses.length - 1) {
+                                    tr = tr.setNodeMarkup(pos, undefined, {
+                                        ...node.attrs,
+                                        indent: currentIndent + 1,
+                                    });
+                                    transactionChanged = true;
+                                }
+                            }
+                        });
+
+                        if (transactionChanged) {
+                            dispatch?.(tr);
+                            return true;
+                        }
+
+                        return false;
+                    },
+            outdent:
+                () =>
+                    ({ tr, state, dispatch }) => {
+                        const { selection } = state;
+                        let transactionChanged = false;
+
+                        tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+                            if (this.options.types.includes(node.type.name)) {
+                                const currentIndent = node.attrs.indent || 0;
+                                if (currentIndent > 0) {
+                                    tr = tr.setNodeMarkup(pos, undefined, {
+                                        ...node.attrs,
+                                        indent: currentIndent - 1,
+                                    });
+                                    transactionChanged = true;
+                                }
+                            }
+                        });
+
+                        if (transactionChanged) {
+                            dispatch?.(tr);
+                            return true;
+                        }
+
+                        return false;
+                    },
+        };
+    },
+});
 
 const MenuBar = ({ editor }: { editor: any }) => {
     if (!editor) {
@@ -200,7 +301,8 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                 HTMLAttributes: {
                     class: 'text-[var(--mainBlue)] underline cursor-pointer hover:text-blue-800',
                 },
-            })
+            }),
+            Indent
         ],
         content: value || { type: 'doc', content: [] },
         immediatelyRender: false,

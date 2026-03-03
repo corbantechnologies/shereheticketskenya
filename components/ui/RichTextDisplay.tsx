@@ -4,7 +4,48 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
+import { Extension } from '@tiptap/core';
 import parse from "html-react-parser";
+
+export interface IndentOptions {
+    types: string[];
+    indentClasses: string[];
+}
+
+const Indent = Extension.create<IndentOptions>({
+    name: 'indent',
+    addOptions() {
+        return {
+            types: ['paragraph', 'heading', 'blockquote'],
+            indentClasses: ['pl-0', 'pl-4', 'pl-8', 'pl-12', 'pl-16', 'pl-20', 'pl-24', 'pl-28'],
+        };
+    },
+    addGlobalAttributes() {
+        return [
+            {
+                types: this.options.types,
+                attributes: {
+                    indent: {
+                        default: 0,
+                        parseHTML: (element) => {
+                            const indentClass = this.options.indentClasses.find((cls) => element.classList.contains(cls));
+                            if (indentClass) {
+                                return this.options.indentClasses.indexOf(indentClass);
+                            }
+                            return 0;
+                        },
+                        renderHTML: (attributes) => {
+                            if (attributes.indent === 0) {
+                                return {};
+                            }
+                            return { class: this.options.indentClasses[attributes.indent] };
+                        },
+                    },
+                },
+            },
+        ];
+    },
+});
 
 interface RichTextDisplayProps {
     content: any;
@@ -47,7 +88,8 @@ export default function RichTextDisplay({ content }: RichTextDisplayProps) {
                     HTMLAttributes: {
                         class: 'text-[var(--mainBlue)] underline cursor-pointer hover:text-blue-800',
                     },
-                })
+                }),
+                Indent
             ]);
 
             // Parse the HTML string into safe React elements
