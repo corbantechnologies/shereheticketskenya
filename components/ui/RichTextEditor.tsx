@@ -4,8 +4,11 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Button } from './button';
-import { Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Quote, Undo, Redo } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Quote, Undo, Redo, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link as LinkIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import Link from '@tiptap/extension-link';
 import { cn } from '@/lib/utils'; // Assuming they have cn utility like a standard shadcn project, if not we can use clsx or just template strings.
 
 interface RichTextEditorProps {
@@ -65,6 +68,39 @@ const MenuBar = ({ editor }: { editor: any }) => {
             >
                 <Strikethrough className="h-4 w-4" />
             </ToolbarButton>
+            <ToolbarButton
+                onClick={() => editor.chain().focus().toggleUnderline().run()}
+                isActive={editor.isActive('underline')}
+            >
+                <UnderlineIcon className="h-4 w-4" />
+            </ToolbarButton>
+
+            <div className="w-[1px] h-5 bg-gray-300 mx-1.5" />
+
+            <ToolbarButton
+                onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                isActive={editor.isActive({ textAlign: 'left' })}
+            >
+                <AlignLeft className="h-4 w-4" />
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                isActive={editor.isActive({ textAlign: 'center' })}
+            >
+                <AlignCenter className="h-4 w-4" />
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                isActive={editor.isActive({ textAlign: 'right' })}
+            >
+                <AlignRight className="h-4 w-4" />
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+                isActive={editor.isActive({ textAlign: 'justify' })}
+            >
+                <AlignJustify className="h-4 w-4" />
+            </ToolbarButton>
 
             <div className="w-[1px] h-5 bg-gray-300 mx-1.5" />
 
@@ -105,6 +141,24 @@ const MenuBar = ({ editor }: { editor: any }) => {
             <div className="w-[1px] h-5 bg-gray-300 mx-1.5" />
 
             <ToolbarButton
+                onClick={() => {
+                    const previousUrl = editor.getAttributes('link').href;
+                    const url = window.prompt('URL', previousUrl);
+                    if (url === null) return;
+                    if (url === '') {
+                        editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                        return;
+                    }
+                    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+                }}
+                isActive={editor.isActive('link')}
+            >
+                <LinkIcon className="h-4 w-4" />
+            </ToolbarButton>
+
+            <div className="w-[1px] h-5 bg-gray-300 mx-1.5" />
+
+            <ToolbarButton
                 onClick={() => editor.chain().focus().undo().run()}
                 disabled={!editor.can().chain().focus().undo().run()}
             >
@@ -136,6 +190,16 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
             }),
             Placeholder.configure({
                 placeholder: 'Write the exciting details for your event...',
+            }),
+            Underline,
+            TextAlign.configure({
+                types: ['heading', 'paragraph'],
+            }),
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: 'text-[var(--mainBlue)] underline cursor-pointer hover:text-blue-800',
+                },
             })
         ],
         content: value || { type: 'doc', content: [] },

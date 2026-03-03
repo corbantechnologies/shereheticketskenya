@@ -1,6 +1,9 @@
 import React from "react";
 import { generateHTML } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import Link from '@tiptap/extension-link';
 import parse from "html-react-parser";
 
 interface RichTextDisplayProps {
@@ -36,6 +39,15 @@ export default function RichTextDisplay({ content }: RichTextDisplayProps) {
                         levels: [1, 2, 3],
                     },
                 }),
+                Underline,
+                TextAlign.configure({
+                    types: ['heading', 'paragraph'],
+                }),
+                Link.configure({
+                    HTMLAttributes: {
+                        class: 'text-[var(--mainBlue)] underline cursor-pointer hover:text-blue-800',
+                    },
+                })
             ]);
 
             // Parse the HTML string into safe React elements
