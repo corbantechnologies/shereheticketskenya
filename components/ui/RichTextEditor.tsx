@@ -138,7 +138,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                 placeholder: 'Write the exciting details for your event...',
             })
         ],
-        content: value || { type: 'doc', content: [] }, // Provide a default empty doc if value is null
+        content: value || { type: 'doc', content: [] },
         immediatelyRender: false,
         editorProps: {
             attributes: {

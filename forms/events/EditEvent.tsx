@@ -9,7 +9,6 @@ import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
@@ -109,8 +108,7 @@ export default function EditEvent({
         <Formik
           initialValues={{
             name: event.name || "",
-            description: event.description || "",
-            content: event.content || null,
+            content: event.content || event.description || "",
             start_date: event.start_date || "",
             start_time: event.start_time || "",
             end_date: event.end_date || "",
@@ -126,10 +124,14 @@ export default function EditEvent({
             try {
               const formData = new FormData();
               formData.append("name", values.name);
-              formData.append("description", values.description);
+
               if (values.content) {
                 formData.append("content", JSON.stringify(values.content));
               }
+              if (values.cancellation_policy) {
+                formData.append("cancellation_policy", JSON.stringify(values.cancellation_policy));
+              }
+
               formData.append("start_date", values.start_date);
               if (values.start_time)
                 formData.append("start_time", values.start_time);
@@ -139,7 +141,7 @@ export default function EditEvent({
               if (values.capacity) {
                 formData.append("capacity", values.capacity.toString());
               }
-              formData.append("cancellation_policy", values.cancellation_policy);
+              // Cancellation policy is now handled in JSON stringification block above
               formData.append("is_closed", values.is_closed.toString());
 
               if (values.image) {
@@ -229,31 +231,17 @@ export default function EditEvent({
                 </div>
 
                 <div>
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                    Description <span className="text-destructive">*</span>
-                  </Label>
-                  <Field
-                    as={Textarea}
-                    id="description"
-                    name="description"
-                    placeholder="Tell attendees what makes this event special..."
-                    rows={5}
-                    className="mt-2 text-sm bg-white"
-                  />
-                  {errors.description && touched.description && (
-                    <p className="text-destructive text-sm mt-1">{errors.description as string}</p>
-                  )}
-                </div>
-
-                <div>
                   <Label htmlFor="content" className="text-sm font-medium text-gray-700">
-                    Event Details (Rich Text)
+                    Description & Details (Rich Text) <span className="text-destructive">*</span>
                   </Label>
-                  <div className="mt-2">
+                  <div className="mt-2 text-sm">
                     <RichTextEditor
                       value={values.content}
                       onChange={(val) => setFieldValue("content", val)}
                     />
+                    {errors.content && touched.content && (
+                      <p className="text-destructive text-sm mt-1">{errors.content as string}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -330,17 +318,15 @@ export default function EditEvent({
                   <Label htmlFor="cancellation_policy" className="text-sm font-medium text-gray-700">
                     Cancellation Policy <span className="text-destructive">*</span>
                   </Label>
-                  <Field
-                    as={Textarea}
-                    id="cancellation_policy"
-                    name="cancellation_policy"
-                    placeholder="Describe your policy for ticket cancellations and refunds..."
-                    rows={4}
-                    className="mt-2 text-sm bg-white"
-                  />
-                  {errors.cancellation_policy && touched.cancellation_policy && (
-                    <p className="text-destructive text-sm mt-1">{errors.cancellation_policy as string}</p>
-                  )}
+                  <div className="mt-2 text-sm">
+                    <RichTextEditor
+                      value={values.cancellation_policy}
+                      onChange={(val) => setFieldValue("cancellation_policy", val)}
+                    />
+                    {errors.cancellation_policy && touched.cancellation_policy && (
+                      <p className="text-destructive text-sm mt-1">{errors.cancellation_policy as string}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>

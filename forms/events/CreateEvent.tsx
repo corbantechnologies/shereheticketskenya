@@ -8,7 +8,6 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { Calendar } from "lucide-react";
 import toast from "react-hot-toast";
@@ -57,8 +56,7 @@ export default function CreateEvent({
         <Formik
           initialValues={{
             name: "",
-            description: "",
-            content: null as any,
+            content: "",
             start_date: "",
             venue: "",
           }}
@@ -67,10 +65,12 @@ export default function CreateEvent({
             try {
               const formData = new FormData();
               formData.append("name", values.name);
-              formData.append("description", values.description);
+
+              // We've replaced description with the content editor
               if (values.content) {
                 formData.append("content", JSON.stringify(values.content));
               }
+
               formData.append("start_date", values.start_date);
               formData.append("venue", values.venue);
               formData.append("company", companyCode);
@@ -141,38 +141,21 @@ export default function CreateEvent({
 
               <div>
                 <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Description <span className="text-destructive">*</span>
-                </label>
-                <Field
-                  as={Textarea}
-                  id="description"
-                  name="description"
-                  placeholder="Tell attendees what makes this event special..."
-                  rows={6}
-                  className="mt-2 text-sm"
-                />
-                {errors.description && touched.description && (
-                  <p className="text-destructive text-sm mt-1">
-                    {errors.description as string}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
                   htmlFor="content"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Event Details (Rich Text)
+                  Description (Rich Text) <span className="text-destructive">*</span>
                 </label>
-                <div className="mt-2">
+                <div className="mt-2 text-sm">
                   <RichTextEditor
                     value={values.content}
                     onChange={(val) => setFieldValue("content", val)}
                   />
+                  {errors.content && touched.content && (
+                    <p className="text-destructive text-sm mt-1">
+                      {errors.content as string}
+                    </p>
+                  )}
                 </div>
               </div>
 
