@@ -34,6 +34,7 @@ import {
   MapPin,
   Users,
   PartyPopper,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
@@ -45,6 +46,7 @@ import EventBookingsTable from "@/components/events/EventBookingsTable";
 import CreateCoupon from "@/forms/coupons/CreateCoupon";
 import UpdateCoupon from "@/forms/coupons/UpdateCoupon";
 import Modal from "@/components/ui/modal";
+import RichTextDisplay from "@/components/ui/RichTextDisplay";
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -186,6 +188,14 @@ export default function EventDetailPage() {
                   >
                     <Edit3 className="mr-2 h-4 w-4" />
                     Edit Event
+                  </Button>
+                  <Button
+                    size="default"
+                    onClick={() => window.open(`/events/${event.event_code}`, '_blank')}
+                    className="shadow-lg bg-indigo-500 hover:bg-indigo-600"
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Preview
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -330,9 +340,13 @@ export default function EventDetailPage() {
                 <CardContent className="pt-6 space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold mb-3">Description</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {event.description || "No description provided yet."}
-                    </p>
+                    {event.content ? (
+                      <RichTextDisplay content={event.content} />
+                    ) : (
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                        {event.description || "No description provided yet."}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

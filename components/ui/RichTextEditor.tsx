@@ -7,10 +7,20 @@ import { Button } from './button';
 import { Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Quote, Undo, Redo, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link as LinkIcon, Indent as IndentIcon, Outdent as OutdentIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Extension } from '@tiptap/core';
+import type { CommandProps } from '@tiptap/core';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
 import { cn } from '@/lib/utils'; // Assuming they have cn utility like a standard shadcn project, if not we can use clsx or just template strings.
+
+declare module '@tiptap/core' {
+    interface Commands<ReturnType> {
+        indent: {
+            indent: () => ReturnType;
+            outdent: () => ReturnType;
+        };
+    }
+}
 
 interface RichTextEditorProps {
     value: any;
@@ -87,11 +97,11 @@ const Indent = Extension.create<IndentOptions>({
         return {
             indent:
                 () =>
-                    ({ tr, state, dispatch }) => {
+                    ({ tr, state, dispatch }: CommandProps) => {
                         const { selection } = state;
                         let transactionChanged = false;
 
-                        tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+                        tr.doc.nodesBetween(selection.from, selection.to, (node: any, pos: number) => {
                             if (this.options.types.includes(node.type.name)) {
                                 const currentIndent = node.attrs.indent || 0;
                                 if (currentIndent < this.options.indentClasses.length - 1) {
@@ -113,11 +123,11 @@ const Indent = Extension.create<IndentOptions>({
                     },
             outdent:
                 () =>
-                    ({ tr, state, dispatch }) => {
+                    ({ tr, state, dispatch }: CommandProps) => {
                         const { selection } = state;
                         let transactionChanged = false;
 
-                        tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+                        tr.doc.nodesBetween(selection.from, selection.to, (node: any, pos: number) => {
                             if (this.options.types.includes(node.type.name)) {
                                 const currentIndent = node.attrs.indent || 0;
                                 if (currentIndent > 0) {
