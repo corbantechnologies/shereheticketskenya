@@ -18,6 +18,7 @@ export interface TicketType {
     created_at: string;
     updated_at: string;
     reference: string;
+    tickets_sold: number;
     bookings: any[];
 }
 
