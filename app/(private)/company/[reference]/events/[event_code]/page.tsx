@@ -321,7 +321,7 @@ export default function EventDetailPage() {
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="tickets">Ticket Types</TabsTrigger>
               <TabsTrigger value="bookings">Bookings</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              {/* <TabsTrigger value="analytics">Analytics</TabsTrigger> */}
               <TabsTrigger value="coupons">Coupons</TabsTrigger>
             </TabsList>
 
@@ -402,10 +402,9 @@ export default function EventDetailPage() {
                               <p className="text-3xl font-bold">
                                 KSh {type.price}
                               </p>
-                              {/* TODO: Add tickets sold */}
-                              {/* <p className="text-sm text-muted-foreground">
-                                {type.bookings?.length || 0} sold
-                              </p> */}
+                              <p className="text-sm text-muted-foreground">
+                                {type.tickets_sold || 0} sold
+                              </p>
                             </div>
                             {!event.is_closed && (
                               <Button

@@ -26,7 +26,7 @@ export default function EventBookingsTable({
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   // Filter bookings
   const filteredBookings = bookings.filter((booking) => {
@@ -48,19 +48,6 @@ export default function EventBookingsTable({
     startIndex,
     startIndex + itemsPerPage
   );
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "CONFIRMED":
-        return "default"; // green-ish in custom theme?
-      case "PENDING":
-        return "secondary";
-      case "CANCELLED":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -148,7 +135,7 @@ export default function EventBookingsTable({
                       {booking.currency} {booking.amount}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatusBadgeVariant(booking.status)}>
+                      <Badge>
                         {booking.status}
                       </Badge>
                     </TableCell>
