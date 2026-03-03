@@ -35,8 +35,9 @@ export default function EventBookingsTable({
       booking.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.booking_code.toLowerCase().includes(searchTerm.toLowerCase());
 
+    const currentStatus = (booking.status || booking.payment_status || "PENDING").toUpperCase();
     const matchesStatus =
-      statusFilter === "ALL" || booking.status === statusFilter;
+      statusFilter === "ALL" || currentStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -50,11 +51,17 @@ export default function EventBookingsTable({
   );
 
   const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
+    const s = (status || "").toUpperCase();
+    switch (s) {
+      case "COMPLETED":
       case "CONFIRMED":
+      case "SUCCESSFUL":
+      case "SUCCESS":
         return "default"; // green-ish in custom theme?
       case "PENDING":
         return "secondary";
+      case "FAILED":
+      case "REVERSED":
       case "CANCELLED":
         return "destructive";
       default:
@@ -89,9 +96,10 @@ export default function EventBookingsTable({
             className="w-full md:w-40 h-10 px-3 py-2 bg-background border rounded-md text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="ALL">All Statuses</option>
-            <option value="CONFIRMED">Confirmed</option>
+            <option value="COMPLETED">Completed</option>
             <option value="PENDING">Pending</option>
-            <option value="CANCELLED">Cancelled</option>
+            <option value="FAILED">Failed</option>
+            <option value="REVERSED">Reversed</option>
           </select>
         </div>
       </div>
@@ -148,8 +156,8 @@ export default function EventBookingsTable({
                       {booking.currency} {booking.amount}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatusBadgeVariant(booking.status)}>
-                        {booking.status}
+                      <Badge variant={getStatusBadgeVariant(booking.status || booking.payment_status || "PENDING")}>
+                        {(booking.status || booking.payment_status || "PENDING").toUpperCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
