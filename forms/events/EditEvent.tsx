@@ -124,9 +124,6 @@ export default function EditEvent({
                       placeholder="e.g. New Year's Bash 2026"
                       className="mt-2 text-sm bg-white"
                     />
-                    {errors.name && touched.name && (
-                      <p className="text-destructive text-sm mt-1">{errors.name as string}</p>
-                    )}
                   </div>
 
                   <div>
@@ -140,9 +137,6 @@ export default function EditEvent({
                       placeholder="e.g. Ngong Racecourse, Nairobi"
                       className="mt-2 text-sm bg-white"
                     />
-                    {errors.venue && touched.venue && (
-                      <p className="text-destructive text-sm mt-1">{errors.venue as string}</p>
-                    )}
                   </div>
 
                   <div>
@@ -157,9 +151,6 @@ export default function EditEvent({
                       placeholder="e.g. 500"
                       className="mt-2 text-sm bg-white"
                     />
-                    {errors.capacity && touched.capacity && (
-                      <p className="text-destructive text-sm mt-1">{errors.capacity as string}</p>
-                    )}
                   </div>
                 </div>
 
@@ -172,9 +163,6 @@ export default function EditEvent({
                       value={values.content}
                       onChange={(val) => setFieldValue("content", val)}
                     />
-                    {errors.content && touched.content && (
-                      <p className="text-destructive text-sm mt-1">{errors.content as string}</p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -195,9 +183,6 @@ export default function EditEvent({
                           name="start_date"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                         />
-                        {errors.start_date && touched.start_date && (
-                          <p className="text-destructive text-xs mt-1">{errors.start_date as string}</p>
-                        )}
                       </div>
                       <div>
                         <Field
@@ -205,9 +190,6 @@ export default function EditEvent({
                           name="start_time"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                         />
-                        {errors.start_time && touched.start_time && (
-                          <p className="text-destructive text-xs mt-1">{errors.start_time as string}</p>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -224,9 +206,6 @@ export default function EditEvent({
                           name="end_date"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                         />
-                        {errors.end_date && touched.end_date && (
-                          <p className="text-destructive text-xs mt-1">{errors.end_date as string}</p>
-                        )}
                       </div>
                       <div>
                         <Field
@@ -234,9 +213,6 @@ export default function EditEvent({
                           name="end_time"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                         />
-                        {errors.end_time && touched.end_time && (
-                          <p className="text-destructive text-xs mt-1">{errors.end_time as string}</p>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -256,9 +232,6 @@ export default function EditEvent({
                       value={values.refund_policy}
                       onChange={(val) => setFieldValue("refund_policy", val)}
                     />
-                    {errors.refund_policy && touched.refund_policy && (
-                      <p className="text-destructive text-sm mt-1">{errors.refund_policy as string}</p>
-                    )}
                   </div>
                 </div>
 
@@ -282,9 +255,6 @@ export default function EditEvent({
                       }}
                       className="block w-full text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:font-medium file:bg-[var(--mainBlue)] file:text-white hover:file:bg-[var(--mainBlue)]/90 cursor-pointer bg-white border border-gray-200"
                     />
-                    {errors.image && touched.image && (
-                      <p className="text-destructive text-sm mt-2">{errors.image as string}</p>
-                    )}
                   </div>
 
                   {imagePreview && (
