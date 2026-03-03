@@ -21,73 +21,7 @@ interface EditEventProps {
   refetchEvent: () => void;
 }
 
-const validationSchema = Yup.object({
-  name: Yup.string().required("Event name is required"),
-  description: Yup.string().required("Description is required"),
-  start_date: Yup.date()
-    .required("Start date is required")
-    .test(
-      "is-future",
-      "Start date cannot be in the past",
-      function (value) {
-        if (!value) return true;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return new Date(value) >= today;
-      }
-    ),
-  start_time: Yup.string(),
-  end_date: Yup.date()
-    .nullable()
-    .test(
-      "is-after-start",
-      "End date cannot be before start date",
-      function (value) {
-        const { start_date } = this.parent;
-        if (!value || !start_date) return true;
-        const start = new Date(start_date);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(value);
-        end.setHours(0, 0, 0, 0);
-        return end >= start;
-      }
-    ),
-  end_time: Yup.string()
-    .nullable()
-    .test(
-      "is-greater",
-      "End time must be after start time on the same day",
-      function (value) {
-        const { start_date, end_date, start_time } = this.parent;
-        if (start_date && end_date && start_time && value) {
-          const isSameDay =
-            new Date(start_date).toDateString() ===
-            new Date(end_date).toDateString();
-          if (isSameDay) {
-            return value > start_time;
-          }
-        }
-        return true;
-      }
-    ),
-  venue: Yup.string().required("Venue is required"),
-  capacity: Yup.number().nullable().min(1, "Capacity must be at least 1"),
-  refund_policy: Yup.string().required("Cancellation policy is required"),
-  image: Yup.mixed<File>()
-    .nullable()
-    .test(
-      "fileSize",
-      "File too large (max 5MB)",
-      (value) =>
-        !value || (value instanceof File && value.size <= 5 * 1024 * 1024)
-    )
-    .test(
-      "fileType",
-      "Only image files allowed",
-      (value) =>
-        !value || (value instanceof File && value.type.startsWith("image/"))
-    ),
-});
+
 
 export default function EditEvent({
   event,
@@ -119,7 +53,6 @@ export default function EditEvent({
             image: null as File | null,
             is_closed: event.is_closed || false,
           }}
-          validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               const formData = new FormData();
