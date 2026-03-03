@@ -37,7 +37,7 @@ interface Event {
   company: string;
   created_at: string;
   updated_at: string;
-  cancellation_policy: string;
+  refund_policy: string;
   capacity: number;
   is_closed: boolean;
 
@@ -325,8 +325,8 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                           <Field
                             name="coupon"
                             className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-ring focus:border-primary ${couponError
-                                ? "border-destructive"
-                                : "border-input"
+                              ? "border-destructive"
+                              : "border-input"
                               }`}
                             placeholder="Enter coupon code"
                           />

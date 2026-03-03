@@ -217,8 +217,8 @@ export default function EventDetailPage() {
             {/* Cancellation Policy */}
             <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold mb-4">Cancellation Policy</h2>
-              {event.cancellation_policy ? (
-                <RichTextDisplay content={event.cancellation_policy} />
+              {event.refund_policy ? (
+                <RichTextDisplay content={event.refund_policy} />
               ) : (
                 <p className="text-foreground/80 text-base sm:text-lg leading-relaxed whitespace-pre-line">
                   No cancellation policy specified for this event.
