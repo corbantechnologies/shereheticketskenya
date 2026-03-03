@@ -17,6 +17,7 @@ import { useFetchEvent } from "@/hooks/events/actions";
 import TicketTypeChip from "@/components/events/TicketTypeChip";
 import MakeBooking from "@/forms/bookings/MakeBooking";
 import { Button } from "@/components/ui/button";
+import RichTextDisplay from "@/components/ui/RichTextDisplay";
 
 export default function EventDetailPage() {
   const { event_code } = useParams<{ event_code: string }>();
@@ -158,9 +159,13 @@ export default function EventDetailPage() {
             {/* About */}
             <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold mb-4">About This Event</h2>
-              <p className="text-foreground/80 text-base sm:text-lg leading-relaxed">
-                {event.description || "No description provided yet."}
-              </p>
+              {event.content ? (
+                <RichTextDisplay content={event.content} />
+              ) : (
+                <p className="text-foreground/80 text-base sm:text-lg leading-relaxed whitespace-pre-line">
+                  {event.description || "No details provided yet."}
+                </p>
+              )}
             </div>
 
             {/* Event Details */}
@@ -212,10 +217,13 @@ export default function EventDetailPage() {
             {/* Cancellation Policy */}
             <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold mb-4">Cancellation Policy</h2>
-              <p className="text-foreground/80 text-base sm:text-lg leading-relaxed">
-                {event.cancellation_policy ||
-                  "No cancellation policy specified for this event."}
-              </p>
+              {event.refund_policy ? (
+                <RichTextDisplay content={event.refund_policy} />
+              ) : (
+                <p className="text-foreground/80 text-base sm:text-lg leading-relaxed whitespace-pre-line">
+                  No cancellation policy specified for this event.
+                </p>
+              )}
             </div>
           </div>
 

@@ -17,6 +17,7 @@ interface Event {
   event_code: string;
   name: string;
   description: string;
+  content: any;
   image: string;
   start_date: string;
   end_date: string;
@@ -26,7 +27,7 @@ interface Event {
   company: string;
   created_at: string;
   updated_at: string;
-  cancellation_policy: string;
+  refund_policy: string;
   capacity: number;
   is_published: boolean;
   is_closed: boolean;
@@ -38,6 +39,7 @@ interface Event {
 interface createEvent {
   name: string;
   description: string;
+  content: any;
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional
@@ -46,12 +48,13 @@ interface createEvent {
   company: string; // Pick company code
   image: File;
   is_published: boolean;
-  cancellation_policy: string;
+  refund_policy: string;
 }
 
 interface updateEvent {
   name: string;
   description: string;
+  content: any;
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional
@@ -62,7 +65,7 @@ interface updateEvent {
   image: File;
   is_published: boolean;
   is_closed: boolean;
-  cancellation_policy: string;
+  refund_policy: string;
 }
 
 export const getEvents = async (): Promise<Event[]> => {

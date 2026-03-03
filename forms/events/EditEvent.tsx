@@ -9,7 +9,7 @@ import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateEvent } from "@/services/events";
@@ -72,7 +72,7 @@ const validationSchema = Yup.object({
     ),
   venue: Yup.string().required("Venue is required"),
   capacity: Yup.number().nullable().min(1, "Capacity must be at least 1"),
-  cancellation_policy: Yup.string().required("Cancellation policy is required"),
+  refund_policy: Yup.string().required("Cancellation policy is required"),
   image: Yup.mixed<File>()
     .nullable()
     .test(
@@ -108,14 +108,14 @@ export default function EditEvent({
         <Formik
           initialValues={{
             name: event.name || "",
-            description: event.description || "",
+            content: event.content || event.description || "",
             start_date: event.start_date || "",
             start_time: event.start_time || "",
             end_date: event.end_date || "",
             end_time: event.end_time || "",
             venue: event.venue || "",
             capacity: event.capacity || "",
-            cancellation_policy: event.cancellation_policy || "",
+            refund_policy: event.refund_policy || "",
             image: null as File | null,
             is_closed: event.is_closed || false,
           }}
@@ -124,7 +124,14 @@ export default function EditEvent({
             try {
               const formData = new FormData();
               formData.append("name", values.name);
-              formData.append("description", values.description);
+
+              if (values.content) {
+                formData.append("content", JSON.stringify(values.content));
+              }
+              if (values.refund_policy) {
+                formData.append("refund_policy", JSON.stringify(values.refund_policy));
+              }
+
               formData.append("start_date", values.start_date);
               if (values.start_time)
                 formData.append("start_time", values.start_time);
@@ -134,7 +141,7 @@ export default function EditEvent({
               if (values.capacity) {
                 formData.append("capacity", values.capacity.toString());
               }
-              formData.append("cancellation_policy", values.cancellation_policy);
+              // Cancellation policy is now handled in JSON stringification block above
               formData.append("is_closed", values.is_closed.toString());
 
               if (values.image) {
@@ -160,7 +167,7 @@ export default function EditEvent({
             }
           }}
         >
-          {({ setFieldValue, errors, touched, isSubmitting }) => (
+          {({ setFieldValue, values, errors, touched, isSubmitting }) => (
             <Form className="space-y-4">
               <div className="border-b pb-4">
                 <h2 className="text-2xl font-bold text-gray-900">Edit Event</h2>
@@ -224,20 +231,18 @@ export default function EditEvent({
                 </div>
 
                 <div>
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                    Description <span className="text-destructive">*</span>
+                  <Label htmlFor="content" className="text-sm font-medium text-gray-700">
+                    Description & Details (Rich Text) <span className="text-destructive">*</span>
                   </Label>
-                  <Field
-                    as={Textarea}
-                    id="description"
-                    name="description"
-                    placeholder="Tell attendees what makes this event special..."
-                    rows={5}
-                    className="mt-2 text-sm bg-white"
-                  />
-                  {errors.description && touched.description && (
-                    <p className="text-destructive text-sm mt-1">{errors.description as string}</p>
-                  )}
+                  <div className="mt-2 text-sm">
+                    <RichTextEditor
+                      value={values.content}
+                      onChange={(val) => setFieldValue("content", val)}
+                    />
+                    {errors.content && touched.content && (
+                      <p className="text-destructive text-sm mt-1">{errors.content as string}</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -310,20 +315,18 @@ export default function EditEvent({
                 <h3 className="text-base font-semibold text-gray-900 border-b pb-2">Policies & Media</h3>
 
                 <div>
-                  <Label htmlFor="cancellation_policy" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="refund_policy" className="text-sm font-medium text-gray-700">
                     Cancellation Policy <span className="text-destructive">*</span>
                   </Label>
-                  <Field
-                    as={Textarea}
-                    id="cancellation_policy"
-                    name="cancellation_policy"
-                    placeholder="Describe your policy for ticket cancellations and refunds..."
-                    rows={4}
-                    className="mt-2 text-sm bg-white"
-                  />
-                  {errors.cancellation_policy && touched.cancellation_policy && (
-                    <p className="text-destructive text-sm mt-1">{errors.cancellation_policy as string}</p>
-                  )}
+                  <div className="mt-2 text-sm">
+                    <RichTextEditor
+                      value={values.refund_policy}
+                      onChange={(val) => setFieldValue("refund_policy", val)}
+                    />
+                    {errors.refund_policy && touched.refund_policy && (
+                      <p className="text-destructive text-sm mt-1">{errors.refund_policy as string}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>
