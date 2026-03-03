@@ -157,7 +157,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
     }
 
     return (
-        <div className="flex flex-wrap items-center gap-1 p-2 bg-gray-50/80 border-b border-gray-200">
+        <div className="flex flex-wrap items-center gap-1 gap-y-2 p-2 bg-gray-50/80 border-b border-gray-200">
             <ToolbarButton
                 onClick={() => editor.chain().focus().toggleBold().run()}
                 disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -211,6 +211,19 @@ const MenuBar = ({ editor }: { editor: any }) => {
                 isActive={editor.isActive({ textAlign: 'justify' })}
             >
                 <AlignJustify className="h-4 w-4" />
+            </ToolbarButton>
+
+            <div className="w-[1px] h-5 bg-gray-300 mx-1.5" />
+
+            <ToolbarButton
+                onClick={() => editor.chain().focus().indent().run()}
+            >
+                <IndentIcon className="h-4 w-4" />
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => editor.chain().focus().outdent().run()}
+            >
+                <OutdentIcon className="h-4 w-4" />
             </ToolbarButton>
 
             <div className="w-[1px] h-5 bg-gray-300 mx-1.5" />
@@ -325,7 +338,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
                 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-6 [&_h1]:text-gray-900
                 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-gray-900
                 [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-500 [&_blockquote]:my-4
-                [&_.is-empty::before]:content-[attr(data-placeholder)] [&_.is-empty::before]:text-gray-400 [&_.is-empty::before]:float-left [&_.is-empty::before]:pointer-events-none [&_.is-empty::before]:h-0`,
+                caret-black [&_.is-empty::before]:content-[attr(data-placeholder)] [&_.is-empty::before]:text-gray-400 [&_.is-empty::before]:float-left [&_.is-empty::before]:pointer-events-none [&_.is-empty::before]:h-0`,
             },
         },
         onUpdate: ({ editor }) => {
