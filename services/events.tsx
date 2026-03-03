@@ -17,6 +17,7 @@ interface Event {
   event_code: string;
   name: string;
   description: string;
+  content: any;
   image: string;
   start_date: string;
   end_date: string;
@@ -38,6 +39,7 @@ interface Event {
 interface createEvent {
   name: string;
   description: string;
+  content: any;
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional
@@ -52,6 +54,7 @@ interface createEvent {
 interface updateEvent {
   name: string;
   description: string;
+  content: any;
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional

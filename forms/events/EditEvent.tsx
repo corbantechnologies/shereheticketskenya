@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateEvent } from "@/services/events";
@@ -109,6 +110,7 @@ export default function EditEvent({
           initialValues={{
             name: event.name || "",
             description: event.description || "",
+            content: event.content || null,
             start_date: event.start_date || "",
             start_time: event.start_time || "",
             end_date: event.end_date || "",
@@ -125,6 +127,9 @@ export default function EditEvent({
               const formData = new FormData();
               formData.append("name", values.name);
               formData.append("description", values.description);
+              if (values.content) {
+                formData.append("content", JSON.stringify(values.content));
+              }
               formData.append("start_date", values.start_date);
               if (values.start_time)
                 formData.append("start_time", values.start_time);
@@ -160,7 +165,7 @@ export default function EditEvent({
             }
           }}
         >
-          {({ setFieldValue, errors, touched, isSubmitting }) => (
+          {({ setFieldValue, values, errors, touched, isSubmitting }) => (
             <Form className="space-y-4">
               <div className="border-b pb-4">
                 <h2 className="text-2xl font-bold text-gray-900">Edit Event</h2>
@@ -238,6 +243,18 @@ export default function EditEvent({
                   {errors.description && touched.description && (
                     <p className="text-destructive text-sm mt-1">{errors.description as string}</p>
                   )}
+                </div>
+
+                <div>
+                  <Label htmlFor="content" className="text-sm font-medium text-gray-700">
+                    Event Details (Rich Text)
+                  </Label>
+                  <div className="mt-2">
+                    <RichTextEditor
+                      value={values.content}
+                      onChange={(val) => setFieldValue("content", val)}
+                    />
+                  </div>
                 </div>
               </div>
 
