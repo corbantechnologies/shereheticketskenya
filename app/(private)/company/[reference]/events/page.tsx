@@ -2,15 +2,14 @@
 // app/(private)/company/[reference]/events/page.tsx
 "use client";
 
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useState, useMemo } from "react";
+import CompanyEventsTable from "@/components/events/CompanyEventsTable";
 import { useFetchCompany } from "@/hooks/company/actions";
 import { DashboardSkeleton } from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Calendar, ChevronDown } from "lucide-react";
-import CreateEvent from "@/forms/events/CreateEvent";
-import { useState, useMemo } from "react";
-import CompanyEventsTable from "@/components/events/CompanyEventsTable";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
@@ -20,16 +19,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Modal from "@/components/ui/modal";
 
 export default function CompanyEventsPage() {
+  const router = useRouter();
   const { reference } = useParams<{ reference: string }>();
   const {
     isLoading,
     data: company,
     refetch: refetchCompany,
   } = useFetchCompany(reference);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
 
   if (isLoading) return <DashboardSkeleton />;
@@ -71,7 +69,7 @@ export default function CompanyEventsPage() {
           </div>
           <Button
             size="sm"
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => router.push(`/company/${reference}/events/create`)}
             disabled={!hasRequiredDetails}
             className="h-8 text-xs bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white"
           >
@@ -179,17 +177,6 @@ export default function CompanyEventsPage() {
         </Card>
 
       </div>
-
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      >
-        <CreateEvent
-          companyCode={company.company_code}
-          closeModal={() => setIsCreateModalOpen(false)}
-          refetchEvents={refetchCompany}
-        />
-      </Modal>
     </>
   );
 }

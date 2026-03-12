@@ -21,8 +21,9 @@ import { useState } from "react";
 
 interface CreateEventProps {
   companyCode: string;
-  closeModal: () => void;
-  refetchEvents: () => void;
+  closeModal?: () => void;
+  refetchEvents?: () => void;
+  isPage?: boolean;
 }
 
 const validationSchema = Yup.object({
@@ -36,6 +37,7 @@ export default function CreateEvent({
   companyCode,
   closeModal,
   refetchEvents,
+  isPage = false,
 }: CreateEventProps) {
   const axiosAuth = useAxiosAuth();
   const router = useRouter();
@@ -91,8 +93,11 @@ export default function CreateEvent({
               await createEvent(formData, { headers: axiosAuth.headers });
 
               toast.success("Event created successfully! Click on the newly created event to complete setup.");
-              refetchEvents();
-              closeModal();
+              if (refetchEvents) refetchEvents();
+              if (closeModal) closeModal();
+              if (isPage) {
+                window.history.back();
+              }
             } catch (error: any) {
               console.error("Create event error:", error);
               toast.error(
@@ -310,7 +315,7 @@ export default function CreateEvent({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={closeModal}
+                  onClick={() => isPage ? window.history.back() : closeModal?.()}
                   disabled={isSubmitting}
                 >
                   Cancel
