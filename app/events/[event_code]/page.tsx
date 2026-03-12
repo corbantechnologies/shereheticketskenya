@@ -96,7 +96,7 @@ export default function EventDetailPage() {
   const status = getEventStatus(event);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#d5d5d5]">
       {/* Booking Modal */}
       {showBookingModal && (
         <MakeBooking
@@ -140,7 +140,7 @@ export default function EventDetailPage() {
 
         {/* Hero text */}
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-30">
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-3 drop-shadow-lg">
               {event.name}
             </h1>
@@ -172,16 +172,16 @@ export default function EventDetailPage() {
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 pb-20 lg:pb-8">
+      <div className="mx-auto px-4 sm:px-6 py-8 pb-20 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
           {/* Left — Event Info */}
           <div className="lg:col-span-2 space-y-5">
 
             {/* About */}
-            <Card className="py-0">
+            <Card className="py-0 border-none shadow-lg bg-white">
               <CardContent className="p-4">
-                <h2 className="text-base font-semibold mb-2 text-foreground">About this event</h2>
+                <h2 className="text-lg font-semibold mb-2 text-foreground">About this event</h2>
                 {event.content ? (
                   <RichTextDisplay content={event.content} />
                 ) : (
@@ -193,9 +193,9 @@ export default function EventDetailPage() {
             </Card>
 
             {/* Cancellation Policy */}
-            <Card className="py-0">
+            <Card className="py-0 border-none shadow-lg bg-white">
               <CardContent className="p-4">
-                <h2 className="text-base font-semibold mb-2 text-foreground">Cancellation policy</h2>
+                <h2 className="text-lg font-semibold mb-2 text-foreground">Cancellation policy</h2>
                 {event.refund_policy ? (
                   <RichTextDisplay content={event.refund_policy} />
                 ) : (
@@ -210,7 +210,7 @@ export default function EventDetailPage() {
           {/* Right — Ticket Selection */}
           <div className="lg:col-span-1">
             {event.is_closed ? (
-              <Card className="py-0 lg:sticky top-6 text-center">
+              <Card className="py-0 border-none shadow-lg lg:sticky top-6 text-center bg-white">
                 <CardContent className="p-4">
                   <p className="text-sm text-muted-foreground">
                     This event is closed. No tickets are available.
@@ -218,9 +218,9 @@ export default function EventDetailPage() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="py-0 lg:sticky top-6">
+              <Card className="py-0 border-none shadow-lg lg:sticky top-6 bg-white">
                 <CardContent className="p-4">
-                <h2 className="text-base font-semibold mb-4 text-foreground">Select tickets</h2>
+                <h2 className="text-lg font-semibold mb-4 text-foreground">Select tickets</h2>
                 <div className="space-y-3">
                   {event.ticket_types?.length > 0 ? (
                     <>
@@ -242,7 +242,7 @@ export default function EventDetailPage() {
                         return (
                           <Card
                             key={ticket.reference}
-                            className={`shadow-sm transition-shadow ${
+                            className={`shadow-sm transition-shadow p-0  ${
                               isEligible
                                 ? "hover:shadow-md cursor-pointer"
                                 : "opacity-55 cursor-not-allowed bg-muted/20"
@@ -251,7 +251,7 @@ export default function EventDetailPage() {
                               if (isEligible) setShowBookingModal(true);
                             }}
                           >
-                            <CardContent className="py-4">
+                            <CardContent className="py-3 px-2">
                             <div className="flex justify-between items-start gap-3 mb-2">
                               <div>
                                 <h4
@@ -344,7 +344,7 @@ export default function EventDetailPage() {
 
       {/* Mobile sticky CTA */}
       {!event.is_closed && hasBookableTickets && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border px-4 py-3 flex items-center gap-3">
+        <div className="lg:hidden bg-white fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-gray-200 px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground truncate">{event.name}</p>
             {getLowestPrice() && (
