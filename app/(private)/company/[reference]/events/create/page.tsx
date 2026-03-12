@@ -6,10 +6,23 @@ import { useParams, useRouter } from "next/navigation";
 import CreateEvent from "@/forms/events/CreateEvent";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFetchCompany } from "@/hooks/company/actions";
+import { DashboardSkeleton } from "@/components/general/LoadingComponents";
 
 export default function StandaloneCreateEventPage() {
   const router = useRouter();
   const { reference } = useParams<{ reference: string }>();
+  const { isLoading, data: company } = useFetchCompany(reference);
+
+  if (isLoading) return <DashboardSkeleton />;
+
+  if (!company) {
+    return (
+      <div className="p-8 text-center text-sm text-muted-foreground">
+        Company not found.
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto px-4 sm:px-6 py-6 space-y-6">
@@ -27,7 +40,7 @@ export default function StandaloneCreateEventPage() {
       <Card className="border-none shadow-lg bg-white overflow-hidden">
         <CardContent className="p-0">
           <CreateEvent 
-            companyCode={reference}
+            companyCode={company.company_code}
             isPage={true} 
           />
         </CardContent>
