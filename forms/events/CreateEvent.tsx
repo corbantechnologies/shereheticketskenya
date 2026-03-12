@@ -124,7 +124,7 @@ export default function CreateEvent({
               <div className="bg-gray-50/30 p-4 rounded-xl border border-gray-200 space-y-6">
                 <h3 className="text-base font-semibold text-gray-900 border-b pb-2">Basic Details</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="lg:col-span-2">
+                  <div>
                     <Label htmlFor="name" className="text-sm font-medium text-gray-700">
                       Event Name <span className="text-destructive">*</span>
                     </Label>
@@ -141,20 +141,7 @@ export default function CreateEvent({
                     )}
                   </div>
 
-                  <div className="lg:col-span-2">
-                    <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                      Short Description
-                    </Label>
-                    <Field
-                      as={Textarea}
-                      id="description"
-                      name="description"
-                      placeholder="e.g. A quick summary of the event for previews"
-                      className="mt-2 text-sm bg-white"
-                    />
-                  </div>
-
-                  <div className="lg:col-span-2">
+                  <div>
                     <Label htmlFor="venue" className="text-sm font-medium text-gray-700">
                       Venue <span className="text-destructive">*</span>
                     </Label>
@@ -170,6 +157,21 @@ export default function CreateEvent({
                       <p className="text-destructive text-xs mt-1">{errors.venue as string}</p>
                     )}
                   </div>
+
+                  <div className="lg:col-span-2">
+                    <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                      Short Description
+                    </Label>
+                    <Field
+                      as={Textarea}
+                      id="description"
+                      name="description"
+                      placeholder="e.g. A quick summary of the event for previews"
+                      className="mt-2 text-sm bg-white"
+                    />
+                  </div>
+
+                  
                 </div>
 
                 <div>
