@@ -18,7 +18,7 @@ export default function StandaloneEditEventPage() {
 
   if (!event) {
     return (
-      <div className="container mx-auto p-8 text-center">
+      <div className="mx-auto p-8 text-center">
         <p className="text-muted-foreground">Event not found.</p>
         <button 
           onClick={() => router.back()}
@@ -31,7 +31,7 @@ export default function StandaloneEditEventPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* Header / Breadcrumb */}
       <div className="flex items-center justify-between">
         <button
