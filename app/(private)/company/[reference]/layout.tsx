@@ -17,21 +17,20 @@ export default function CompanyDetailLayout({
   if (isLoading) {
     return (
       <>
-        <div className="h-16 bg-white border-b" />{" "}
-        {/* placeholder for navbar height */}
+        <div className="h-16 bg-white border-b border-gray-200" />
         <DashboardSkeleton />
       </>
     );
   }
 
   if (!company) {
-    return <div className="p-8 text-center">Company not found.</div>;
+    return <div className="p-8 text-center text-sm text-muted-foreground">Company not found.</div>;
   }
 
   return (
     <>
       <OrganizerNavbar company={company} />
-      <main className="pt-16 min-h-screen bg-background">{children}</main>
+      <main className="pt-16 min-h-screen bg-[#d5d5d5]">{children}</main>
     </>
   );
 }
