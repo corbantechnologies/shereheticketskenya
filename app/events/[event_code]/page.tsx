@@ -181,14 +181,17 @@ export default function EventDetailPage() {
             {/* About */}
             <Card className="py-0 border-none shadow-lg bg-white">
               <CardContent className="p-4">
-                <h2 className="text-lg font-semibold mb-2 text-foreground">About this event</h2>
-                {event.content ? (
-                  <RichTextDisplay content={event.content} />
-                ) : (
-                  <p className="text-foreground/70 text-sm leading-relaxed whitespace-pre-line">
-                    {event.description || "No details provided yet."}
+                <h2 className="text-lg font-semibold mb-3 text-foreground">About this event</h2>
+
+                {/* Short description — always shown if present */}
+                {event.description && (
+                  <p className="text-sm text-foreground/80 leading-relaxed mb-3">
+                    {event.description}
                   </p>
                 )}
+
+                {/* Rich text body — always shown */}
+                <RichTextDisplay content={event.content} />
               </CardContent>
             </Card>
 
