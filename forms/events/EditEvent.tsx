@@ -14,20 +14,22 @@ import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
+import { useRouter } from "next/navigation";
 
 interface EditEventProps {
   event: any;
-  closeModal: () => void;
-  refetchEvent: () => void;
+  closeModal?: () => void;
+  refetchEvent?: () => void;
+  isPage?: boolean;
 }
-
-
 
 export default function EditEvent({
   event,
   closeModal,
   refetchEvent,
+  isPage = false,
 }: EditEventProps) {
+  const router = useRouter();
   const [imagePreview, setimagePreview] = useState<string | null>(
     event.image || null
   );
@@ -86,8 +88,13 @@ export default function EditEvent({
               });
 
               toast.success("Event updated successfully!");
-              refetchEvent();
-              closeModal();
+              if (refetchEvent) refetchEvent();
+              if (closeModal) closeModal();
+              if (isPage) {
+                // If the user hasn't provided reference, we might need to extract it or use relative
+                // But usually we'll have the back URL or detail URL
+                window.history.back();
+              }
             } catch (error: any) {
               console.error("Update event error:", error);
               toast.error(
@@ -294,7 +301,7 @@ export default function EditEvent({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={closeModal}
+                  onClick={() => isPage ? window.history.back() : closeModal?.()}
                   disabled={isSubmitting}
                 >
                   Cancel

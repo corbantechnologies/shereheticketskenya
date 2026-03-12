@@ -52,7 +52,6 @@ import { format } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
-import EditEvent from "@/forms/events/EditEvent";
 import EditTicketType from "@/forms/tickettypes/EditTicketType";
 import EventBookingsTable from "@/components/events/EventBookingsTable";
 import CreateCoupon from "@/forms/coupons/CreateCoupon";
@@ -64,7 +63,6 @@ export default function EventDetailPage() {
   const router = useRouter();
   const { reference, event_code } = useParams<{ reference: string; event_code: string }>();
   const { isLoading, data: event, refetch } = useFetchCompanyEvent(event_code);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);
   const [isEditTicketModalOpen, setIsEditTicketModalOpen] = useState(false);
   const [isCreateCouponModalOpen, setIsCreateCouponModalOpen] = useState(false);
@@ -184,7 +182,7 @@ export default function EventDetailPage() {
                   {!event.is_closed && (
                     <>
                       <DropdownMenuItem
-                        onClick={() => setIsEditModalOpen(true)}
+                        onClick={() => router.push(`/company/${reference}/events/${event_code}/edit`)}
                         className="text-xs cursor-pointer"
                       >
                         <Edit3 className="h-3.5 w-3.5 mr-2" /> Edit Event
@@ -603,14 +601,6 @@ export default function EventDetailPage() {
       </div>
 
       {/* ── Modals ───────────────────────────────────────────────────── */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
-        <EditEvent
-          event={event}
-          closeModal={() => setIsEditModalOpen(false)}
-          refetchEvent={refetch}
-        />
-      </Modal>
-
       <Modal
         isOpen={isCreateTicketModalOpen}
         onClose={() => setIsCreateTicketModalOpen(false)}
