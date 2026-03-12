@@ -75,7 +75,7 @@ function EventCard({ event }: { event: any }) {
 
         {/* Footer CTA */}
         <CardFooter className="px-5 pb-5 pt-3">
-          <Button className="w-full bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 shadow-sm text-sm">
+          <Button className="w-full text-white bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 shadow-sm text-sm">
             View Details &amp; Book
           </Button>
         </CardFooter>
