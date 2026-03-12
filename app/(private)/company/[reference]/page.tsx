@@ -55,39 +55,28 @@ export default function CompanyDetailPage() {
     <>
       <div className="container mx-auto px-4 sm:px-6 py-6 space-y-4">
 
-        {/* Top nav row */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.push("/organizer/dashboard")}
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            All companies
-          </button>
+        {/* Company header + overview — unified card */}
+        <Card className="py-0 border-none shadow-lg bg-white overflow-hidden">
+          {/* Top strip: breadcrumb + edit */}
+          <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+            <button
+              onClick={() => router.push("/organizer/dashboard")}
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              All companies
+            </button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setIsEditModalOpen(true)}
+              className="h-7 text-xs border-gray-200 bg-white hover:bg-gray-50 px-2.5"
+            >
+              <Edit3 className="h-3 w-3 mr-1" />
+              Edit
+            </Button>
+          </div>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setIsEditModalOpen(true)}
-            className="h-8 text-sm border-gray-200 bg-white hover:bg-gray-50"
-          >
-            <Edit3 className="h-3.5 w-3.5 mr-1.5" />
-            Edit
-          </Button>
-        </div>
-
-        {/* Incomplete profile alert */}
-        {!hasRequiredDetails && (
-          <Alert className="border-orange-200 bg-orange-50 text-orange-800 py-3">
-            <AlertCircle className="h-4 w-4 !text-orange-600" />
-            <AlertDescription className="text-sm">
-              <span className="font-medium">Profile incomplete.</span> Add your country, city, address, and phone to unlock event management.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Company overview card */}
-        <Card className="py-0 border-none shadow-lg bg-white">
           <CardContent className="p-4">
             <div className="flex items-start gap-4">
               {/* Logo */}
@@ -138,6 +127,16 @@ export default function CompanyDetailPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Incomplete profile alert */}
+        {!hasRequiredDetails && (
+          <Alert className="border-orange-200 bg-orange-50 text-orange-800 py-3">
+            <AlertCircle className="h-4 w-4 !text-orange-600" />
+            <AlertDescription className="text-sm">
+              <span className="font-medium">Profile incomplete.</span> Add your country, city, address, and phone to unlock event management.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Events section */}
         <Card className="py-0 border-none shadow-lg bg-white">
