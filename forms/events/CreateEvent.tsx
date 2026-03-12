@@ -29,7 +29,23 @@ interface CreateEventProps {
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Event name is required"),
   venue: Yup.string().required("Venue is required"),
-  start_date: Yup.date().required("Start date is required"),
+  start_date: Yup.date()
+    .required("Start date is required")
+    .test("is-not-past", "Start date cannot be in the past", function (value) {
+      if (!value) return true;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(value);
+      selectedDate.setHours(0, 0, 0, 0);
+      return selectedDate >= today;
+    }),
+  end_date: Yup.date()
+    .nullable()
+    .test("is-after-start", "End date must be after start date", function (value, context) {
+      const { start_date } = context.parent;
+      if (!value || !start_date) return true;
+      return new Date(value) >= new Date(start_date);
+    }),
   refund_policy: Yup.mixed().required("Cancellation policy is required"),
   content: Yup.mixed().required("Description & Details are required"),
 });
@@ -43,6 +59,9 @@ export default function CreateEvent({
   const headers = useAxiosAuth();
   const router = useRouter();
   const [imagePreview, setimagePreview] = useState<string | null>(null);
+
+  const today = new Date();
+  const minDateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   return (
     <div className="h-full bg-white flex flex-col">
@@ -204,6 +223,7 @@ export default function CreateEvent({
                         <Field
                           type="date"
                           name="start_date"
+                          min={minDateString}
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                           required
                         />
@@ -240,6 +260,9 @@ export default function CreateEvent({
                           name="end_time"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                         />
+                        {errors.end_date && touched.end_date && (
+                          <p className="text-destructive text-xs mt-1">{errors.end_date as string}</p>
+                        )}
                       </div>
                     </div>
                   </div>
