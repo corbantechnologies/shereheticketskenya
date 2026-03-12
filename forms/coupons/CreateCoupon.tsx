@@ -58,7 +58,6 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
                         closeModal();
                         refetch();
                     } catch (error: any) {
-                        console.log(error);
                         if (error?.response?.data) {
                             const errorData = error.response.data;
                             const errorMessage = typeof errorData === 'object'

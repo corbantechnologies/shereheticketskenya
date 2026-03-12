@@ -119,7 +119,6 @@ export default function CreateEvent({
                 window.history.back();
               }
             } catch (error: any) {
-              console.log("Create event error:", error);
               toast.error(
                 error.response?.data?.detail ||
                 error.response?.data?.non_field_errors?.[0] ||

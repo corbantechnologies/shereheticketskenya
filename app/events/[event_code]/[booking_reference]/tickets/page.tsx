@@ -67,7 +67,6 @@ export default function TicketsPage() {
 
       toast.success("Tickets downloaded successfully!");
     } catch (error) {
-      console.error("Download failed:", error);
       toast.error("Failed to download tickets");
     } finally {
       setIsDownloading(false);

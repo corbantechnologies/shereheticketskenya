@@ -80,7 +80,6 @@ export default function UpdateCompany({
       if (closeDialog) closeDialog(); // Close on success
       // alert("Company updated successfully!"); // Removed alert for smoother UX
     } catch (error) {
-      console.error(error);
       alert("Failed to update company");
     } finally {
       setLoading(false);

@@ -118,7 +118,6 @@ export default function RichTextDisplay({ content }: RichTextDisplayProps) {
         );
 
     } catch (error) {
-        console.error("Failed to parse rich text content", error);
 
         // Final ultimate fallback so the page never breaks
         return (

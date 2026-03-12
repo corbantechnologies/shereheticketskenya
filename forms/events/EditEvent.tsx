@@ -128,7 +128,6 @@ export default function EditEvent({
                 window.history.back();
               }
             } catch (error: any) {
-              console.error("Update event error:", error);
               toast.error(
                 error.response?.data?.detail ||
                 error.response?.data?.non_field_errors?.[0] ||

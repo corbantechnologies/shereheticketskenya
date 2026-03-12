@@ -85,7 +85,6 @@ function BookingPayment() {
         }
         // Else: still pending → continue polling
       } catch (err) {
-        console.error("Error during polling:", err);
       }
     }, 5000);
 

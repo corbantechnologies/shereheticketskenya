@@ -64,7 +64,6 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
                         closeModal();
                         refetch();
                     } catch (error: any) {
-                        console.log(error);
                         if (error?.response?.data) {
                             const errorData = error.response.data;
                             const errorMessage = typeof errorData === 'object'

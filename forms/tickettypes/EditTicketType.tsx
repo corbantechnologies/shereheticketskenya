@@ -160,7 +160,6 @@ function EditTicketType({
             closeModal();
             refetch();
           } catch (error: any) {
-            console.error(error);
             const errorMessage =
               error.response?.data?.non_field_errors?.[0] ||
               "Error updating ticket type. Please try again.";
