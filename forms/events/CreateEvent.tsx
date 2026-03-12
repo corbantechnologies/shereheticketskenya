@@ -195,7 +195,7 @@ export default function CreateEvent({
                   <div>
                     <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Start Date & Time <span className="text-destructive">*</span>
+                      Start Date <span className="text-destructive">*</span> & Time <span className="text-muted-foreground text-xs font-normal ml-1">(Optional)</span>
                     </Label>
                     <div className="grid grid-cols-2 gap-4 mt-2">
                       <div>
