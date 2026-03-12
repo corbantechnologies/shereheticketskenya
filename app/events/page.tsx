@@ -4,16 +4,19 @@
 
 import { useFetchEvents } from "@/hooks/events/actions";
 import { LoadingSpinner } from "@/components/general/LoadingComponents";
-import { Calendar, Search, X } from "lucide-react";
+import { Calendar, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import EventCard from "@/components/events/EventsCard";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
+const PAGE_SIZE = 20;
 
 export default function EventsPage() {
   const { isLoading, data: events = [] } = useFetchEvents();
   const [nameQuery, setNameQuery] = useState("");
   const [dateQuery, setDateQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const openEvents = events.filter((event: any) => !event.is_closed);
 
@@ -22,14 +25,24 @@ export default function EventsPage() {
       const matchesName = event.name
         ?.toLowerCase()
         .includes(nameQuery.toLowerCase());
-
       const matchesDate = dateQuery
         ? event.start_date?.startsWith(dateQuery)
         : true;
-
       return matchesName && matchesDate;
     });
   }, [openEvents, nameQuery, dateQuery]);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [nameQuery, dateQuery]);
+
+  const totalPages = Math.ceil(filteredEvents.length / PAGE_SIZE);
+
+  const paginatedEvents = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredEvents.slice(start, start + PAGE_SIZE);
+  }, [filteredEvents, currentPage]);
 
   const hasFilters = nameQuery || dateQuery;
 
@@ -37,6 +50,20 @@ export default function EventsPage() {
     setNameQuery("");
     setDateQuery("");
   };
+
+  // Build compact page number range (max 5 visible page numbers)
+  const pageNumbers = useMemo(() => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const delta = 2;
+    const left = Math.max(2, currentPage - delta);
+    const right = Math.min(totalPages - 1, currentPage + delta);
+    const pages: (number | "...")[] = [1];
+    if (left > 2) pages.push("...");
+    for (let i = left; i <= right; i++) pages.push(i);
+    if (right < totalPages - 1) pages.push("...");
+    pages.push(totalPages);
+    return pages;
+  }, [currentPage, totalPages]);
 
   if (isLoading) {
     return (
@@ -95,11 +122,16 @@ export default function EventsPage() {
 
       {/* Events Grid */}
       <div className="container mx-auto px-4 py-8">
-        {/* Results count */}
+        {/* Results info */}
         <p className="text-sm text-muted-foreground mb-6">
           {hasFilters
             ? `${filteredEvents.length} result${filteredEvents.length !== 1 ? "s" : ""} found`
             : `${openEvents.length} event${openEvents.length !== 1 ? "s" : ""} available`}
+          {totalPages > 1 && (
+            <span className="ml-2 text-muted-foreground/60">
+              · Page {currentPage} of {totalPages}
+            </span>
+          )}
         </p>
 
         {filteredEvents.length === 0 ? (
@@ -118,11 +150,60 @@ export default function EventsPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {filteredEvents.map((event: any) => (
-              <EventCard key={event.event_code} event={event} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {paginatedEvents.map((event: any) => (
+                <EventCard key={event.event_code} event={event} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-1 mt-10">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                {pageNumbers.map((page, i) =>
+                  page === "..." ? (
+                    <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground text-sm">
+                      …
+                    </span>
+                  ) : (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="icon"
+                      className={`h-9 w-9 text-sm ${
+                        currentPage === page
+                          ? "bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white border-0"
+                          : ""
+                      }`}
+                      onClick={() => setCurrentPage(page as number)}
+                    >
+                      {page}
+                    </Button>
+                  )
+                )}
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
