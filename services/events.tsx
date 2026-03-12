@@ -16,8 +16,8 @@ interface Event {
   reference: string;
   event_code: string;
   name: string;
-  description: string;
-  content: any;
+  description: string; // a short detail about the event
+  content: any; // a long detail about the event
   image: string;
   start_date: string;
   end_date: string;
