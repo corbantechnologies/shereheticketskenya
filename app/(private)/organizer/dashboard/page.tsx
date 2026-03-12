@@ -5,16 +5,10 @@
 import { useFetchAccount } from "@/hooks/accounts/actions";
 import { LoadingSpinner } from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Plus, PartyPopper, Lock } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Building2, Plus, Lock, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function OrganizerDashboardPage() {
@@ -23,122 +17,167 @@ export default function OrganizerDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-[#d5d5d5]">
         <LoadingSpinner />
       </div>
     );
   }
 
   if (!organizer) {
-    return <div className="p-8 text-center">Unable to load dashboard.</div>;
+    return (
+      <div className="min-h-screen bg-[#d5d5d5] flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Unable to load dashboard.</p>
+      </div>
+    );
   }
 
-  const { first_name, is_premium, companies = [] } = organizer;
+  const { first_name, last_name, email, is_premium, companies = [] } = organizer;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Greeting */}
-      <div className="bg-gradient-to-br from-[var(--mainBlue)] to-[var(--mainBlue)]/80 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-20 md:py-28">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Welcome back, {first_name}! 🎉
-          </h1>
-          <p className="text-xl opacity-90 max-w-3xl">
-            Manage your event companies and create unforgettable sherehe
-            experiences.
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen">
+      <div className="mx-auto px-4 sm:px-6 py-8 space-y-5">
 
-      {/* Main Content - Now properly below hero without overlap */}
-      <div className="max-w-7xl mx-auto px-6 pt-12 pb-20">
-        {/* Premium Status & Quick Actions */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12">
-          <div className="flex items-center gap-6">
-            <Badge
-              variant={is_premium ? "default" : "secondary"}
-              className="text-lg px-6 py-3"
-            >
-              {is_premium ? "Premium Organizer" : "Free Plan"}
-            </Badge>
-            <p className="text-muted-foreground text-lg">
-              {companies.length}{" "}
-              {companies.length === 1 ? "Company" : "Companies"}
+        {/* Header row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">Organizer Portal</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Manage your event companies and settings.
             </p>
           </div>
 
           <Button
-            size="lg"
             disabled={!is_premium}
-            className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 text-white shadow-lg"
+            className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white text-sm h-9 self-start sm:self-auto"
             onClick={() => {
               // TODO: Open create company modal
             }}
           >
-            <Plus className="mr-2 h-6 w-6" />
-            Create New Company
-            {!is_premium && <Lock className="ml-3 h-5 w-5" />}
+            <Plus className="h-4 w-4 mr-1.5" />
+            New company
+            {!is_premium && <Lock className="h-3.5 w-3.5 ml-2" />}
           </Button>
         </div>
 
-        {/* Companies Grid */}
-        {companies.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {companies.map((company: any) => (
-              <Card
-                key={company.reference}
-                className="hover:shadow-2xl transition-all duration-300 cursor-pointer border border-border bg-card hover:border-[var(--mainBlue)]/30"
-                onClick={() => router.push(`/company/${company.reference}`)}
+        {/* Profile + plan card */}
+        <Card className="py-0 border-none shadow-lg bg-white">
+          <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={undefined} />
+                <AvatarFallback className="bg-[var(--mainBlue)]/10 text-[var(--mainBlue)] text-sm font-semibold">
+                  {first_name?.[0]}{last_name?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  {first_name} {last_name}
+                </p>
+                <p className="text-xs text-muted-foreground">{email}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge
+                variant={is_premium ? "default" : "secondary"}
+                className={`text-xs px-2.5 py-0.5 ${is_premium ? "bg-[var(--mainBlue)] text-white" : ""}`}
               >
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <Avatar className="h-16 w-16 ring-4 ring-background shadow-lg">
-                      <AvatarImage src={company.logo || undefined} />
-                      <AvatarFallback className="bg-[var(--mainRed)] text-white text-2xl font-bold">
-                        <Building2 className="h-8 w-8" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <PartyPopper className="h-10 w-10 text-[var(--mainRed)] opacity-30" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardTitle className="text-xl mb-2">{company.name}</CardTitle>
-                  <CardDescription className="text-sm mb-6">
-                    {company.company_code}
-                  </CardDescription>
-                  <Button
-                    className="w-full bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/company/${company.reference}`);
-                    }}
-                  >
-                    Manage Company
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card className="border-dashed border-2">
-            <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-              <Building2 className="h-20 w-20 text-muted-foreground mb-6" />
-              <CardTitle className="text-2xl mb-3">No Companies Yet</CardTitle>
-              <CardDescription className="max-w-md mb-8">
-                Start by creating your first event company. Premium users can
-                create multiple.
-              </CardDescription>
-              <Button
-                size="lg"
-                disabled={!is_premium}
-                className="bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                Create Company
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+                {is_premium ? "Premium" : "Free plan"}
+              </Badge>
+              {!is_premium && (
+                <p className="text-xs text-muted-foreground">
+                  Upgrade to unlock multiple companies &amp; more.
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Companies section */}
+        <Card className="py-0 border-none shadow-lg bg-white">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-foreground">
+                Companies
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  {companies.length} {companies.length === 1 ? "company" : "companies"}
+                </span>
+              </h2>
+            </div>
+
+            {companies.length > 0 ? (
+              <div className="rounded-lg border border-gray-200 overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-muted/40 border-b border-gray-200">
+                      <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Company</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground hidden sm:table-cell">Code</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {companies.map((company: any) => (
+                      <tr
+                        key={company.reference}
+                        className="hover:bg-muted/20 transition-colors cursor-pointer"
+                        onClick={() => router.push(`/company/${company.reference}`)}
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8 shrink-0">
+                              <AvatarImage src={company.logo || undefined} />
+                              <AvatarFallback className="bg-[var(--mainRed)]/10 text-[var(--mainRed)] text-xs font-semibold">
+                                <Building2 className="h-4 w-4" />
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium text-foreground text-sm">{company.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground text-xs hidden sm:table-cell font-mono">
+                          {company.company_code}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            className="inline-flex items-center gap-1 text-xs text-[var(--mainBlue)] hover:underline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/company/${company.reference}`);
+                            }}
+                          >
+                            Manage <ChevronRight className="h-3.5 w-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center mb-3">
+                  <Building2 className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">No companies yet</p>
+                <p className="text-xs text-muted-foreground mb-4 max-w-xs">
+                  {is_premium
+                    ? "Create your first event company to get started."
+                    : "Upgrade to premium to create your first event company."}
+                </p>
+                <Button
+                  size="sm"
+                  disabled={!is_premium}
+                  className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white text-xs h-8"
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Create company
+                  {!is_premium && <Lock className="h-3 w-3 ml-1.5" />}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+
+
       </div>
     </div>
   );

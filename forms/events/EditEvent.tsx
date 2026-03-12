@@ -14,20 +14,23 @@ import { Upload, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
+import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
 
 interface EditEventProps {
   event: any;
-  closeModal: () => void;
-  refetchEvent: () => void;
+  closeModal?: () => void;
+  refetchEvent?: () => void;
+  isPage?: boolean;
 }
-
-
 
 export default function EditEvent({
   event,
   closeModal,
   refetchEvent,
+  isPage = false,
 }: EditEventProps) {
+  const router = useRouter();
   const [imagePreview, setimagePreview] = useState<string | null>(
     event.image || null
   );
@@ -42,7 +45,8 @@ export default function EditEvent({
         <Formik
           initialValues={{
             name: event.name || "",
-            content: event.content || event.description || "",
+            description: event.description || "",
+            content: event.content || "",
             start_date: event.start_date || "",
             start_time: event.start_time || "",
             end_date: event.end_date || "",
@@ -51,12 +55,14 @@ export default function EditEvent({
             capacity: event.capacity || "",
             refund_policy: event.refund_policy || "",
             image: null as File | null,
+            is_published: event.is_published || false,
             is_closed: event.is_closed || false,
           }}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               const formData = new FormData();
               formData.append("name", values.name);
+              formData.append("description", values.description);
 
               if (values.content) {
                 formData.append("content", JSON.stringify(values.content));
@@ -74,7 +80,7 @@ export default function EditEvent({
               if (values.capacity) {
                 formData.append("capacity", values.capacity.toString());
               }
-              // Cancellation policy is now handled in JSON stringification block above
+              formData.append("is_published", values.is_published.toString());
               formData.append("is_closed", values.is_closed.toString());
 
               if (values.image) {
@@ -86,8 +92,13 @@ export default function EditEvent({
               });
 
               toast.success("Event updated successfully!");
-              refetchEvent();
-              closeModal();
+              if (refetchEvent) refetchEvent();
+              if (closeModal) closeModal();
+              if (isPage) {
+                // If the user hasn't provided reference, we might need to extract it or use relative
+                // But usually we'll have the back URL or detail URL
+                window.history.back();
+              }
             } catch (error: any) {
               console.error("Update event error:", error);
               toast.error(
@@ -122,6 +133,19 @@ export default function EditEvent({
                       id="name"
                       name="name"
                       placeholder="e.g. New Year's Bash 2026"
+                      className="mt-2 text-sm bg-white"
+                    />
+                  </div>
+
+                  <div className="lg:col-span-2">
+                    <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                      Short Description <span className="text-destructive">*</span>
+                    </Label>
+                    <Field
+                      as={Textarea}
+                      id="description"
+                      name="description"
+                      placeholder="e.g. A quick summary of the event for previews"
                       className="mt-2 text-sm bg-white"
                     />
                   </div>
@@ -271,22 +295,36 @@ export default function EditEvent({
               </div>
 
               {/* Status Section */}
-              <div className="bg-red-50/50 p-6 rounded-xl border border-red-100 flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-semibold text-red-900">Event Status</h3>
-                  <p className="text-sm text-red-700/80 mt-1">Closing an event will stop all ticket registrations and sales.</p>
+              <div className="bg-gray-50/30 p-6 rounded-xl border border-gray-200 space-y-4">
+                <h3 className="text-base font-semibold text-gray-900 border-b pb-2">Status & Visibility</h3>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center space-x-3 bg-white px-4 py-3 rounded-lg border border-gray-200 shadow-sm flex-1">
+                    <Field
+                      type="checkbox"
+                      id="is_published"
+                      name="is_published"
+                      className="h-5 w-5 rounded border-gray-300 text-[var(--mainBlue)] focus:ring-[var(--mainBlue)] cursor-pointer"
+                    />
+                    <Label htmlFor="is_published" className="text-sm font-semibold text-gray-900 cursor-pointer">
+                      Published
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3 bg-red-50 px-4 py-3 rounded-lg border border-red-200 shadow-sm flex-1">
+                    <Field
+                      type="checkbox"
+                      id="is_closed"
+                      name="is_closed"
+                      className="h-5 w-5 rounded border-gray-300 text-[var(--mainRed)] focus:ring-[var(--mainRed)] cursor-pointer"
+                    />
+                    <Label htmlFor="is_closed" className="text-sm font-semibold text-red-900 cursor-pointer">
+                      Close Event
+                    </Label>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3 bg-white px-4 py-3 rounded-lg border border-red-200 shadow-sm">
-                  <Field
-                    type="checkbox"
-                    id="is_closed"
-                    name="is_closed"
-                    className="h-5 w-5 rounded border-gray-300 text-[var(--mainRed)] focus:ring-[var(--mainRed)] cursor-pointer"
-                  />
-                  <Label htmlFor="is_closed" className="text-sm font-semibold text-gray-900 cursor-pointer">
-                    Close Event
-                  </Label>
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  Published events are visible to the public. Closing an event stops all sales.
+                </p>
               </div>
 
               {/* Submit */}
@@ -294,7 +332,7 @@ export default function EditEvent({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={closeModal}
+                  onClick={() => isPage ? window.history.back() : closeModal?.()}
                   disabled={isSubmitting}
                 >
                   Cancel

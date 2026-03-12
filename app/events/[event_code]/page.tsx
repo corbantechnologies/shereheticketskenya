@@ -17,7 +17,23 @@ import { useFetchEvent } from "@/hooks/events/actions";
 import TicketTypeChip from "@/components/events/TicketTypeChip";
 import MakeBooking from "@/forms/bookings/MakeBooking";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import RichTextDisplay from "@/components/ui/RichTextDisplay";
+
+function getEventStatus(event: any): { label: string; color: string } | null {
+  if (event.is_closed) return { label: "Closed", color: "bg-red-500/80" };
+  const now = new Date();
+  const start = new Date(event.start_date);
+  const diffDays = Math.ceil(
+    (start.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0)) /
+      (1000 * 60 * 60 * 24)
+  );
+  if (diffDays === 0) return { label: "Today", color: "bg-green-500/80" };
+  if (diffDays === 1) return { label: "Tomorrow", color: "bg-blue-500/80" };
+  if (diffDays <= 7) return { label: "This Week", color: "bg-[var(--mainBlue)]/80" };
+  if (diffDays <= 14) return { label: "This Month", color: "bg-purple-500/80" };
+  return null;
+}
 
 export default function EventDetailPage() {
   const { event_code } = useParams<{ event_code: string }>();
@@ -30,15 +46,13 @@ export default function EventDetailPage() {
     refetch: refetchEvent,
   } = useFetchEvent(event_code);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       month: "long",
       day: "numeric",
       year: "numeric",
     });
-  };
 
   const formatTime = (timeString: string | null) => {
     if (!timeString) return "TBA";
@@ -49,41 +63,40 @@ export default function EventDetailPage() {
     });
   };
 
-  const formatTicketDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+  const formatTicketDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
     });
-  };
 
   const getLowestPrice = () => {
-    if (!event?.ticket_types || event.ticket_types.length === 0) return null;
-    const prices = event.ticket_types.map((ticket: any) =>
-      parseFloat(ticket.price)
-    );
-    return Math.min(...prices);
+    if (!event?.ticket_types?.length) return null;
+    return Math.min(...event.ticket_types.map((t: any) => parseFloat(t.price)));
   };
+
+  const hasBookableTickets = event?.ticket_types?.some(
+    (t: any) => t.status === "ON_SALE" || !t.status
+  );
 
   const defaultImage =
     "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=800&h=400&fit=crop";
 
-  if (isLoadingEvent) {
-    return <LoadingSpinner />;
-  }
+  if (isLoadingEvent) return <LoadingSpinner />;
 
   if (!event) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground text-xl">Event not found</p>
+        <p className="text-muted-foreground">Event not found</p>
       </div>
     );
   }
 
+  const status = getEventStatus(event);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#d5d5d5]">
       {/* Booking Modal */}
       {showBookingModal && (
         <MakeBooking
@@ -93,28 +106,14 @@ export default function EventDetailPage() {
         />
       )}
 
-      {/* Sticky Top Bar */}
-      <div className="bg-white shadow-sm sticky top-0 z-40 border-b border-border">
-        <div className="px-6 py-4 flex items-center justify-start">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 px-4 py-2 text-foreground hover:bg-muted rounded-md transition"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back to Events
-          </button>
-        </div>
-      </div>
-
       {/* Hero Banner */}
-      <div className="relative h-[60vh] md:h-96 w-full overflow-hidden bg-black/90">
-        {/* Blurred Background Layer for filling space */}
+      <div className="relative h-[55vh] md:h-[420px] w-full overflow-hidden bg-black/90">
+        {/* Blurred background */}
         <div
           className="absolute inset-0 bg-cover bg-center blur-2xl opacity-40 scale-110"
           style={{ backgroundImage: `url(${event.image || defaultImage})` }}
         />
-
-        {/* Main Image Layer (Full Visibility) */}
+        {/* Main image */}
         <div className="relative h-full w-full flex items-center justify-center z-10 p-4">
           <img
             src={event.image || defaultImage}
@@ -122,168 +121,168 @@ export default function EventDetailPage() {
             className="max-h-full max-w-full object-contain drop-shadow-2xl"
           />
         </div>
-
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-20" />
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 z-30">
-          <div className="mx-auto max-w-7xl">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+        {/* Back button — overlay pill */}
+        <button
+          onClick={() => router.back()}
+          className="absolute top-5 left-5 z-30 flex items-center gap-1.5 bg-black/40 hover:bg-black/60 text-white text-sm px-3 py-1.5 rounded-full backdrop-blur-sm transition"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
+
+        {/* Status badge */}
+        {status && (
+          <span className={`absolute top-5 right-5 z-30 text-xs font-medium text-white px-3 py-1 rounded-full backdrop-blur-sm ${status.color}`}>
+            {status.label}
+          </span>
+        )}
+
+        {/* Hero text */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-30">
+          <div className="mx-auto">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-3 drop-shadow-lg">
               {event.name}
             </h1>
-            <div className="flex flex-wrap gap-4 sm:gap-6 text-white/90 text-base sm:text-lg">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="flex flex-wrap gap-3 sm:gap-5 text-white/85 text-sm">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />
                 <span>{formatDate(event.start_date)}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4" />
                 <span>
                   {formatTime(event.start_time)}
-                  {event.end_time && ` - ${formatTime(event.end_time)}`}
+                  {event.end_time && ` – ${formatTime(event.end_time)}`}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4" />
                 <span>{event.venue || "Venue TBA"}</span>
               </div>
+              {event.capacity && (
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4" />
+                  <span>{event.capacity} capacity</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className=" mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
-          {/* Left Column - Event Info */}
-          <div className="lg:col-span-2 space-y-6 sm:space-y-10">
-            {/* About */}
-            <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold mb-4">About This Event</h2>
-              {event.content ? (
-                <RichTextDisplay content={event.content} />
-              ) : (
-                <p className="text-foreground/80 text-base sm:text-lg leading-relaxed whitespace-pre-line">
-                  {event.description || "No details provided yet."}
-                </p>
-              )}
-            </div>
+      <div className="mx-auto px-4 sm:px-6 py-8 pb-20 lg:pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
-            {/* Event Details */}
-            <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold mb-6">Event Details</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                <div className="flex items-start gap-4">
-                  <Calendar className="w-6 h-6 text-[var(--mainBlue)] mt-1" />
-                  <div>
-                    <p className="font-semibold">Date</p>
-                    <p className="text-foreground/80">
-                      {formatDate(event.start_date)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <Clock className="w-6 h-6 text-[var(--mainBlue)] mt-1" />
-                  <div>
-                    <p className="font-semibold">Time</p>
-                    <p className="text-foreground/80">
-                      {formatTime(event.start_time)}
-                      {event.end_time && ` - ${formatTime(event.end_time)}`}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <MapPin className="w-6 h-6 text-[var(--mainBlue)] mt-1" />
-                  <div>
-                    <p className="font-semibold">Venue</p>
-                    <p className="text-foreground/80">
-                      {event.venue || "To be announced"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <Users className="w-6 h-6 text-[var(--mainBlue)] mt-1" />
-                  <div>
-                    <p className="font-semibold">Capacity</p>
-                    <p className="text-foreground/80">
-                      {event.capacity
-                        ? `${event.capacity} attendees`
-                        : "Not specified"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Left — Event Info */}
+          <div className="lg:col-span-2 space-y-5">
+
+            {/* About */}
+            <Card className="py-0 border-none shadow-lg bg-white">
+              <CardContent className="p-4">
+                <h2 className="text-lg font-semibold mb-3 text-foreground">About this event</h2>
+
+                {/* Short description — always shown if present */}
+                {event.description && (
+                  <p className="text-sm text-foreground/80 leading-relaxed mb-3">
+                    {event.description}
+                  </p>
+                )}
+
+                {/* Rich text body — always shown */}
+                <RichTextDisplay content={event.content} />
+              </CardContent>
+            </Card>
 
             {/* Cancellation Policy */}
-            <div className="bg-card rounded-xl shadow-md p-5 sm:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold mb-4">Cancellation Policy</h2>
-              {event.refund_policy ? (
-                <RichTextDisplay content={event.refund_policy} />
-              ) : (
-                <p className="text-foreground/80 text-base sm:text-lg leading-relaxed whitespace-pre-line">
-                  No cancellation policy specified for this event.
-                </p>
-              )}
-            </div>
+            <Card className="py-0 border-none shadow-lg bg-white">
+              <CardContent className="p-4">
+                <h2 className="text-lg font-semibold mb-2 text-foreground">Cancellation policy</h2>
+                {event.refund_policy ? (
+                  <RichTextDisplay content={event.refund_policy} />
+                ) : (
+                  <p className="text-foreground/70 text-sm leading-relaxed">
+                    No cancellation policy specified for this event.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Right Column - Ticket Selection */}
+          {/* Right — Ticket Selection */}
           <div className="lg:col-span-1">
             {event.is_closed ? (
-              <div className="lg:sticky top-24 bg-card rounded-xl shadow-md p-5 sm:p-8 text-center">
-                <p className="text-lg sm:text-xl text-muted-foreground">
-                  This event is closed. No tickets are available.
-                </p>
-              </div>
+              <Card className="py-0 border-none shadow-lg lg:sticky top-6 text-center bg-white">
+                <CardContent className="p-4">
+                  <p className="text-sm text-muted-foreground">
+                    This event is closed. No tickets are available.
+                  </p>
+                </CardContent>
+              </Card>
             ) : (
-              <div className="lg:sticky top-24 bg-card rounded-xl shadow-md p-5 sm:p-8">
-                <h2 className="text-xl sm:text-2xl font-bold mb-6">Select Tickets</h2>
-                <div className="space-y-4 sm:space-y-5">
-                  {event.ticket_types && event.ticket_types.length > 0 ? (
+              <Card className="py-0 border-none shadow-lg lg:sticky top-6 bg-white">
+                <CardContent className="p-4">
+                <h2 className="text-lg font-semibold mb-4 text-foreground">Select tickets</h2>
+                <div className="space-y-3">
+                  {event.ticket_types?.length > 0 ? (
                     <>
                       {event.ticket_types.map((ticket: any) => {
-                        const isEligible = ticket.status === "ON_SALE" || !ticket.status;
+                        const isEligible =
+                          ticket.status === "ON_SALE" || !ticket.status;
+                        const isStruckThrough =
+                          ticket.status === "SOLD_OUT" ||
+                          ticket.status === "ENDED";
 
-                        const getStatusColor = (status: string) => {
-                          switch (status) {
-                            case "ON_SALE": return "bg-green-100 text-green-800 border-green-200";
-                            case "SOLD_OUT": return "bg-red-100 text-red-800 border-red-200";
-                            case "UPCOMING": return "bg-blue-100 text-blue-800 border-blue-200";
-                            case "PAUSED": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-                            case "ENDED": return "bg-gray-100 text-gray-800 border-gray-200";
-                            default: return "bg-muted text-muted-foreground border-border";
-                          }
+                        const statusColors: Record<string, string> = {
+                          ON_SALE: "bg-green-100 text-green-800 border-green-200",
+                          SOLD_OUT: "bg-red-100 text-red-800 border-red-200",
+                          UPCOMING: "bg-blue-100 text-blue-800 border-blue-200",
+                          PAUSED: "bg-yellow-100 text-yellow-800 border-yellow-200",
+                          ENDED: "bg-gray-100 text-gray-800 border-gray-200",
                         };
-
-                        const formatStatusName = (status: string) => {
-                          if (!status) return "AVAILABLE";
-                          return status.replace("_", " ");
-                        };
-
-                        const isStruckThrough = ticket.status === "SOLD_OUT" || ticket.status === "ENDED";
 
                         return (
-                          <div
+                          <Card
                             key={ticket.reference}
-                            className={`border border-border rounded-xl p-4 sm:p-6 transition-colors ${isEligible
-                              ? "hover:border-[var(--mainRed)]/50 cursor-pointer"
-                              : "opacity-60 cursor-not-allowed bg-muted/30"
-                              }`}
+                            className={`shadow-sm transition-shadow p-0  ${
+                              isEligible
+                                ? "hover:shadow-md cursor-pointer"
+                                : "opacity-55 cursor-not-allowed bg-muted/20"
+                            }`}
                             onClick={() => {
                               if (isEligible) setShowBookingModal(true);
                             }}
                           >
-                            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-3 sm:mb-4">
+                            <CardContent className="py-3 px-2">
+                            <div className="flex justify-between items-start gap-3 mb-2">
                               <div>
-                                <h4 className={`text-lg sm:text-xl font-bold flex flex-wrap items-center gap-2 sm:gap-3 ${isStruckThrough ? "line-through text-muted-foreground" : ""}`}>
+                                <h4
+                                  className={`text-sm font-medium flex flex-wrap items-center gap-2 ${
+                                    isStruckThrough
+                                      ? "line-through text-muted-foreground"
+                                      : ""
+                                  }`}
+                                >
                                   {ticket.name}
                                   {ticket.status && ticket.status !== "ON_SALE" && (
-                                    <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${getStatusColor(ticket.status)} decoration-0 no-underline`}>
-                                      {formatStatusName(ticket.status)}
+                                    <span
+                                      className={`text-xs px-2 py-0.5 rounded-full border font-medium no-underline ${
+                                        statusColors[ticket.status] ??
+                                        "bg-muted text-muted-foreground border-border"
+                                      }`}
+                                    >
+                                      {ticket.status.replace("_", " ")}
                                     </span>
                                   )}
                                 </h4>
-                                <p className={`text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 ${isStruckThrough ? "line-through text-muted-foreground" : "text-[var(--mainRed)]"}`}>
+                                <p
+                                  className={`text-lg font-semibold mt-0.5 ${
+                                    isStruckThrough
+                                      ? "line-through text-muted-foreground"
+                                      : "text-[var(--mainBlue)]"
+                                  }`}
+                                >
                                   KES {parseFloat(ticket.price).toLocaleString()}
                                 </p>
                               </div>
@@ -294,64 +293,77 @@ export default function EventDetailPage() {
                                 }
                               />
                             </div>
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 gap-2">
+
+                            <div className="text-xs text-muted-foreground">
                               {ticket.quantity_available !== null ? (
                                 ticket.quantity_available <= 10 ? (
-                                  <p className="text-orange-600 font-semibold">
-                                    Only {ticket.quantity_available} tickets left!
-                                  </p>
+                                  <span className="text-orange-600 font-medium">
+                                    Only {ticket.quantity_available} left!
+                                  </span>
                                 ) : (
-                                  <p className="text-muted-foreground">
-                                    {ticket.quantity_available} tickets available
-                                  </p>
+                                  <span>{ticket.quantity_available} available</span>
                                 )
                               ) : (
-                                <p className="text-muted-foreground">
-                                  Unlimited tickets
-                                </p>
+                                <span>Unlimited</span>
                               )}
-
-                              {/* Show status label explicitly if not active */}
                               {!isEligible && (
-                                <p className="text-sm font-medium text-red-600/80">
+                                <p className="text-red-500/80 mt-1">
                                   {ticket.status === "UPCOMING" && ticket.sales_start
-                                    ? `Sales start on ${formatTicketDate(ticket.sales_start)}`
+                                    ? `Sales open ${formatTicketDate(ticket.sales_start)}`
                                     : ticket.status === "ENDED" && ticket.sales_end
-                                      ? `Sales ended on ${formatTicketDate(ticket.sales_end)}`
-                                      : "Currently unavailable for booking"}
+                                    ? `Sales ended ${formatTicketDate(ticket.sales_end)}`
+                                    : "Currently unavailable"}
                                 </p>
                               )}
                             </div>
-                          </div>
+                            </CardContent>
+                          </Card>
                         );
                       })}
 
                       <Button
                         onClick={() => setShowBookingModal(true)}
-                        disabled={!event.ticket_types.some((t: any) => t.status === "ON_SALE" || !t.status)}
-                        className="w-full bg-[var(--mainRed)] hover:bg-[var(--mainRed)]/90 text-white text-base sm:text-lg py-5 sm:py-6 shadow-lg disabled:opacity-50"
+                        disabled={!hasBookableTickets}
+                        className="w-full bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white py-5 mt-1 disabled:opacity-50"
                       >
-                        {event.ticket_types.some((t: any) => t.status === "ON_SALE" || !t.status)
-                          ? "Get Tickets"
-                          : "No Tickets Available"}
+                        {hasBookableTickets ? "Get Tickets" : "No Tickets Available"}
                       </Button>
-                      <p className="text-center text-sm text-muted-foreground mt-4">
+                      <p className="text-center text-xs text-muted-foreground">
                         Secure payment processing
                       </p>
                     </>
                   ) : (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground text-lg">
-                        No tickets available for this event
-                      </p>
-                    </div>
+                    <p className="text-sm text-muted-foreground text-center py-6">
+                      No tickets available for this event
+                    </p>
                   )}
                 </div>
-              </div>
+              </CardContent>
+            </Card>
             )}
           </div>
         </div>
       </div>
+
+      {/* Mobile sticky CTA */}
+      {!event.is_closed && hasBookableTickets && (
+        <div className="lg:hidden bg-white fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-gray-200 px-4 py-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-muted-foreground truncate">{event.name}</p>
+            {getLowestPrice() && (
+              <p className="text-sm font-medium text-foreground">
+                From KES {getLowestPrice()!.toLocaleString()}
+              </p>
+            )}
+          </div>
+          <Button
+            onClick={() => setShowBookingModal(true)}
+            className="shrink-0 bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white px-5"
+          >
+            Get Tickets
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

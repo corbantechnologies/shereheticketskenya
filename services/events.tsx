@@ -16,8 +16,8 @@ interface Event {
   reference: string;
   event_code: string;
   name: string;
-  description: string;
-  content: any;
+  description: string; // a short detail about the event
+  content: any; // a long detail about the event
   image: string;
   start_date: string;
   end_date: string;
@@ -38,8 +38,8 @@ interface Event {
 
 interface createEvent {
   name: string;
-  description: string;
-  content: any;
+  description: string; // short description about the event
+  content: any; // long description about the event - this is rich text
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional
@@ -48,13 +48,13 @@ interface createEvent {
   company: string; // Pick company code
   image: File;
   is_published: boolean;
-  refund_policy: any;
+  refund_policy: any; // rich text
 }
 
 interface updateEvent {
   name: string;
-  description: string;
-  content: any;
+  description: string; // short description about the event
+  content: any; // long description about the event - this is rich text
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional
@@ -65,7 +65,7 @@ interface updateEvent {
   image: File;
   is_published: boolean;
   is_closed: boolean;
-  refund_policy: any;
+  refund_policy: any; // rich text
 }
 
 export const getEvents = async (): Promise<Event[]> => {
@@ -134,6 +134,18 @@ export const publishEvent = async (
   const response: AxiosResponse<Event> = await apiActions.patch(
     `/api/v1/events/${event_code}/`,
     { is_published: true },
+    headers
+  );
+  return response.data;
+};
+
+export const unpublishEvent = async (
+  event_code: string,
+  headers: { headers: { Authorization: string } }
+): Promise<Event> => {
+  const response: AxiosResponse<Event> = await apiActions.patch(
+    `/api/v1/events/${event_code}/`,
+    { is_published: false },
     headers
   );
   return response.data;

@@ -9,8 +9,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-      <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md shadow-lg">
+      <div className="mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="font-bold text-2xl tracking-tight">
           Sherehe <span className="text-[var(--mainRed)]">Tickets</span>
@@ -76,13 +76,13 @@ export default function Navbar() {
             >
               About
             </Link>
-            <Link
+            {/* <Link
               href="/categories"
               className="text-lg font-medium"
               onClick={() => setMobileOpen(false)}
             >
               Categories
-            </Link>
+            </Link> */}
             <Link
               href="/organizers"
               className="text-lg font-medium"
@@ -91,12 +91,12 @@ export default function Navbar() {
               For Organizers
             </Link>
           </nav>
-          <div className="flex flex-col gap-3 pt-4 border-t border-border">
-            <Button variant="outline" className="w-full justify-start" asChild>
+          <div className="flex gap-3 pt-4 border-t border-gray-300">
+            <Button variant="default" className="flex-1 bg-red-500 text-white justify-center" asChild>
               <Link href="/login">Log In</Link>
             </Button>
-            <Button className="w-full justify-start md:justify-center" asChild>
-              <Link href="/register">Sign Up</Link>
+            <Button className="flex-1 bg-green-500 text-white justify-center" asChild>
+              <Link href="/register" >Sign Up</Link>
             </Button>
           </div>
         </div>

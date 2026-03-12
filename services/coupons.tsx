@@ -23,6 +23,7 @@ export interface Coupon {
     valid_to: string;
     usage_limit: number;
     usage_count: number;
+    tickets_sold: number;
     is_active: boolean;
     created_at: string;
     updated_at: string;
