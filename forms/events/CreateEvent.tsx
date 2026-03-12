@@ -26,11 +26,28 @@ interface CreateEventProps {
   isPage?: boolean;
 }
 
-const validationSchema = Yup.object({
+const validationSchema = Yup.object().shape({
   name: Yup.string().required("Event name is required"),
-  description: Yup.string().required("Short description is required"),
   venue: Yup.string().required("Venue is required"),
-  start_date: Yup.date().required("Start date is required"),
+  start_date: Yup.date()
+    .required("Start date is required")
+    .test("is-not-past", "Start date cannot be in the past", function (value) {
+      if (!value) return true;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(value);
+      selectedDate.setHours(0, 0, 0, 0);
+      return selectedDate >= today;
+    }),
+  end_date: Yup.date()
+    .nullable()
+    .test("is-after-start", "End date must be after start date", function (value, context) {
+      const { start_date } = context.parent;
+      if (!value || !start_date) return true;
+      return new Date(value) >= new Date(start_date);
+    }),
+  refund_policy: Yup.mixed().required("Cancellation policy is required"),
+  content: Yup.mixed().required("Description & Details are required"),
 });
 
 export default function CreateEvent({
@@ -39,9 +56,12 @@ export default function CreateEvent({
   refetchEvents,
   isPage = false,
 }: CreateEventProps) {
-  const axiosAuth = useAxiosAuth();
+  const headers = useAxiosAuth();
   const router = useRouter();
   const [imagePreview, setimagePreview] = useState<string | null>(null);
+
+  const today = new Date();
+  const minDateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   return (
     <div className="h-full bg-white flex flex-col">
@@ -90,7 +110,7 @@ export default function CreateEvent({
                 formData.append("image", values.image);
               }
 
-              await createEvent(formData, { headers: axiosAuth.headers });
+              await createEvent(formData, headers);
 
               toast.success("Event created successfully! Click on the newly created event to complete setup.");
               if (refetchEvents) refetchEvents();
@@ -99,7 +119,6 @@ export default function CreateEvent({
                 window.history.back();
               }
             } catch (error: any) {
-              console.error("Create event error:", error);
               toast.error(
                 error.response?.data?.detail ||
                 error.response?.data?.non_field_errors?.[0] ||
@@ -123,7 +142,7 @@ export default function CreateEvent({
               <div className="bg-gray-50/30 p-4 rounded-xl border border-gray-200 space-y-6">
                 <h3 className="text-base font-semibold text-gray-900 border-b pb-2">Basic Details</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="lg:col-span-2">
+                  <div>
                     <Label htmlFor="name" className="text-sm font-medium text-gray-700">
                       Event Name <span className="text-destructive">*</span>
                     </Label>
@@ -133,29 +152,14 @@ export default function CreateEvent({
                       name="name"
                       placeholder="e.g. New Year's Bash 2026"
                       className="mt-2 text-sm bg-white"
+                      required
                     />
                     {errors.name && touched.name && (
                       <p className="text-destructive text-xs mt-1">{errors.name as string}</p>
                     )}
                   </div>
 
-                  <div className="lg:col-span-2">
-                    <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                      Short Description <span className="text-destructive">*</span>
-                    </Label>
-                    <Field
-                      as={Textarea}
-                      id="description"
-                      name="description"
-                      placeholder="e.g. A quick summary of the event for previews"
-                      className="mt-2 text-sm bg-white"
-                    />
-                    {errors.description && touched.description && (
-                      <p className="text-destructive text-xs mt-1">{errors.description as string}</p>
-                    )}
-                  </div>
-
-                  <div className="lg:col-span-2">
+                  <div>
                     <Label htmlFor="venue" className="text-sm font-medium text-gray-700">
                       Venue <span className="text-destructive">*</span>
                     </Label>
@@ -165,11 +169,27 @@ export default function CreateEvent({
                       name="venue"
                       placeholder="e.g. Ngong Racecourse, Nairobi"
                       className="mt-2 text-sm bg-white"
+                      required
                     />
                     {errors.venue && touched.venue && (
                       <p className="text-destructive text-xs mt-1">{errors.venue as string}</p>
                     )}
                   </div>
+
+                  <div className="lg:col-span-2">
+                    <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                      Short Description
+                    </Label>
+                    <Field
+                      as={Textarea}
+                      id="description"
+                      name="description"
+                      placeholder="e.g. A quick summary of the event for previews"
+                      className="mt-2 text-sm bg-white"
+                    />
+                  </div>
+
+                  
                 </div>
 
                 <div>
@@ -181,6 +201,9 @@ export default function CreateEvent({
                       value={values.content}
                       onChange={(val) => setFieldValue("content", val)}
                     />
+                    {errors.content && touched.content && (
+                      <p className="text-destructive text-xs mt-1">{errors.content as string}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -192,16 +215,18 @@ export default function CreateEvent({
                   <div>
                     <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Start Date & Time <span className="text-destructive">*</span>
+                      Start Date <span className="text-destructive">*</span> & Time <span className="text-muted-foreground text-xs font-normal ml-1">(Optional)</span>
                     </Label>
                     <div className="grid grid-cols-2 gap-4 mt-2">
                       <div>
                         <Field
                           type="date"
                           name="start_date"
+                          min={minDateString}
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
+                          required
                         />
-                         {errors.start_date && touched.start_date && (
+                        {errors.start_date && touched.start_date && (
                           <p className="text-destructive text-xs mt-1">{errors.start_date as string}</p>
                         )}
                       </div>
@@ -234,6 +259,9 @@ export default function CreateEvent({
                           name="end_time"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                         />
+                        {errors.end_date && touched.end_date && (
+                          <p className="text-destructive text-xs mt-1">{errors.end_date as string}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -253,6 +281,9 @@ export default function CreateEvent({
                       value={values.refund_policy}
                       onChange={(val) => setFieldValue("refund_policy", val)}
                     />
+                    {errors.refund_policy && touched.refund_policy && (
+                      <p className="text-destructive text-xs mt-1">{errors.refund_policy as string}</p>
+                    )}
                   </div>
                 </div>
 
@@ -267,6 +298,7 @@ export default function CreateEvent({
                       name="image"
                       type="file"
                       accept="image/*"
+                      required
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {

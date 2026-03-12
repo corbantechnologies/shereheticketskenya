@@ -157,7 +157,6 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                   setLoading(false);
                   closeModal();
                 } catch (error) {
-                  console.error(error);
                   toast.error("Error making booking. Please try again.");
                 } finally {
                   setLoading(false);
@@ -195,7 +194,6 @@ export default function MakeBooking({ event, closeModal }: MakeBookingProps) {
                     setValidatedCoupon(coupon);
                     toast.success("Coupon applied successfully!");
                   } catch (error) {
-                    console.error("Coupon validation error:", error);
                     const err = error as AxiosError<{ error: string }>;
                     setCouponError(
                       err.response?.data?.error ||

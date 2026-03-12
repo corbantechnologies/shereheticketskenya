@@ -119,7 +119,6 @@ export default function BookingDetailPage() {
           setIsPolling(false);
         }
       } catch (e) {
-        console.error("Polling error", e);
       }
     }, 5000);
 
@@ -340,7 +339,6 @@ export default function BookingDetailPage() {
                     // Start Polling
                     pollPaymentStatus();
                   } catch (error: any) {
-                    console.error(error);
                     toast.error("Failed to initiate payment");
                     setPaymentMessage(
                       error.response?.data?.error ||

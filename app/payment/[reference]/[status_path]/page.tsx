@@ -81,7 +81,6 @@ export default function BookingPaymentStatusPage() {
           toast.error("Unknown payment status. Contact support.");
         }
       } catch (error: any) {
-        console.error("Error fetching booking:", error);
         toast.error("Failed to load booking details. Please try again.");
         setLoading(false);
       }

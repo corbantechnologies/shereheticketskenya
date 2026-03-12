@@ -24,6 +24,30 @@ interface EditEventProps {
   isPage?: boolean;
 }
 
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("Event name is required"),
+  venue: Yup.string().required("Venue is required"),
+  start_date: Yup.date()
+    .required("Start date is required")
+    .test("is-not-past", "Start date cannot be in the past", function (value) {
+      if (!value) return true;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(value);
+      selectedDate.setHours(0, 0, 0, 0);
+      return selectedDate >= today;
+    }),
+  end_date: Yup.date()
+    .nullable()
+    .test("is-after-start", "End date must be after start date", function (value, context) {
+      const { start_date } = context.parent;
+      if (!value || !start_date) return true;
+      return new Date(value) >= new Date(start_date);
+    }),
+  refund_policy: Yup.mixed().required("Cancellation policy is required"),
+  content: Yup.mixed().required("Description & Details are required"),
+});
+
 export default function EditEvent({
   event,
   closeModal,
@@ -35,6 +59,9 @@ export default function EditEvent({
     event.image || null
   );
   const axiosAuth = useAxiosAuth();
+
+  const today = new Date();
+  const minDateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   return (
     <div className="h-full bg-white flex flex-col">
@@ -58,6 +85,7 @@ export default function EditEvent({
             is_published: event.is_published || false,
             is_closed: event.is_closed || false,
           }}
+          validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               const formData = new FormData();
@@ -100,7 +128,6 @@ export default function EditEvent({
                 window.history.back();
               }
             } catch (error: any) {
-              console.error("Update event error:", error);
               toast.error(
                 error.response?.data?.detail ||
                 error.response?.data?.non_field_errors?.[0] ||
@@ -134,7 +161,11 @@ export default function EditEvent({
                       name="name"
                       placeholder="e.g. New Year's Bash 2026"
                       className="mt-2 text-sm bg-white"
+                      required
                     />
+                    {errors.name && touched.name && (
+                      <p className="text-destructive text-xs mt-1">{errors.name as string}</p>
+                    )}
                   </div>
 
                   <div className="lg:col-span-2">
@@ -160,7 +191,11 @@ export default function EditEvent({
                       name="venue"
                       placeholder="e.g. Ngong Racecourse, Nairobi"
                       className="mt-2 text-sm bg-white"
+                      required
                     />
+                    {errors.venue && touched.venue && (
+                      <p className="text-destructive text-xs mt-1">{errors.venue as string}</p>
+                    )}
                   </div>
 
                   <div>
@@ -187,6 +222,9 @@ export default function EditEvent({
                       value={values.content}
                       onChange={(val) => setFieldValue("content", val)}
                     />
+                    {errors.content && touched.content && (
+                      <p className="text-destructive text-xs mt-1">{errors.content as string}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -205,8 +243,13 @@ export default function EditEvent({
                         <Field
                           type="date"
                           name="start_date"
+                          min={minDateString}
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
+                          required
                         />
+                        {errors.start_date && touched.start_date && (
+                          <p className="text-destructive text-xs mt-1">{errors.start_date as string}</p>
+                        )}
                       </div>
                       <div>
                         <Field
@@ -230,6 +273,9 @@ export default function EditEvent({
                           name="end_date"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                         />
+                        {errors.end_date && touched.end_date && (
+                          <p className="text-destructive text-xs mt-1">{errors.end_date as string}</p>
+                        )}
                       </div>
                       <div>
                         <Field
@@ -256,6 +302,9 @@ export default function EditEvent({
                       value={values.refund_policy}
                       onChange={(val) => setFieldValue("refund_policy", val)}
                     />
+                    {errors.refund_policy && touched.refund_policy && (
+                      <p className="text-destructive text-xs mt-1">{errors.refund_policy as string}</p>
+                    )}
                   </div>
                 </div>
 
