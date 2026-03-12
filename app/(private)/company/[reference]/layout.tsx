@@ -24,7 +24,7 @@ export default function CompanyDetailLayout({
   }
 
   if (!company) {
-    return <div className="p-8 text-center text-sm text-muted-foreground">Company not found.</div>;
+    return <div className="p-4 text-center text-sm text-muted-foreground">Company not found.</div>;
   }
 
   return (

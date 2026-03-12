@@ -47,9 +47,12 @@ import {
   EyeOff,
   HamburgerIcon,
   Menu,
+  ChevronDown,
+  ChevronRight,
+  Info,
 } from "lucide-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 import CreateTicketType from "@/forms/tickettypes/CreateTicketType";
 import EditTicketType from "@/forms/tickettypes/EditTicketType";
@@ -69,6 +72,7 @@ export default function EventDetailPage() {
   const [isEditCouponModalOpen, setIsEditCouponModalOpen] = useState(false);
   const [selectedTicketType, setSelectedTicketType] = useState<any>(null);
   const [selectedCoupon, setSelectedCoupon] = useState<any>(null);
+  const [expandedCouponId, setExpandedCouponId] = useState<string | null>(null);
   const authHeaders = useAxiosAuth();
   const [isClosing, setIsClosing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -145,7 +149,7 @@ export default function EventDetailPage() {
 
   return (
     <>
-      <div className="container mx-auto px-4 sm:px-6 py-6 space-y-4">
+      <div className="mx-auto px-4 sm:px-4 py-6 space-y-4">
 
         {/* ── Event header card ───────────────────────────────────────── */}
         <Card className="py-0 border-none shadow-lg bg-white overflow-hidden">
@@ -520,57 +524,130 @@ export default function EventDetailPage() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="bg-muted/40 border-b border-gray-200">
+                          <th className="w-10 px-4 py-2.5"></th>
                           <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Code</th>
                           <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground hidden sm:table-cell">Discount</th>
                           <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground hidden md:table-cell">Valid</th>
                           <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground hidden sm:table-cell">Usage</th>
                           <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Status</th>
-                          <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground"></th>
+                          <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {coupons.map((coupon: any) => (
-                          <tr key={coupon.id} className="hover:bg-muted/20 transition-colors">
-                            <td className="px-4 py-3">
-                              <p className="font-mono text-sm font-medium text-foreground">{coupon.code}</p>
-                            </td>
-                            <td className="px-4 py-3 text-sm text-foreground hidden sm:table-cell">
-                              {coupon.discount_type === "FIXED"
-                                ? `KSh ${coupon.discount_value} OFF`
-                                : `${coupon.discount_value}% OFF`}
-                            </td>
-                            <td className="px-4 py-3 text-xs text-muted-foreground hidden md:table-cell">
-                              {format(new Date(coupon.valid_from), "dd MMM")} – {format(new Date(coupon.valid_to), "dd MMM yyyy")}
-                            </td>
-                            <td className="px-4 py-3 text-xs text-muted-foreground hidden sm:table-cell">
-                              {coupon.usage_count} / {coupon.usage_limit ?? "∞"}
-                            </td>
-                            <td className="px-4 py-3">
-                              <Badge
-                                className={`text-xs px-2 py-0.5 border ${
-                                  coupon.is_active
-                                    ? "bg-green-100 text-green-700 border-green-200"
-                                    : "bg-gray-100 text-gray-500 border-gray-200"
-                                }`}
+                        {coupons.map((coupon: any) => {
+                          const isExpanded = expandedCouponId === coupon.id;
+                          return (
+                            <React.Fragment key={coupon.id}>
+                              <tr 
+                                className={`hover:bg-muted/10 transition-colors cursor-pointer ${isExpanded ? "bg-muted/5" : ""}`}
+                                onClick={() => setExpandedCouponId(isExpanded ? null : coupon.id)}
                               >
-                                {coupon.is_active ? "Active" : "Inactive"}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              {!event.is_closed && (
-                                <button
-                                  className="inline-flex items-center gap-1 text-xs text-[var(--mainBlue)] hover:underline"
-                                  onClick={() => {
-                                    setSelectedCoupon(coupon);
-                                    setIsEditCouponModalOpen(true);
-                                  }}
-                                >
-                                  <Edit3 className="h-3 w-3" /> Edit
-                                </button>
+                                <td className="px-4 py-3">
+                                  {isExpanded ? (
+                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="flex flex-col">
+                                    <span className="font-mono text-sm font-medium text-foreground">{coupon.code}</span>
+                                    <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{coupon.name}</span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-foreground hidden sm:table-cell">
+                                  {coupon.discount_type === "FIXED"
+                                    ? `KSh ${Number(coupon.discount_value).toLocaleString()} OFF`
+                                    : `${coupon.discount_value}% OFF`}
+                                </td>
+                                <td className="px-4 py-3 text-xs text-muted-foreground hidden md:table-cell">
+                                  {format(new Date(coupon.valid_from), "dd MMM")} – {format(new Date(coupon.valid_to), "dd MMM yyyy")}
+                                </td>
+                                <td className="px-4 py-3 text-xs text-muted-foreground hidden sm:table-cell">
+                                  {coupon.usage_count} / {coupon.usage_limit ?? "∞"}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <Badge
+                                    className={`text-xs px-2 py-0.5 border ${
+                                      coupon.is_active
+                                        ? "bg-green-100 text-green-700 border-green-200"
+                                        : "bg-gray-100 text-gray-500 border-gray-200"
+                                    }`}
+                                  >
+                                    {coupon.is_active ? "Active" : "Inactive"}
+                                  </Badge>
+                                </td>
+                                <td className="px-4 py-3 text-left">
+                                  {!event.is_closed && (
+                                    <button
+                                      className="inline-flex items-center gap-1 text-xs text-[var(--mainBlue)] hover:underline"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedCoupon(coupon);
+                                        setIsEditCouponModalOpen(true);
+                                      }}
+                                    >
+                                      <Edit3 className="h-3 w-3" /> Edit
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                              {isExpanded && (
+                                <tr className="bg-gray-50/50">
+                                  <td colSpan={7} className="px-8 py-4 border-t border-gray-100">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                      <div className="space-y-3">
+                                        <div className="flex items-start gap-2">
+                                          <div className="mt-0.5 p-1 bg-blue-50 rounded-md">
+                                            <Info className="h-3.5 w-3.5 text-blue-600" />
+                                          </div>
+                                          <div>
+                                            <p className="text-xs font-semibold text-foreground uppercase tracking-wider">Coupon Details</p>
+                                            <p className="text-sm text-foreground font-medium mt-1">{coupon.name}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">Created on {format(new Date(coupon.created_at), "PPP")}</p>
+                                          </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 pt-2">
+                                          <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <p className="text-[10px] text-muted-foreground uppercase font-bold">Tickets Sold</p>
+                                            <p className="text-xl font-bold text-foreground mt-0.5">{coupon.tickets_sold ?? 0}</p>
+                                          </div>
+                                          <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <p className="text-[10px] text-muted-foreground uppercase font-bold">Usage Count</p>
+                                            <p className="text-xl font-bold text-foreground mt-0.5">{coupon.usage_count}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="space-y-3">
+                                        <div className="flex items-start gap-2">
+                                          <div className="mt-0.5 p-1 bg-purple-50 rounded-md">
+                                            <Ticket className="h-3.5 w-3.5 text-purple-600" />
+                                          </div>
+                                          <div>
+                                            <p className="text-xs font-semibold text-foreground uppercase tracking-wider">Applicable Tickets</p>
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                              {coupon.ticket_type_details && coupon.ticket_type_details.length > 0 ? (
+                                                coupon.ticket_type_details.map((t: any) => (
+                                                  <Badge key={t.ticket_type_code} variant="outline" className="text-[10px] py-0 px-2 bg-white border-gray-200">
+                                                    {t.name} (KSh {Number(t.price).toLocaleString()})
+                                                  </Badge>
+                                                ))
+                                              ) : (
+                                                <span className="text-xs text-muted-foreground italic">Applies to all ticket types</span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
                               )}
-                            </td>
-                          </tr>
-                        ))}
+                            </React.Fragment>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
