@@ -74,7 +74,7 @@ export default function Home() {
         {/* Events Grid */}
         <section className="py-6 bg-background">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row justify-between md:items-center items-start mb-12 gap-4">
+            <div className="flex flex-col md:flex-row justify-between md:items-center items-start mb-6 gap-4">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">Upcoming Events</h2>
                 <p className="text-muted-foreground text-base">Don&apos;t miss out on these amazing experiences</p>
@@ -95,7 +95,7 @@ export default function Home() {
                 <p className="text-lg text-muted-foreground">Check back later for new events!</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {openEvents.map((event: any) => (
                   <EventCard key={event.event_code} event={event} />
                 ))}

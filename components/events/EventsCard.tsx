@@ -24,7 +24,7 @@ function EventCard({ event }: { event: any }) {
 
   return (
     <Link href={`/events/${event.event_code}`} className="flex h-full">
-      <Card className="group border-0 w-full max-w-[350px] max-h-[500px] overflow-hidden py-0 gap-0 hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col">
+      <Card className="group border-0 w-full max-h-[500px] overflow-hidden py-0 gap-0 hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col">
 
         {/* Image */}
         <div className="relative h-52 flex-shrink-0 overflow-hidden bg-muted">
@@ -47,7 +47,7 @@ function EventCard({ event }: { event: any }) {
 
         {/* Body */}
         <CardContent className="flex flex-col flex-grow pt-5 pb-3 px-5 overflow-hidden">
-          <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-[var(--mainBlue)] transition-colors line-clamp-1">
+          <h3 className="text-md font-semibold text-foreground mb-1 group-hover:text-[var(--mainBlue)] transition-colors line-clamp-1">
             {event.name}
           </h3>
 
