@@ -38,8 +38,8 @@ interface Event {
 
 interface createEvent {
   name: string;
-  description: string;
-  content: any;
+  description: string; // short description about the event
+  content: any; // long description about the event - this is rich text
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional
@@ -48,13 +48,13 @@ interface createEvent {
   company: string; // Pick company code
   image: File;
   is_published: boolean;
-  refund_policy: any;
+  refund_policy: any; // rich text
 }
 
 interface updateEvent {
   name: string;
-  description: string;
-  content: any;
+  description: string; // short description about the event
+  content: any; // long description about the event - this is rich text
   start_date: string;
   start_time: string; // Optional
   end_date: string; // Optional
@@ -65,7 +65,7 @@ interface updateEvent {
   image: File;
   is_published: boolean;
   is_closed: boolean;
-  refund_policy: any;
+  refund_policy: any; // rich text
 }
 
 export const getEvents = async (): Promise<Event[]> => {
