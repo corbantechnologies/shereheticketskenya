@@ -57,7 +57,7 @@ export default function CompanyEventsPage() {
 
   return (
     <>
-      <div className="container mx-auto px-4 sm:px-6 py-6 space-y-4">
+      <div className="mx-auto px-4 sm:px-6 py-6 space-y-4">
 
         {/* Page header */}
         <div className="flex items-center justify-between">

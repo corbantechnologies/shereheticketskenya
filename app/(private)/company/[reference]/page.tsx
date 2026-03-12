@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import EventsDisplayTable from "@/components/events/EventsDisplayTable";
 import UpdateCompany from "@/forms/company/UpdateCompany";
-import CreateEvent from "@/forms/events/CreateEvent";
 import { useState } from "react";
 import Modal from "@/components/ui/modal";
 
@@ -31,7 +30,6 @@ export default function CompanyDetailPage() {
   const { reference } = useParams<{ reference: string }>();
   const { isLoading, data: company, refetch } = useFetchCompany(reference);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
 
   if (isLoading) return <DashboardSkeleton />;
 
@@ -53,7 +51,7 @@ export default function CompanyDetailPage() {
 
   return (
     <>
-      <div className="container mx-auto px-4 sm:px-6 py-6 space-y-4">
+      <div className="mx-auto px-4 sm:px-6 py-6 space-y-4">
 
         {/* Company header + overview — unified card */}
         <Card className="py-0 border-none shadow-lg bg-white overflow-hidden">
@@ -145,7 +143,7 @@ export default function CompanyDetailPage() {
               <h2 className="text-sm font-semibold text-foreground">Events</h2>
               <Button
                 size="sm"
-                onClick={() => setIsCreateEventModalOpen(true)}
+                onClick={() => router.push(`/company/${reference}/events/create`)}
                 disabled={!hasRequiredDetails}
                 className="h-8 text-xs bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white"
               >
@@ -185,18 +183,6 @@ export default function CompanyDetailPage() {
           company={company}
           refetch={refetch}
           closeDialog={() => setIsEditModalOpen(false)}
-        />
-      </Modal>
-
-      {/* Create event modal */}
-      <Modal
-        isOpen={isCreateEventModalOpen}
-        onClose={() => setIsCreateEventModalOpen(false)}
-      >
-        <CreateEvent
-          companyCode={company.company_code}
-          closeModal={() => setIsCreateEventModalOpen(false)}
-          refetchEvents={refetch}
         />
       </Modal>
     </>
