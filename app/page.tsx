@@ -8,6 +8,7 @@ import EventCard from "@/components/events/EventsCard";
 import { Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function Home() {
   const { isLoading, data: events = [] } = useFetchEvents();
@@ -16,24 +17,60 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[var(--mainBlue)]/5 via-background to-[var(--mainRed)]/5 pt-24 pb-12">
+        {/* Background blobs */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute top-10 right-0 w-[400px] h-[400px] bg-[var(--mainBlue)]/10 rounded-full blur-3xl opacity-60" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[var(--mainRed)]/10 rounded-full blur-3xl opacity-60" />
+        </div>
+
+        <div className="container relative z-10 mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+
+            {/* Image */}
+            <div className="w-full md:w-1/2 flex-shrink-0">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+                <Image
+                  src="/sherehe.jpg"
+                  alt="Sherehe Events"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                {/* subtle overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent" />
+              </div>
+            </div>
+
+            {/* Text */}
+            <div className="w-full md:w-1/2 flex flex-col items-start text-left">
+              <span className="text-sm font-semibold uppercase tracking-widest text-[var(--mainBlue)] mb-3">
+                Kenya&apos;s #1 Ticketing Platform
+              </span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-5 leading-tight">
+                Piga{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--mainBlue)] to-[var(--mainRed)]">
+                  Sherehe
+                </span>
+              </h1>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-md">
+                Discover and book tickets to the most exciting events in Kenya. From concerts to conferences — we&apos;ve got you covered.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button asChild className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white px-6 py-5 text-base rounded-xl shadow-md">
+                  <Link href="/events">Browse Events <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+                <Button asChild variant="outline" className="px-6 py-5 text-base rounded-xl border-[var(--mainBlue)] text-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/5">
+                  <Link href="/organizers">Host an Event</Link>
+                </Button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
       <main className="flex-grow">
-        {/* Simple Hero for Landing */}
-        <section className="relative overflow-hidden bg-background pt-32 pb-16">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl z-0 pointer-events-none">
-            <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-[var(--mainBlue)]/10 rounded-full blur-3xl opacity-50 mix-blend-multiply" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[var(--mainRed)]/10 rounded-full blur-3xl opacity-50 mix-blend-multiply" />
-          </div>
-
-          <div className="container relative z-10 mx-auto px-6 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground mb-6 max-w-4xl mx-auto">
-              Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--mainBlue)] to-[var(--mainRed)]">Sherehe?</span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Discover and book tickets to the most exciting events in Kenya.
-            </p>
-          </div>
-        </section>
-
         {/* Events Grid */}
         <section className="py-12 bg-background">
           <div className="container mx-auto px-6">
