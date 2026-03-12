@@ -70,14 +70,14 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <main className="flex-grow">
+      <main>
         {/* Events Grid */}
-        <section className="py-12 bg-background">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+        <section className="py-6 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-between md:items-center items-start mb-12 gap-4">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-2">Upcoming Events</h2>
-                <p className="text-muted-foreground text-lg">Don&apos;t miss out on these amazing experiences</p>
+                <h2 className="text-2xl md:text-3xl font-bold mb-2">Upcoming Events</h2>
+                <p className="text-muted-foreground text-base">Don&apos;t miss out on these amazing experiences</p>
               </div>
               <Button variant="ghost" className="text-[var(--mainBlue)] font-semibold hover:text-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/10" asChild>
                 <Link href="/events">View All Events <ArrowRight className="ml-2 h-4 w-4" /></Link>
