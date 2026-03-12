@@ -5,7 +5,6 @@
 
 import React from "react";
 import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
@@ -26,20 +25,13 @@ interface CreateEventProps {
   isPage?: boolean;
 }
 
-const validationSchema = Yup.object({
-  name: Yup.string().required("Event name is required"),
-  description: Yup.string().required("Short description is required"),
-  venue: Yup.string().required("Venue is required"),
-  start_date: Yup.date().required("Start date is required"),
-});
-
 export default function CreateEvent({
   companyCode,
   closeModal,
   refetchEvents,
   isPage = false,
 }: CreateEventProps) {
-  const axiosAuth = useAxiosAuth();
+  const headers = useAxiosAuth();
   const router = useRouter();
   const [imagePreview, setimagePreview] = useState<string | null>(null);
 
@@ -63,7 +55,6 @@ export default function CreateEvent({
             image: null as File | null,
             is_published: false,
           }}
-          validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               const formData = new FormData();
@@ -90,7 +81,7 @@ export default function CreateEvent({
                 formData.append("image", values.image);
               }
 
-              await createEvent(formData, { headers: axiosAuth.headers });
+              await createEvent(formData, headers);
 
               toast.success("Event created successfully! Click on the newly created event to complete setup.");
               if (refetchEvents) refetchEvents();
@@ -99,7 +90,7 @@ export default function CreateEvent({
                 window.history.back();
               }
             } catch (error: any) {
-              console.error("Create event error:", error);
+              console.log("Create event error:", error);
               toast.error(
                 error.response?.data?.detail ||
                 error.response?.data?.non_field_errors?.[0] ||
@@ -110,7 +101,7 @@ export default function CreateEvent({
             }
           }}
         >
-          {({ errors, touched, isSubmitting, values, setFieldValue }) => (
+          {({ isSubmitting, values, setFieldValue }) => (
             <Form className="space-y-6">
               <div className="border-b pb-4">
                 <h2 className="text-2xl font-bold text-gray-900">Create New Event</h2>
@@ -133,10 +124,8 @@ export default function CreateEvent({
                       name="name"
                       placeholder="e.g. New Year's Bash 2026"
                       className="mt-2 text-sm bg-white"
+                      required
                     />
-                    {errors.name && touched.name && (
-                      <p className="text-destructive text-xs mt-1">{errors.name as string}</p>
-                    )}
                   </div>
 
                   <div className="lg:col-span-2">
@@ -149,10 +138,8 @@ export default function CreateEvent({
                       name="description"
                       placeholder="e.g. A quick summary of the event for previews"
                       className="mt-2 text-sm bg-white"
+                      required
                     />
-                    {errors.description && touched.description && (
-                      <p className="text-destructive text-xs mt-1">{errors.description as string}</p>
-                    )}
                   </div>
 
                   <div className="lg:col-span-2">
@@ -165,10 +152,8 @@ export default function CreateEvent({
                       name="venue"
                       placeholder="e.g. Ngong Racecourse, Nairobi"
                       className="mt-2 text-sm bg-white"
+                      required
                     />
-                    {errors.venue && touched.venue && (
-                      <p className="text-destructive text-xs mt-1">{errors.venue as string}</p>
-                    )}
                   </div>
                 </div>
 
@@ -200,16 +185,15 @@ export default function CreateEvent({
                           type="date"
                           name="start_date"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
+                          required
                         />
-                         {errors.start_date && touched.start_date && (
-                          <p className="text-destructive text-xs mt-1">{errors.start_date as string}</p>
-                        )}
                       </div>
                       <div>
                         <Field
                           type="time"
                           name="start_time"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
+                          required
                         />
                       </div>
                     </div>
@@ -267,6 +251,7 @@ export default function CreateEvent({
                       name="image"
                       type="file"
                       accept="image/*"
+                      required
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
