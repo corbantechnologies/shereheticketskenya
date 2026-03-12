@@ -5,6 +5,7 @@
 
 import React from "react";
 import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
@@ -24,6 +25,14 @@ interface CreateEventProps {
   refetchEvents?: () => void;
   isPage?: boolean;
 }
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("Event name is required"),
+  venue: Yup.string().required("Venue is required"),
+  start_date: Yup.date().required("Start date is required"),
+  refund_policy: Yup.mixed().required("Cancellation policy is required"),
+  content: Yup.mixed().required("Description & Details are required"),
+});
 
 export default function CreateEvent({
   companyCode,
@@ -55,6 +64,7 @@ export default function CreateEvent({
             image: null as File | null,
             is_published: false,
           }}
+          validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               const formData = new FormData();
@@ -101,7 +111,7 @@ export default function CreateEvent({
             }
           }}
         >
-          {({ isSubmitting, values, setFieldValue }) => (
+          {({ errors, touched, isSubmitting, values, setFieldValue }) => (
             <Form className="space-y-6">
               <div className="border-b pb-4">
                 <h2 className="text-2xl font-bold text-gray-900">Create New Event</h2>
@@ -126,11 +136,14 @@ export default function CreateEvent({
                       className="mt-2 text-sm bg-white"
                       required
                     />
+                    {errors.name && touched.name && (
+                      <p className="text-destructive text-xs mt-1">{errors.name as string}</p>
+                    )}
                   </div>
 
                   <div className="lg:col-span-2">
                     <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                      Short Description <span className="text-destructive">*</span>
+                      Short Description
                     </Label>
                     <Field
                       as={Textarea}
@@ -138,7 +151,6 @@ export default function CreateEvent({
                       name="description"
                       placeholder="e.g. A quick summary of the event for previews"
                       className="mt-2 text-sm bg-white"
-                      required
                     />
                   </div>
 
@@ -154,6 +166,9 @@ export default function CreateEvent({
                       className="mt-2 text-sm bg-white"
                       required
                     />
+                    {errors.venue && touched.venue && (
+                      <p className="text-destructive text-xs mt-1">{errors.venue as string}</p>
+                    )}
                   </div>
                 </div>
 
@@ -166,6 +181,9 @@ export default function CreateEvent({
                       value={values.content}
                       onChange={(val) => setFieldValue("content", val)}
                     />
+                    {errors.content && touched.content && (
+                      <p className="text-destructive text-xs mt-1">{errors.content as string}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -187,13 +205,15 @@ export default function CreateEvent({
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
                           required
                         />
+                        {errors.start_date && touched.start_date && (
+                          <p className="text-destructive text-xs mt-1">{errors.start_date as string}</p>
+                        )}
                       </div>
                       <div>
                         <Field
                           type="time"
                           name="start_time"
                           className="px-3 py-2 border rounded-md focus:ring-2 focus:ring-ring w-full text-sm bg-white"
-                          required
                         />
                       </div>
                     </div>
@@ -237,6 +257,9 @@ export default function CreateEvent({
                       value={values.refund_policy}
                       onChange={(val) => setFieldValue("refund_policy", val)}
                     />
+                    {errors.refund_policy && touched.refund_policy && (
+                      <p className="text-destructive text-xs mt-1">{errors.refund_policy as string}</p>
+                    )}
                   </div>
                 </div>
 
