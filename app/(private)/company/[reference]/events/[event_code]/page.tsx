@@ -5,13 +5,19 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useFetchCompanyEvent } from "@/hooks/events/actions";
-import { closeEvent, publishEvent } from "@/services/events";
+import { closeEvent, publishEvent, unpublishEvent } from "@/services/events";
 import useAxiosAuth from "@/hooks/authentication/useAxiosAuth";
 import { DashboardSkeleton } from "@/components/general/LoadingComponents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +30,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  MoreVertical,
   ArrowLeft,
+  MoreHorizontal,
   Plus,
   Edit3,
   Ticket,
@@ -36,6 +44,9 @@ import {
   Eye,
   Clock,
   Tag,
+  EyeOff,
+  HamburgerIcon,
+  Menu,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
@@ -63,6 +74,7 @@ export default function EventDetailPage() {
   const authHeaders = useAxiosAuth();
   const [isClosing, setIsClosing] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
 
   if (isLoading) return <DashboardSkeleton />;
 
@@ -113,6 +125,19 @@ export default function EventDetailPage() {
     }
   };
 
+  const handleUnpublishEvent = async () => {
+    try {
+      setIsUnpublishing(true);
+      await unpublishEvent(event_code, authHeaders);
+      await refetch();
+      toast.success("Event unpublished successfully.");
+    } catch {
+      toast.error("Failed to unpublish event. Please try again.");
+    } finally {
+      setIsUnpublishing(false);
+    }
+  };
+
   const statusLabel = event.is_closed ? "Closed" : event.is_published ? "Published" : "Draft";
   const statusClass = event.is_closed
     ? "bg-gray-100 text-gray-500 border-gray-200"
@@ -138,94 +163,113 @@ export default function EventDetailPage() {
 
             {/* Action buttons */}
             <div className="flex items-center gap-2">
-              {/* Preview — always */}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => window.open(`/events/${event.event_code}`, "_blank")}
-                className="h-7 text-xs border-gray-200 bg-white hover:bg-gray-50 px-2.5"
-              >
-                <Eye className="h-3 w-3 mr-1" /> Preview
-              </Button>
-
-              {!event.is_closed && (
-                <>
-                  {/* Edit */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
                     size="sm"
-                    variant="outline"
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="h-7 text-xs border-gray-200 bg-white hover:bg-gray-50 px-2.5"
+                    variant="ghost"
+                    className="h-7 w-7 p-0 hover:bg-gray-200"
                   >
-                    <Edit3 className="h-3 w-3 mr-1" /> Edit
+                    <Menu className="h-4 w-4" />
                   </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-auto bg-white text-black">
+                  <DropdownMenuItem
+                    onClick={() => window.open(`/events/${event.event_code}`, "_blank")}
+                    className="text-xs cursor-pointer"
+                  >
+                    <Eye className="h-3.5 w-3.5 mr-2" /> Preview Event
+                  </DropdownMenuItem>
 
-                  {/* Publish */}
-                  {!event.is_published && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          disabled={isPublishing}
-                          className="h-7 text-xs bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white px-2.5"
-                        >
-                          <Globe className="h-3 w-3 mr-1" />
-                          {isPublishing ? "Publishing…" : "Publish"}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-white text-black">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Publish this event?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            &quot;{event.name}&quot; will be visible on the platform. You can unpublish it later via Edit.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handlePublishEvent}
-                            className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90"
-                          >
-                            Yes, publish
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
-
-                  {/* Close */}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={isClosing}
-                        className="h-7 text-xs border-gray-200 bg-white hover:bg-red-50 text-red-600 hover:text-red-700 px-2.5"
+                  {!event.is_closed && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => setIsEditModalOpen(true)}
+                        className="text-xs cursor-pointer"
                       >
-                        <XCircle className="h-3 w-3 mr-1" />
-                        {isClosing ? "Closing…" : "Close event"}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-white text-black">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Close this event?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This cannot be undone. Ticket sales for &quot;{event.name}&quot; will stop immediately.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleCloseEvent}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          Yes, close event
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </>
-              )}
+                        <Edit3 className="h-3.5 w-3.5 mr-2" /> Edit Event
+                      </DropdownMenuItem>
+
+                      {!event.is_published ? (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <div className="flex items-center px-2 py-1.5 text-xs cursor-pointer hover:bg-gray-100 rounded-sm">
+                              <Globe className="h-3.5 w-3.5 mr-2" /> Publish Event
+                            </div>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-white text-black">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Publish this event?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                &quot;{event.name}&quot; will be visible on the platform. You can unpublish it later.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handlePublishEvent}
+                                className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white"
+                              >
+                                Yes, publish
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      ) : (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <div className="flex items-center px-2 py-1.5 text-xs cursor-pointer hover:bg-gray-100 rounded-sm">
+                              <EyeOff className="h-3.5 w-3.5 mr-2" /> Unpublish Event
+                            </div>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-white text-black">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Unpublish this event?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                &quot;{event.name}&quot; will no longer be visible to the public. You can publish it again later.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleUnpublishEvent}
+                                className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white"
+                              >
+                                Yes, unpublish
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <div className="flex items-center px-2 py-1.5 text-xs cursor-pointer hover:bg-red-50 text-red-600 rounded-sm">
+                            <XCircle className="h-3.5 w-3.5 mr-2" /> Close Event
+                          </div>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white text-black">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Close this event?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action is permanent and cannot be undone. Ticket sales will stop immediately.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleCloseEvent}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              Yes, close event
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 

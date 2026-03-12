@@ -139,6 +139,18 @@ export const publishEvent = async (
   return response.data;
 };
 
+export const unpublishEvent = async (
+  event_code: string,
+  headers: { headers: { Authorization: string } }
+): Promise<Event> => {
+  const response: AxiosResponse<Event> = await apiActions.patch(
+    `/api/v1/events/${event_code}/`,
+    { is_published: false },
+    headers
+  );
+  return response.data;
+};
+
 export const closeEvent = async (
   event_code: string,
   headers: { headers: { Authorization: string } }
