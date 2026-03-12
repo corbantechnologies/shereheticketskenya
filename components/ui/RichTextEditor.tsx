@@ -100,7 +100,7 @@ const Indent = Extension.create({
                     indent: {
                         default: 0,
                         parseHTML: (element) => {
-                            const cls = this.options.indentClasses.find((c) =>
+                            const cls = this.options.indentClasses.find((c: string) =>
                                 element.classList.contains(c)
                             );
                             return cls ? this.options.indentClasses.indexOf(cls) : 0;
