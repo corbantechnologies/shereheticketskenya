@@ -15,7 +15,7 @@ import {
 import { LoadingSpinner } from "@/components/general/LoadingComponents";
 import { useFetchEvent } from "@/hooks/events/actions";
 import TicketTypeChip from "@/components/events/TicketTypeChip";
-import MakeBooking from "@/forms/bookings/MakeBooking";
+// import MakeBooking from "@/forms/bookings/MakeBooking"; // Removed in favor of standalone page
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import RichTextDisplay from "@/components/ui/RichTextDisplay";
@@ -38,7 +38,8 @@ function getEventStatus(event: any): { label: string; color: string } | null {
 export default function EventDetailPage() {
   const { event_code } = useParams<{ event_code: string }>();
   const router = useRouter();
-  const [showBookingModal, setShowBookingModal] = useState(false);
+  // const [showBookingModal, setShowBookingModal] = useState(false); // No longer needed
+
 
   const {
     isLoading: isLoadingEvent,
@@ -97,14 +98,8 @@ export default function EventDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#d5d5d5]">
-      {/* Booking Modal */}
-      {showBookingModal && (
-        <MakeBooking
-          event={event}
-          closeModal={() => setShowBookingModal(false)}
-          refetchEvent={refetchEvent}
-        />
-      )}
+      {/* Booking Modal Removed */}
+
 
       {/* Hero Banner */}
       <div className="relative h-[55vh] md:h-[420px] w-full overflow-hidden bg-black/90">
@@ -251,7 +246,7 @@ export default function EventDetailPage() {
                                 : "opacity-55 cursor-not-allowed bg-muted/20"
                             }`}
                             onClick={() => {
-                              if (isEligible) setShowBookingModal(true);
+                              if (isEligible) router.push(`/events/${event_code}/book?ticket=${ticket.ticket_type_code}`);
                             }}
                           >
                             <CardContent className="py-3 px-2">
@@ -322,7 +317,7 @@ export default function EventDetailPage() {
                       })}
 
                       <Button
-                        onClick={() => setShowBookingModal(true)}
+                        onClick={() => router.push(`/events/${event_code}/book`)}
                         disabled={!hasBookableTickets}
                         className="w-full bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white py-5 mt-1 disabled:opacity-50"
                       >
@@ -357,7 +352,7 @@ export default function EventDetailPage() {
             )}
           </div>
           <Button
-            onClick={() => setShowBookingModal(true)}
+            onClick={() => router.push(`/events/${event_code}/book`)}
             className="shrink-0 bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white px-5"
           >
             Get Tickets
