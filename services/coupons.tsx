@@ -72,6 +72,21 @@ interface validateCoupon {
     ticket_type_code: string; // optional
 }
 
+export interface CouponValidationResponse {
+    message: string;
+    discount_value: number;
+    discount_type: "FIXED" | "PERCENTAGE";
+    applies_to_all: boolean;
+    discount_amount: number;
+    code: string;
+    valid_tickets: {
+        ticket_type_code: string;
+        name: string;
+        original_price: number;
+        discounted_price: number;
+    }[];
+}
+
 // Authenticated Views
 export const createCoupon = async (
     formData: createCoupon | FormData,
@@ -125,8 +140,8 @@ export const getCoupon = async (reference: string, headers: { headers: { Authori
 
 export const validateCoupon = async (
     formData: validateCoupon | FormData,
-): Promise<Coupon> => {
-    const response: AxiosResponse<Coupon> = await apiActions.post(
+): Promise<CouponValidationResponse> => {
+    const response: AxiosResponse<CouponValidationResponse> = await apiActions.post(
         `/api/v1/coupons/validate/`,
         formData,
     );
