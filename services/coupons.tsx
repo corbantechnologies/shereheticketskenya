@@ -45,6 +45,7 @@ export interface Coupon {
 
 interface createCoupon {
     event: string; // event_code
+    code: string; // optional, will be generated if not provided
     ticket_type: string[]; // ticket_type_code, optional, can be more than one
     name: string; //optional
     discount_type: string;

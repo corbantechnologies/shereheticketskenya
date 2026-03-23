@@ -21,7 +21,9 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
     // Helper to format date for datetime-local input (YYYY-MM-DDTHH:mm)
     const formatDate = (dateString: string) => {
         if (!dateString) return "";
-        return new Date(dateString).toISOString().slice(0, 16);
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "";
+        return date.toISOString().slice(0, 10);
     };
 
     return (
@@ -47,8 +49,19 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
                         if (values.name) formData.append("name", values.name);
                         formData.append("discount_type", values.discount_type);
                         formData.append("discount_value", values.discount_value);
-                        formData.append("valid_from", new Date(values.valid_from).toISOString());
-                        formData.append("valid_to", new Date(values.valid_to).toISOString());
+                        if (values.valid_from) {
+                            const validFromDate = new Date(values.valid_from);
+                            if (!isNaN(validFromDate.getTime())) {
+                                formData.append("valid_from", validFromDate.toISOString().slice(0, 10));
+                            }
+                        }
+
+                        if (values.valid_to) {
+                            const validToDate = new Date(values.valid_to);
+                            if (!isNaN(validToDate.getTime())) {
+                                formData.append("valid_to", validToDate.toISOString().slice(0, 10));
+                            }
+                        }
                         if (values.usage_limit !== "")
                             formData.append("usage_limit", values.usage_limit.toString());
                         formData.append("is_active", values.is_active.toString());
@@ -91,7 +104,7 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
                         </div>
 
                         {/* Discount Type & Value */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Discount Type</label>
                                 <Field
@@ -116,11 +129,11 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
                         </div>
 
                         {/* Validity Period */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Valid From</label>
                                 <Field
-                                    type="datetime-local"
+                                    type="date"
                                     name="valid_from"
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                                     required
@@ -129,10 +142,9 @@ function UpdateCoupon({ closeModal, refetch, coupon, event }: UpdateCouponProps)
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Valid To</label>
                                 <Field
-                                    type="datetime-local"
+                                    type="date"
                                     name="valid_to"
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                                    required
                                 />
                             </div>
                         </div>

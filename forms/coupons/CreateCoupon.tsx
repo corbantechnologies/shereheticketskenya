@@ -24,6 +24,7 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
             <Formik
                 initialValues={{
                     event: event?.event_code,
+                    code: "",
                     name: "",
                     discount_type: "FIXED",
                     discount_value: "",
@@ -38,11 +39,23 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
                     try {
                         const formData = new FormData();
                         formData.append("event", values.event);
+                        if (values.code) formData.append("code", values.code);
                         if (values.name) formData.append("name", values.name);
                         formData.append("discount_type", values.discount_type);
                         formData.append("discount_value", values.discount_value);
-                        formData.append("valid_from", new Date(values.valid_from).toISOString());
-                        formData.append("valid_to", new Date(values.valid_to).toISOString());
+                        if (values.valid_from) {
+                            const validFromDate = new Date(values.valid_from);
+                            if (!isNaN(validFromDate.getTime())) {
+                                formData.append("valid_from", validFromDate.toISOString().slice(0, 10));
+                            }
+                        }
+
+                        if (values.valid_to) {
+                            const validToDate = new Date(values.valid_to);
+                            if (!isNaN(validToDate.getTime())) {
+                                formData.append("valid_to", validToDate.toISOString().slice(0, 10));
+                            }
+                        }
                         if (values.usage_limit)
                             formData.append("usage_limit", values.usage_limit.toString());
                         formData.append("is_active", values.is_active.toString());
@@ -58,6 +71,7 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
                         closeModal();
                         refetch();
                     } catch (error: any) {
+                        console.log(error);
                         if (error?.response?.data) {
                             const errorData = error.response.data;
                             const errorMessage = typeof errorData === 'object'
@@ -73,19 +87,31 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
             >
                 {({ values, setFieldValue }) => (
                     <Form className="space-y-4">
-                        {/* Name */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Name</label>
-                            <Field
-                                type="text"
-                                name="name"
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                                placeholder="Optional coupon name"
-                            />
+                        {/* Name & Code */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Name</label>
+                                <Field
+                                    type="text"
+                                    name="name"
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                                    placeholder="Optional coupon name"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Code</label>
+                                <Field
+                                    type="text"
+                                    name="code"
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                                    placeholder="Optional coupon code"
+                                />
+                            </div>
+
                         </div>
 
                         {/* Discount Type & Value */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Discount Type</label>
                                 <Field
@@ -93,8 +119,8 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
                                     name="discount_type"
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                                 >
-                                    <option value="FIXED">Fixed Amount</option>
                                     <option value="PERCENTAGE">Percentage</option>
+                                    <option value="FIXED">Fixed Amount</option>
                                 </Field>
                             </div>
                             <div>
@@ -110,11 +136,11 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
                         </div>
 
                         {/* Validity Period */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Valid From</label>
                                 <Field
-                                    type="datetime-local"
+                                    type="date"
                                     name="valid_from"
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                                     required
@@ -123,10 +149,9 @@ function CreateCoupon({ closeModal, refetch, event }: CreateCouponProps) {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Valid To</label>
                                 <Field
-                                    type="datetime-local"
+                                    type="date"
                                     name="valid_to"
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                                    required
                                 />
                             </div>
                         </div>
