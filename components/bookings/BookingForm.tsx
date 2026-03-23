@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { apiActions } from "@/tools/axios";
-import { Coupon, validateCoupon } from "@/services/coupons";
+import { CouponValidationResponse, validateCoupon } from "@/services/coupons";
 import { Loader2 } from "lucide-react";
 import { AxiosError } from "axios";
 
@@ -86,7 +86,7 @@ const validationSchema = Yup.object({
 export default function BookingForm({ event, onSuccess, onCancel, initialTicketType }: BookingFormProps) {
   const [loading, setLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
-  const [validatedCoupon, setValidatedCoupon] = useState<Coupon | null>(null);
+  const [validatedCoupon, setValidatedCoupon] = useState<CouponValidationResponse | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -200,12 +200,11 @@ export default function BookingForm({ event, onSuccess, onCancel, initialTicketT
 
         let discountAmount = 0;
         if (validatedCoupon && subTotal > 0) {
-          const discountValue = parseFloat(
-            validatedCoupon.discount_value,
-          );
-          if (validatedCoupon.discount_type === "fixed") {
-            discountAmount = discountValue;
-          } else if (validatedCoupon.discount_type === "percentage") {
+          const discountValue = validatedCoupon.discount_value;
+          const type = validatedCoupon.discount_type.toUpperCase();
+          if (type === "FIXED") {
+            discountAmount = discountValue * values.quantity;
+          } else if (type === "PERCENTAGE") {
             discountAmount = (subTotal * discountValue) / 100;
           }
         }
@@ -227,22 +226,30 @@ export default function BookingForm({ event, onSuccess, onCancel, initialTicketT
                 className="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-primary"
               >
                 <option value="">Select a ticket type</option>
-                {event.ticket_types.map((ticket) => (
-                  <option
-                    key={ticket.reference}
-                    value={ticket.ticket_type_code}
-                    disabled={
-                      (ticket.status && ticket.status !== "ON_SALE") ||
-                      (!ticket.status && ticket.quantity_available !== null && ticket.quantity_available <= 0)
-                    }
-                  >
-                    {ticket.name} - KES{" "}
-                    {parseFloat(ticket.price).toLocaleString()}
-                    {ticket.quantity_available !== null &&
-                      ` (${ticket.quantity_available} available)`}
-                    {ticket.status && ticket.status !== "ON_SALE" && ` - ${ticket.status.replace("_", " ")}`}
-                  </option>
-                ))}
+                {event.ticket_types.map((ticket) => {
+                  const discountedPrice = validatedCoupon?.valid_tickets?.find(
+                    (vt) => vt.ticket_type_code === ticket.ticket_type_code
+                  )?.discounted_price;
+
+                  return (
+                    <option
+                      key={ticket.reference}
+                      value={ticket.ticket_type_code}
+                      disabled={
+                        (ticket.status && ticket.status !== "ON_SALE") ||
+                        (!ticket.status && ticket.quantity_available !== null && ticket.quantity_available <= 0)
+                      }
+                    >
+                      {ticket.name} - KES{" "}
+                      {discountedPrice
+                        ? `${discountedPrice.toLocaleString()} (was ${parseFloat(ticket.price).toLocaleString()})`
+                        : parseFloat(ticket.price).toLocaleString()}
+                      {ticket.quantity_available !== null &&
+                        ` (${ticket.quantity_available} available)`}
+                      {ticket.status && ticket.status !== "ON_SALE" && ` - ${ticket.status.replace("_", " ")}`}
+                    </option>
+                  );
+                })}
               </Field>
               <ErrorMessage
                 name="ticket_type"
@@ -337,12 +344,10 @@ export default function BookingForm({ event, onSuccess, onCancel, initialTicketT
               )}
               {validatedCoupon && (
                 <p className="text-green-600 text-sm mt-1">
-                  Coupon applied: {validatedCoupon.code} (
-                  {validatedCoupon.discount_type === "percentage"
+                  Coupon applied: {values.coupon} (
+                  {validatedCoupon.discount_type.toUpperCase() === "PERCENTAGE"
                     ? `${validatedCoupon.discount_value}% off`
-                    : `KES ${parseFloat(
-                      validatedCoupon.discount_value,
-                    ).toLocaleString()} off`}
+                    : `KES ${validatedCoupon.discount_value.toLocaleString()} off per ticket`}
                   )
                 </p>
               )}
