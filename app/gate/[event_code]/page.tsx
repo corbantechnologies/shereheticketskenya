@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 
-export default function StandaloneGatePage() {
+function StandaloneGatePageContent() {
   const { event_code } = useParams<{ event_code: string }>();
   const searchParams = useSearchParams();
   const initialPin = searchParams.get("pin") || "";
@@ -108,5 +108,19 @@ export default function StandaloneGatePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StandaloneGatePage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <StandaloneGatePageContent />
+    </React.Suspense>
   );
 }

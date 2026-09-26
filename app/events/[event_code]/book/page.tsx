@@ -8,7 +8,7 @@ import { LoadingSpinner } from "@/components/general/LoadingComponents";
 import { useFetchEvent } from "@/hooks/events/actions";
 import BookingForm from "@/components/bookings/BookingForm";
 
-export default function BookingPage() {
+function BookingPageContent() {
   const { event_code } = useParams<{ event_code: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -141,5 +141,19 @@ export default function BookingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BookingPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      }
+    >
+      <BookingPageContent />
+    </React.Suspense>
   );
 }

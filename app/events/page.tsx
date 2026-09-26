@@ -33,7 +33,7 @@ import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 
 const PAGE_SIZE = 16;
 
-export default function EventsPage() {
+function EventsContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
   const initialQuery = searchParams.get("q") || "";
@@ -300,5 +300,19 @@ export default function EventsPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function EventsPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      }
+    >
+      <EventsContent />
+    </React.Suspense>
   );
 }
