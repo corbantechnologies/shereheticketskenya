@@ -1,364 +1,357 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
-// app/events/[event_code]/page.tsx
 "use client";
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/general/Footer";
+import { useFetchEvent } from "@/hooks/events/actions";
+import { LoadingSpinner } from "@/components/general/LoadingComponents";
+import RichTextDisplay from "@/components/ui/RichTextDisplay";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
   Clock,
   MapPin,
-  Users,
+  Ticket,
   ArrowLeft,
+  Share2,
+  ShieldCheck,
+  CheckCircle2,
+  Users,
+  Sparkles,
+  Building,
+  ArrowRight,
 } from "lucide-react";
-import { LoadingSpinner } from "@/components/general/LoadingComponents";
-import { useFetchEvent } from "@/hooks/events/actions";
-import TicketTypeChip from "@/components/events/TicketTypeChip";
-// import MakeBooking from "@/forms/bookings/MakeBooking"; // Removed in favor of standalone page
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import RichTextDisplay from "@/components/ui/RichTextDisplay";
-
-function getEventStatus(event: any): { label: string; color: string } | null {
-  if (event.is_closed) return { label: "Closed", color: "bg-red-500/80" };
-  const now = new Date();
-  const start = new Date(event.start_date);
-  const diffDays = Math.ceil(
-    (start.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0)) /
-      (1000 * 60 * 60 * 24)
-  );
-  if (diffDays === 0) return { label: "Today", color: "bg-green-500/80" };
-  if (diffDays === 1) return { label: "Tomorrow", color: "bg-blue-500/80" };
-  if (diffDays <= 7) return { label: "This Week", color: "bg-[var(--mainBlue)]/80" };
-  if (diffDays <= 14) return { label: "This Month", color: "bg-purple-500/80" };
-  return null;
-}
+import { format, differenceInDays } from "date-fns";
+import toast from "react-hot-toast";
 
 export default function EventDetailPage() {
   const { event_code } = useParams<{ event_code: string }>();
   const router = useRouter();
-  // const [showBookingModal, setShowBookingModal] = useState(false); // No longer needed
 
+  const { isLoading: isLoadingEvent, data: event } = useFetchEvent(event_code);
+  const [selectedTicketCode, setSelectedTicketCode] = useState<string>("");
 
-  const {
-    isLoading: isLoadingEvent,
-    data: event,
-    refetch: refetchEvent,
-  } = useFetchEvent(event_code);
-
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-
-  const formatTime = (timeString: string | null) => {
-    if (!timeString) return "TBA";
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const formatTicketDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-
-  const getLowestPrice = () => {
-    if (!event?.ticket_types?.length) return null;
-    return Math.min(...event.ticket_types.map((t: any) => parseFloat(t.price)));
-  };
-
-  const hasBookableTickets = event?.ticket_types?.some(
-    (t: any) => t.status === "ON_SALE" || !t.status
-  );
-
-  const defaultImage =
-    "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=800&h=400&fit=crop";
-
-  if (isLoadingEvent) return <LoadingSpinner />;
-
-  if (!event) {
+  if (isLoadingEvent) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Event not found</p>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <LoadingSpinner />
       </div>
     );
   }
 
-  const status = getEventStatus(event);
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
+        <h2 className="text-xl font-bold mb-2">Event Not Found</h2>
+        <p className="text-xs text-slate-400 mb-6">This event may have been unpublished or removed.</p>
+        <Button asChild className="bg-blue-600 text-white">
+          <Link href="/events">Explore Other Events</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  const eventDate = event.start_date ? new Date(event.start_date) : new Date();
+  const daysUntil = differenceInDays(eventDate, new Date());
+
+  const ticketTypes = (event.ticket_types || []).filter(
+    (tt: any) => tt.is_active !== false
+  );
+
+  const lowestPrice = ticketTypes.length
+    ? Math.min(...ticketTypes.map((t: any) => parseFloat(t.price)))
+    : 0;
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: event.name,
+          text: `Check out ${event.name} on Sherehe Tickets!`,
+          url: window.location.href,
+        });
+      } catch {}
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Event link copied to clipboard!");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#d5d5d5]">
-      {/* Booking Modal Removed */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-rose-500 selection:text-white">
+      <Navbar />
 
-
-      {/* Hero Banner */}
-      <div className="relative h-[55vh] md:h-[420px] w-full overflow-hidden bg-black/90">
-        {/* Blurred background */}
-        <div
-          className="absolute inset-0 bg-cover bg-center blur-2xl opacity-40 scale-110"
-          style={{ backgroundImage: `url(${event.image || defaultImage})` }}
-        />
-        {/* Main image */}
-        <div className="relative h-full w-full flex items-center justify-center z-10 p-4">
-          <img
-            src={event.image || defaultImage}
-            alt={event.name}
-            className="max-h-full max-w-full object-contain drop-shadow-2xl"
+      {/* Hero Header with Blurred Backdrop Poster */}
+      <div className="relative pt-24 pb-12 px-4 sm:px-6 overflow-hidden border-b border-slate-900">
+        {/* Ambient Blur Backdrop */}
+        {event.image && (
+          <div
+            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-20 scale-110 pointer-events-none"
+            style={{ backgroundImage: `url(${event.image})` }}
           />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-20" />
-
-        {/* Back button — overlay pill */}
-        <button
-          onClick={() => router.back()}
-          className="absolute top-5 left-5 z-30 flex items-center gap-1.5 bg-black/40 hover:bg-black/60 text-white text-sm px-3 py-1.5 rounded-full backdrop-blur-sm transition"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-
-        {/* Status badge */}
-        {status && (
-          <span className={`absolute top-5 right-5 z-30 text-xs font-medium text-white px-3 py-1 rounded-full backdrop-blur-sm ${status.color}`}>
-            {status.label}
-          </span>
         )}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/90 to-slate-950 pointer-events-none" />
 
-        {/* Hero text */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-30">
-          <div className="mx-auto">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-3 drop-shadow-lg">
-              {event.name}
-            </h1>
-            <div className="flex flex-wrap gap-3 sm:gap-5 text-white/85 text-sm">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" />
-                <span>{formatDate(event.start_date)}</span>
+        <div className="container relative z-10 mx-auto max-w-6xl">
+          {/* Back link & Share button */}
+          <div className="flex items-center justify-between mb-6">
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to Events
+            </Link>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="h-8 text-xs border-slate-800 bg-slate-900/80 text-slate-300 hover:text-white rounded-xl flex items-center gap-1.5"
+            >
+              <Share2 className="h-3.5 w-3.5 text-cyan-400" /> Share Event
+            </Button>
+          </div>
+
+          {/* Event Header Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Event Poster (5 cols) */}
+            <div className="lg:col-span-5">
+              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-900">
+                {event.image ? (
+                  <img
+                    src={event.image}
+                    alt={event.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-blue-900 to-rose-950 flex items-center justify-center">
+                    <Ticket className="h-16 w-16 text-slate-700" />
+                  </div>
+                )}
+
+                {/* Countdown chip */}
+                {daysUntil >= 0 && (
+                  <div className="absolute top-4 left-4 bg-slate-950/85 backdrop-blur-md border border-slate-700/80 rounded-full px-3 py-1 text-xs font-bold text-cyan-300 shadow-lg">
+                    {daysUntil === 0
+                      ? "Happening Today!"
+                      : daysUntil === 1
+                      ? "Tomorrow!"
+                      : `In ${daysUntil} Days`}
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                <span>
-                  {formatTime(event.start_time)}
-                  {event.end_time && ` – ${formatTime(event.end_time)}`}
-                </span>
+            </div>
+
+            {/* Event Meta Header (7 cols) */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="bg-blue-600/20 text-cyan-300 border-blue-500/30 text-xs px-3 py-0.5">
+                  {event.category || "Music & Concerts"}
+                </Badge>
+                {event.is_closed && (
+                  <Badge className="bg-rose-600 text-white text-xs">Event Closed</Badge>
+                )}
               </div>
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4" />
-                <span>{event.venue || "Venue TBA"}</span>
-              </div>
-              {event.capacity && (
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4" />
-                  <span>{event.capacity} capacity</span>
-                </div>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                {event.name}
+              </h1>
+
+              {event.description && (
+                <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+                  {event.description}
+                </p>
               )}
+
+              {/* Key Particulars Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
+                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-slate-400 font-medium">Date & Time</div>
+                    <div className="text-sm font-bold text-white">
+                      {format(eventDate, "EEEE, MMMM d, yyyy")}
+                    </div>
+                    {event.start_time && (
+                      <div className="text-xs text-slate-400">
+                        {event.start_time.slice(0, 5)}{" "}
+                        {event.end_time && `– ${event.end_time.slice(0, 5)}`}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-slate-400 font-medium">Venue & Location</div>
+                    <div className="text-sm font-bold text-white truncate max-w-[200px]">
+                      {event.venue || "Venue TBA"}
+                    </div>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        event.venue || "Nairobi Kenya"
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-cyan-400 hover:underline font-semibold"
+                    >
+                      View on Google Maps →
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="mx-auto px-4 sm:px-6 py-8 pb-20 lg:pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+      {/* Main Content & Booking Section */}
+      <main className="container mx-auto max-w-6xl px-4 sm:px-6 py-12 flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          {/* Left Column: Event Content, Lineup & Policy (7 cols) */}
+          <div className="lg:col-span-7 space-y-8">
+            {/* Event Description & Rich Content */}
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 sm:p-8 space-y-4">
+              <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-cyan-400" />
+                About This Event
+              </h2>
 
-          {/* Left — Event Info */}
-          <div className="lg:col-span-2 space-y-5">
-
-            {/* About */}
-            <Card className="py-0 border-none shadow-lg bg-white">
-              <CardContent className="p-4">
-                <h2 className="text-lg font-semibold mb-3 text-foreground">About this event</h2>
-
-                {/* Short description — always shown if present */}
-                {event.description && (
-                  <p className="text-sm text-foreground/80 leading-relaxed mb-3">
-                    {event.description}
-                  </p>
-                )}
-
-                {/* Rich text body — always shown */}
-                <RichTextDisplay content={event.content} />
-              </CardContent>
-            </Card>
-
-            {/* Cancellation Policy */}
-            <Card className="py-0 border-none shadow-lg bg-white">
-              <CardContent className="p-4">
-                <h2 className="text-lg font-semibold mb-2 text-foreground">Cancellation policy</h2>
-                {event.refund_policy ? (
-                  <RichTextDisplay content={event.refund_policy} />
-                ) : (
-                  <p className="text-foreground/70 text-sm leading-relaxed">
-                    No cancellation policy specified for this event.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right — Ticket Selection */}
-          <div className="lg:col-span-1">
-            {event.is_closed ? (
-              <Card className="py-0 border-none shadow-lg lg:sticky top-6 text-center bg-white">
-                <CardContent className="p-4">
-                  <p className="text-sm text-muted-foreground">
-                    This event is closed. No tickets are available.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="py-0 border-none shadow-lg lg:sticky top-6 bg-white">
-                <CardContent className="p-4">
-                <h2 className="text-lg font-semibold mb-4 text-foreground">Select tickets</h2>
-                <div className="space-y-3">
-                  {event.ticket_types?.length > 0 ? (
-                    <>
-                      {event.ticket_types.map((ticket: any) => {
-                        const isEligible =
-                          ticket.status === "ON_SALE" || !ticket.status;
-                        const isStruckThrough =
-                          ticket.status === "SOLD_OUT" ||
-                          ticket.status === "ENDED";
-
-                        const statusColors: Record<string, string> = {
-                          ON_SALE: "bg-green-100 text-green-800 border-green-200",
-                          SOLD_OUT: "bg-red-100 text-red-800 border-red-200",
-                          UPCOMING: "bg-blue-100 text-blue-800 border-blue-200",
-                          PAUSED: "bg-yellow-100 text-yellow-800 border-yellow-200",
-                          ENDED: "bg-gray-100 text-gray-800 border-gray-200",
-                        };
-
-                        return (
-                          <Card
-                            key={ticket.reference}
-                            className={`shadow-sm transition-shadow p-0  ${
-                              isEligible
-                                ? "hover:shadow-md cursor-pointer"
-                                : "opacity-55 cursor-not-allowed bg-muted/20"
-                            }`}
-                            onClick={() => {
-                              if (isEligible) router.push(`/events/${event_code}/book?ticket=${ticket.ticket_type_code}`);
-                            }}
-                          >
-                            <CardContent className="py-3 px-2">
-                            <div className="flex justify-between items-start gap-3 mb-2">
-                              <div>
-                                <h4
-                                  className={`text-sm font-medium flex flex-wrap items-center gap-2 ${
-                                    isStruckThrough
-                                      ? "line-through text-muted-foreground"
-                                      : ""
-                                  }`}
-                                >
-                                  {ticket.name}
-                                  {ticket.status && ticket.status !== "ON_SALE" && (
-                                    <span
-                                      className={`text-xs px-2 py-0.5 rounded-full border font-medium no-underline ${
-                                        statusColors[ticket.status] ??
-                                        "bg-muted text-muted-foreground border-border"
-                                      }`}
-                                    >
-                                      {ticket.status.replace("_", " ")}
-                                    </span>
-                                  )}
-                                </h4>
-                                <p
-                                  className={`text-lg font-semibold mt-0.5 ${
-                                    isStruckThrough
-                                      ? "line-through text-muted-foreground"
-                                      : "text-[var(--mainBlue)]"
-                                  }`}
-                                >
-                                  KES {parseFloat(ticket.price).toLocaleString()}
-                                </p>
-                              </div>
-                              <TicketTypeChip
-                                ticketType={ticket}
-                                isLowestPrice={
-                                  parseFloat(ticket.price) === getLowestPrice()
-                                }
-                              />
-                            </div>
-
-                            <div className="text-xs text-muted-foreground">
-                              {ticket.quantity_available !== null ? (
-                                ticket.quantity_available <= 10 ? (
-                                  <span className="text-orange-600 font-medium">
-                                    Only {ticket.quantity_available} left!
-                                  </span>
-                                ) : (
-                                  <span>{ticket.quantity_available} available</span>
-                                )
-                              ) : (
-                                <span>Unlimited</span>
-                              )}
-                              {!isEligible && (
-                                <p className="text-red-500/80 mt-1">
-                                  {ticket.status === "UPCOMING" && ticket.sales_start
-                                    ? `Sales open ${formatTicketDate(ticket.sales_start)}`
-                                    : ticket.status === "ENDED" && ticket.sales_end
-                                    ? `Sales ended ${formatTicketDate(ticket.sales_end)}`
-                                    : "Currently unavailable"}
-                                </p>
-                              )}
-                            </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-
-                      <Button
-                        onClick={() => router.push(`/events/${event_code}/book`)}
-                        disabled={!hasBookableTickets}
-                        className="w-full bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white py-5 mt-1 disabled:opacity-50"
-                      >
-                        {hasBookableTickets ? "Get Tickets" : "No Tickets Available"}
-                      </Button>
-                      <p className="text-center text-xs text-muted-foreground">
-                        Secure payment processing
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-6">
-                      No tickets available for this event
-                    </p>
-                  )}
+              {event.content ? (
+                <div className="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed">
+                  <RichTextDisplay content={event.content} />
                 </div>
-              </CardContent>
-            </Card>
-            )}
-          </div>
-        </div>
-      </div>
+              ) : (
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  {event.description || "No further details provided for this event."}
+                </p>
+              )}
+            </div>
 
-      {/* Mobile sticky CTA */}
-      {!event.is_closed && hasBookableTickets && (
-        <div className="lg:hidden bg-white fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-gray-200 px-4 py-3 flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground truncate">{event.name}</p>
-            {getLowestPrice() && (
-              <p className="text-sm font-medium text-foreground">
-                From KES {getLowestPrice()!.toLocaleString()}
+            {/* Refund & Admission Policy */}
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 space-y-3 text-xs text-slate-400">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                Admission & Verification Policy
+              </h3>
+              <p>
+                Every ticket is unique and verified upon arrival via camera gate scanner. Once scanned, the QR code cannot be reused. Tickets can be presented on any smartphone or printed.
               </p>
-            )}
+              {event.refund_policy && (
+                <div className="pt-2 border-t border-slate-800 text-slate-300">
+                  <span className="font-semibold text-white">Refund Policy:</span>{" "}
+                  {typeof event.refund_policy === "string"
+                    ? event.refund_policy
+                    : JSON.stringify(event.refund_policy)}
+                </div>
+              )}
+            </div>
           </div>
-          <Button
-            onClick={() => router.push(`/events/${event_code}/book`)}
-            className="shrink-0 bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white px-5"
-          >
-            Get Tickets
-          </Button>
+
+          {/* Right Column: Sticky Ticket Selection & Booking Card (5 cols) */}
+          <div className="lg:col-span-5 sticky top-24 space-y-4">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
+              <div className="border-b border-slate-800 pb-4">
+                <div className="text-xs text-slate-400 font-medium">Tickets available from</div>
+                <div className="text-3xl font-black text-white">
+                  {lowestPrice > 0 ? `KES ${lowestPrice.toLocaleString()}` : "Free Entry"}
+                </div>
+              </div>
+
+              {/* Ticket Tier Selector List */}
+              <div className="space-y-3">
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Select Ticket Tier
+                </div>
+
+                {ticketTypes.length === 0 ? (
+                  <div className="text-center py-6 text-xs text-slate-500 bg-slate-950/60 rounded-2xl border border-slate-800">
+                    No active ticket tiers available.
+                  </div>
+                ) : (
+                  ticketTypes.map((tier: any) => {
+                    const isSelected = selectedTicketCode === tier.ticket_type_code;
+                    const isSoldOut =
+                      tier.is_limited &&
+                      tier.quantity_available !== null &&
+                      tier.quantity_available <= 0;
+
+                    return (
+                      <div
+                        key={tier.ticket_type_code}
+                        onClick={() => !isSoldOut && setSelectedTicketCode(tier.ticket_type_code)}
+                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                          isSoldOut
+                            ? "opacity-40 cursor-not-allowed border-slate-800 bg-slate-950/40"
+                            : isSelected
+                            ? "bg-blue-600/15 border-cyan-400 shadow-md shadow-blue-500/10"
+                            : "bg-slate-950/60 hover:bg-slate-850 border-slate-800 text-slate-200"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-bold text-sm text-white">{tier.name}</div>
+                            {tier.description && (
+                              <div className="text-xs text-slate-400 mt-0.5">{tier.description}</div>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <div className="font-extrabold text-base text-cyan-300">
+                              KES {parseFloat(tier.price).toLocaleString()}
+                            </div>
+                            {tier.is_limited && tier.quantity_available !== null && (
+                              <div className="text-[10px] text-rose-400 font-semibold">
+                                {isSoldOut ? "Sold Out" : `${tier.quantity_available} left`}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Book Tickets CTA Button */}
+              <Button
+                disabled={event.is_closed || ticketTypes.length === 0}
+                onClick={() => {
+                  const targetTier = selectedTicketCode || ticketTypes[0]?.ticket_type_code || "";
+                  router.push(`/events/${event_code}/book?ticket=${targetTier}`);
+                }}
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-rose-600 hover:from-blue-500 hover:to-rose-500 text-white font-bold text-sm rounded-xl shadow-xl shadow-blue-600/25 flex items-center justify-center gap-2"
+              >
+                <span>Proceed to Book Tickets</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+
+              {/* Safe Checkout Badges */}
+              <div className="pt-2 flex items-center justify-center gap-4 text-[11px] text-slate-400">
+                <span className="flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                  M-Pesa STK Push
+                </span>
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
+                  Instant QR Delivery
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </main>
+
+      <Footer />
     </div>
   );
 }

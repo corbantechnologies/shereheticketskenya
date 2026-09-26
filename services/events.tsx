@@ -31,6 +31,9 @@ interface Event {
   capacity: number;
   is_published: boolean;
   is_closed: boolean;
+  category?: string;
+  gate_passcode?: string;
+  platform_fee_percent?: number;
   ticket_types: TicketType[];
   coupons: Coupon[];
   tickets_sold: number;
@@ -158,6 +161,57 @@ export const closeEvent = async (
   const response: AxiosResponse<Event> = await apiActions.patch(
     `/api/v1/events/${event_code}/`,
     { is_closed: true },
+    headers
+  );
+  return response.data;
+};
+
+export interface EventSettlementData {
+  event_code: string;
+  event_name: string;
+  gate_passcode?: string;
+  total_tickets_sold: number;
+  gross_sales: number;
+  platform_fee_percent: number;
+  platform_fee_amount: number;
+  net_event_revenue: number;
+  disbursed_amount: number;
+  pending_amount: number;
+  withdrawable_balance: number;
+  sales_velocity: { date: string; revenue: number; tickets: number }[];
+  recent_payouts: {
+    reference: string;
+    amount_requested: number;
+    platform_fee_deducted: number;
+    net_payout_amount: number;
+    payout_phone: string;
+    status: string;
+    mpesa_transaction_id?: string;
+    notes?: string;
+    created_at: string;
+    disbursed_at?: string;
+  }[];
+}
+
+export const getEventSettlement = async (
+  event_code: string,
+  headers: { headers: { Authorization: string } }
+): Promise<EventSettlementData> => {
+  const response: AxiosResponse<EventSettlementData> = await apiActions.get(
+    `/api/v1/events/${event_code}/settlement/`,
+    headers
+  );
+  return response.data;
+};
+
+export const requestEventPayout = async (
+  event_code: string,
+  data: { amount: number; phone_number: string; notes?: string },
+  headers: { headers: { Authorization: string } }
+) => {
+  const response = await apiActions.post(
+    `/api/v1/events/${event_code}/payout-request/`,
+    data,
     headers
   );
   return response.data;

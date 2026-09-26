@@ -10,10 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Building2, Plus, Lock, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import Modal from "@/components/ui/modal";
+import CreateCompany from "@/forms/company/CreateCompany";
+import OrganizerGuides from "@/components/organizer/OrganizerGuides";
 
 export default function OrganizerDashboardPage() {
   const router = useRouter();
-  const { isLoading, data: organizer } = useFetchAccount();
+  const { isLoading, data: organizer, refetch } = useFetchAccount();
+  const [isCreateCompanyOpen, setIsCreateCompanyOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -49,9 +54,7 @@ export default function OrganizerDashboardPage() {
           <Button
             disabled={!is_premium}
             className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white text-sm h-9 self-start sm:self-auto"
-            onClick={() => {
-              // TODO: Open create company modal
-            }}
+            onClick={() => setIsCreateCompanyOpen(true)}
           >
             <Plus className="h-4 w-4 mr-1.5" />
             New company
@@ -165,6 +168,7 @@ export default function OrganizerDashboardPage() {
                 <Button
                   size="sm"
                   disabled={!is_premium}
+                  onClick={() => setIsCreateCompanyOpen(true)}
                   className="bg-[var(--mainBlue)] hover:bg-[var(--mainBlue)]/90 text-white text-xs h-8"
                 >
                   <Plus className="h-3.5 w-3.5 mr-1" />
@@ -176,8 +180,23 @@ export default function OrganizerDashboardPage() {
           </CardContent>
         </Card>
 
+        {/* In-Portal Organizer Guides */}
+        <OrganizerGuides />
 
-
+        {/* Create Company Modal */}
+        <Modal
+          isOpen={isCreateCompanyOpen}
+          onClose={() => setIsCreateCompanyOpen(false)}
+          title="Create New Organization"
+          description="Register a secondary company/brand to organize and host events."
+        >
+          <div className="p-6">
+            <CreateCompany
+              refetch={refetch}
+              closeDialog={() => setIsCreateCompanyOpen(false)}
+            />
+          </div>
+        </Modal>
       </div>
     </div>
   );
