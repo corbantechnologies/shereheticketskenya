@@ -67,23 +67,23 @@ export default function CompanySwitcher({ collapsed = false }: CompanySwitcherPr
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className={`w-full flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 text-left transition select-none ${
+              className={`w-full flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200 text-left transition select-none ${
                 collapsed ? "justify-center px-1.5" : ""
               }`}
             >
-              <Avatar className="h-8 w-8 rounded-lg shrink-0 border border-slate-700 bg-slate-800">
+              <Avatar className="h-8 w-8 rounded-lg shrink-0 border border-slate-200 bg-blue-50">
                 <AvatarImage src={activeCompany?.logo || undefined} />
-                <AvatarFallback className="bg-gradient-to-tr from-cyan-600 to-blue-600 text-white text-xs font-bold rounded-lg">
+                <AvatarFallback className="bg-blue-600 text-white text-xs font-bold rounded-lg">
                   {activeCompany?.name?.[0] || "S"}
                 </AvatarFallback>
               </Avatar>
 
               {!collapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-white truncate">
+                  <p className="text-xs font-bold text-slate-900 truncate">
                     {activeCompany?.name || "Select Organization"}
                   </p>
-                  <p className="text-[10px] text-slate-400 font-mono truncate">
+                  <p className="text-[10px] text-slate-500 font-mono truncate">
                     {activeCompany?.company_code || "SH-ORG"}
                   </p>
                 </div>
@@ -96,7 +96,7 @@ export default function CompanySwitcher({ collapsed = false }: CompanySwitcherPr
           <DropdownMenuContent
             align="start"
             sideOffset={6}
-            className="w-64 bg-slate-900 border-slate-800 text-slate-100 shadow-2xl rounded-2xl p-1.5"
+            className="w-64 bg-white border border-slate-200 text-slate-800 shadow-xl rounded-2xl p-1.5"
           >
             <DropdownMenuLabel className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-2 py-1">
               Your Organizations
@@ -108,30 +108,30 @@ export default function CompanySwitcher({ collapsed = false }: CompanySwitcherPr
                 <DropdownMenuItem
                   key={company.reference}
                   onClick={() => handleSelectCompany(company.reference)}
-                  className={`flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer hover:bg-slate-800 transition ${
-                    isSelected ? "bg-slate-800/80 font-bold text-white" : "text-slate-300"
+                  className={`flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer hover:bg-slate-50 transition ${
+                    isSelected ? "bg-blue-50 font-bold text-blue-700" : "text-slate-700"
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <Avatar className="h-6 w-6 rounded-md shrink-0 border border-slate-700">
+                    <Avatar className="h-6 w-6 rounded-md shrink-0 border border-slate-200">
                       <AvatarImage src={company.logo || undefined} />
-                      <AvatarFallback className="bg-slate-800 text-cyan-400 text-[10px] font-bold">
+                      <AvatarFallback className="bg-slate-100 text-blue-600 text-[10px] font-bold">
                         {company.name?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <span className="truncate">{company.name}</span>
                   </div>
-                  {isSelected && <Check className="h-3.5 w-3.5 text-cyan-400 shrink-0 ml-2" />}
+                  {isSelected && <Check className="h-3.5 w-3.5 text-blue-600 shrink-0 ml-2" />}
                 </DropdownMenuItem>
               );
             })}
 
-            <DropdownMenuSeparator className="bg-slate-800 my-1" />
+            <DropdownMenuSeparator className="bg-slate-100 my-1" />
 
             <DropdownMenuItem
               onClick={() => setIsCreateModalOpen(true)}
               disabled={!account?.is_premium && companies.length >= 1}
-              className="flex items-center gap-2 p-2 rounded-xl text-xs cursor-pointer text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 font-semibold transition"
+              className="flex items-center gap-2 p-2 rounded-xl text-xs cursor-pointer text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-semibold transition"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>Create New Organization</span>

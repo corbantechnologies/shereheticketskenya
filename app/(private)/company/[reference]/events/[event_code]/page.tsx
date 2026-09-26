@@ -3,6 +3,7 @@
 // app/(private)/company/[reference]/events/[event_code]/page.tsx
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useFetchCompanyEvent } from "@/hooks/events/actions";
 import {
@@ -322,14 +323,14 @@ export default function EventDetailPage() {
 
   return (
     <>
-      <div className="mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <div className="mx-auto space-y-6">
         {/* ── 1. Top Event Header Card ── */}
-        <Card className="border border-slate-800 shadow-2xl bg-slate-900/90 backdrop-blur-xl overflow-hidden rounded-2xl">
+        <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden rounded-2xl">
           {/* Top Strip: Breadcrumb + Action Menu */}
-          <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 bg-slate-950/70 border-b border-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 bg-slate-50 border-b border-slate-200">
             <button
               onClick={() => router.push(`/company/${reference}/events`)}
-              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors font-medium"
+              className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors font-medium"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Back to events
@@ -340,22 +341,22 @@ export default function EventDetailPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => window.open(`/events/${event.event_code}`, "_blank")}
-                className="h-8 text-xs gap-1.5 border-slate-700 bg-slate-800/60 text-slate-200 hover:bg-slate-800 hover:text-white"
+                className="h-8 text-xs gap-1.5 border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
               >
                 <Eye className="h-3.5 w-3.5" /> Public Page
               </Button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-800 text-slate-300 hover:text-white">
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-200 text-slate-700">
                     <Menu className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-slate-900 text-slate-100 shadow-2xl border-slate-800">
+                <DropdownMenuContent align="end" className="w-48 bg-white text-slate-900 shadow-xl border-slate-200">
                   {!event.is_closed && (
                     <DropdownMenuItem
                       onClick={() => router.push(`/company/${reference}/events/${event_code}/edit`)}
-                      className="text-xs cursor-pointer hover:bg-slate-800 text-slate-200"
+                      className="text-xs cursor-pointer hover:bg-slate-50 text-slate-700"
                     >
                       <Edit3 className="h-3.5 w-3.5 mr-2" /> Edit Event Details
                     </DropdownMenuItem>
@@ -364,15 +365,15 @@ export default function EventDetailPage() {
                   {!event.is_closed && (
                     <>
                       {!event.is_published ? (
-                        <DropdownMenuItem onClick={handlePublishEvent} className="text-xs cursor-pointer hover:bg-slate-800 text-emerald-400 font-medium">
+                        <DropdownMenuItem onClick={handlePublishEvent} className="text-xs cursor-pointer hover:bg-emerald-50 text-emerald-600 font-medium">
                           <Globe className="h-3.5 w-3.5 mr-2" /> Publish Event
                         </DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem onClick={handleUnpublishEvent} className="text-xs cursor-pointer hover:bg-slate-800 text-amber-400 font-medium">
+                        <DropdownMenuItem onClick={handleUnpublishEvent} className="text-xs cursor-pointer hover:bg-amber-50 text-amber-600 font-medium">
                           <EyeOff className="h-3.5 w-3.5 mr-2" /> Unpublish Event
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem onClick={handleCloseEvent} className="text-xs cursor-pointer hover:bg-slate-800 text-rose-400 font-medium">
+                      <DropdownMenuItem onClick={handleCloseEvent} className="text-xs cursor-pointer hover:bg-rose-50 text-rose-600 font-medium">
                         <XCircle className="h-3.5 w-3.5 mr-2" /> Close Event
                       </DropdownMenuItem>
                     </>
@@ -387,17 +388,17 @@ export default function EventDetailPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <div className="flex flex-wrap items-center gap-2.5 mb-1.5">
-                  <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{event.name}</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{event.name}</h1>
                   <Badge className={`text-xs px-2.5 py-0.5 border font-semibold ${statusClass}`}>
                     {statusLabel}
                   </Badge>
-                  <Badge variant="outline" className="text-xs text-slate-300 border-slate-700 bg-slate-800/40">
+                  <Badge variant="outline" className="text-xs text-slate-600 border-slate-200 bg-slate-50">
                     {event.category || "Concert"}
                   </Badge>
                 </div>
-                <div className="flex flex-wrap gap-4 text-xs text-slate-400">
+                <div className="flex flex-wrap gap-4 text-xs text-slate-500">
                   <span className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5 text-emerald-400" />
+                    <Calendar className="h-3.5 w-3.5 text-blue-600" />
                     {format(new Date(event.start_date), "dd MMM yyyy")}
                     {event.end_date && ` → ${format(new Date(event.end_date), "dd MMM yyyy")}`}
                   </span>
@@ -408,14 +409,14 @@ export default function EventDetailPage() {
                     </span>
                   )}
                   <span className="flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-rose-400" />
+                    <MapPin className="h-3.5 w-3.5 text-rose-500" />
                     {event.venue || "Venue TBA"}
                   </span>
                 </div>
               </div>
 
               {/* Quick Gate Launch Button */}
-              <div className="flex items-center gap-2.5 bg-slate-950 text-white p-3 rounded-xl shadow-lg border border-slate-800">
+              <div className="flex items-center gap-2.5 bg-slate-900 text-white p-3 rounded-xl shadow-sm border border-slate-800">
                 <div className="pr-3 border-r border-slate-800">
                   <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Gate PIN</p>
                   <div className="flex items-center gap-1 mt-0.5">
@@ -446,7 +447,7 @@ export default function EventDetailPage() {
                     variant="outline"
                     onClick={copyGateLink}
                     title="Copy Standalone Link for Bouncers"
-                    className="h-8 text-xs border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800 hover:text-white"
+                    className="h-8 text-xs border-slate-700 bg-slate-850 text-slate-200 hover:bg-slate-800 hover:text-white"
                   >
                     Bouncer URL
                   </Button>
@@ -455,41 +456,41 @@ export default function EventDetailPage() {
             </div>
 
             {/* KPI Banner */}
-            <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 shadow-inner">
-                <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
-                  <Users className="h-3.5 w-3.5 text-blue-400" /> Tickets Sold
+            <div className="mt-6 pt-5 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                  <Users className="h-3.5 w-3.5 text-blue-600" /> Tickets Sold
                 </p>
-                <p className="text-2xl font-extrabold text-white mt-1">{totalTicketsSold}</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">of {event.capacity ? event.capacity : "unlimited"} capacity</p>
+                <p className="text-2xl font-extrabold text-slate-900 mt-1">{totalTicketsSold}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">of {event.capacity ? event.capacity : "unlimited"} capacity</p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 shadow-inner">
-                <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
-                  <DollarSign className="h-3.5 w-3.5 text-emerald-400" /> Gross Revenue
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                  <DollarSign className="h-3.5 w-3.5 text-emerald-600" /> Gross Revenue
                 </p>
-                <p className="text-2xl font-extrabold text-emerald-400 mt-1">
+                <p className="text-2xl font-extrabold text-emerald-600 mt-1">
                   KES {settlement ? settlement.gross_sales.toLocaleString() : "..."}
                 </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">{allBookings.length} total orders</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">{allBookings.length} total orders</p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 shadow-inner">
-                <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
-                  <CreditCard className="h-3.5 w-3.5 text-purple-400" /> Withdrawable Balance
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                  <CreditCard className="h-3.5 w-3.5 text-purple-600" /> Withdrawable Balance
                 </p>
-                <p className="text-2xl font-extrabold text-white mt-1">
+                <p className="text-2xl font-extrabold text-slate-900 mt-1">
                   KES {settlement ? settlement.withdrawable_balance.toLocaleString() : "..."}
                 </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">Net of 3.5% commission</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Net of 3.5% commission</p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 shadow-inner">
-                <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
-                  <Tag className="h-3.5 w-3.5 text-amber-400" /> Active Tiers
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                  <Tag className="h-3.5 w-3.5 text-amber-600" /> Active Tiers
                 </p>
-                <p className="text-2xl font-extrabold text-white mt-1">{ticketTypes.length}</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">{coupons.length} coupon campaigns</p>
+                <p className="text-2xl font-extrabold text-slate-900 mt-1">{ticketTypes.length}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">{coupons.length} coupon campaigns</p>
               </div>
             </div>
           </CardContent>
@@ -497,34 +498,34 @@ export default function EventDetailPage() {
 
         {/* ── 2. Navigation Tabs ── */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="h-11 bg-slate-900 p-1 w-full grid grid-cols-5 rounded-xl border border-slate-800 shadow-md">
+          <TabsList className="h-11 bg-slate-100 p-1 w-full grid grid-cols-5 rounded-xl border border-slate-200 shadow-xs">
             <TabsTrigger
               value="overview"
-              className="h-9 text-xs font-semibold data-[state=active]:bg-emerald-500 data-[state=active]:text-slate-950 rounded-lg text-slate-300 transition"
+              className="h-9 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs rounded-lg text-slate-600 transition"
             >
               Overview &amp; Velocity
             </TabsTrigger>
             <TabsTrigger
               value="financials"
-              className="h-9 text-xs font-semibold data-[state=active]:bg-emerald-500 data-[state=active]:text-slate-950 rounded-lg text-slate-300 transition"
+              className="h-9 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs rounded-lg text-slate-600 transition"
             >
               Financials &amp; Payouts
             </TabsTrigger>
             <TabsTrigger
               value="crm"
-              className="h-9 text-xs font-semibold data-[state=active]:bg-emerald-500 data-[state=active]:text-slate-950 rounded-lg text-slate-300 transition"
+              className="h-9 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs rounded-lg text-slate-600 transition"
             >
               Attendee CRM ({allBookings.length})
             </TabsTrigger>
             <TabsTrigger
               value="tickets"
-              className="h-9 text-xs font-semibold data-[state=active]:bg-emerald-500 data-[state=active]:text-slate-950 rounded-lg text-slate-300 transition"
+              className="h-9 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs rounded-lg text-slate-600 transition"
             >
               Ticket Tiers ({ticketTypes.length})
             </TabsTrigger>
             <TabsTrigger
               value="coupons"
-              className="h-9 text-xs font-semibold data-[state=active]:bg-emerald-500 data-[state=active]:text-slate-950 rounded-lg text-slate-300 transition"
+              className="h-9 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs rounded-lg text-slate-600 transition"
             >
               Coupons ({coupons.length})
             </TabsTrigger>
@@ -533,19 +534,19 @@ export default function EventDetailPage() {
           {/* ── TAB 1: OVERVIEW & RECHARTS SALES VELOCITY ── */}
           <TabsContent value="overview" className="mt-4 space-y-4">
             {/* Sales Velocity Chart Card */}
-            <Card className="border border-slate-800 shadow-2xl bg-slate-900/90 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border border-slate-200 shadow-sm bg-white rounded-2xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
                   <div>
-                    <h3 className="text-base font-bold text-white flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-emerald-400" />
+                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-emerald-600" />
                       Sales Velocity (Last 14 Days)
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Daily revenue stream generated from confirmed M-Pesa bookings.
                     </p>
                   </div>
-                  <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+                  <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
                     Live Telemetry
                   </Badge>
                 </div>
@@ -560,16 +561,16 @@ export default function EventDetailPage() {
                             <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis
                           dataKey="date"
-                          stroke="#64748b"
+                          stroke="#94a3b8"
                           fontSize={11}
                           tickLine={false}
                           axisLine={false}
                         />
                         <YAxis
-                          stroke="#64748b"
+                          stroke="#94a3b8"
                           fontSize={11}
                           tickLine={false}
                           axisLine={false}
@@ -577,13 +578,14 @@ export default function EventDetailPage() {
                         />
                         <Tooltip
                           formatter={(value: any) => [`KSh ${Number(value).toLocaleString()}`, "Revenue"]}
-                          labelStyle={{ color: "#ffffff", fontWeight: "bold" }}
+                          labelStyle={{ color: "#0f172a", fontWeight: "bold" }}
                           contentStyle={{
-                            backgroundColor: "#090d16",
-                            borderColor: "#334155",
+                            backgroundColor: "#ffffff",
+                            borderColor: "#e2e8f0",
                             borderRadius: "12px",
-                            color: "#ffffff",
+                            color: "#0f172a",
                             fontSize: "12px",
+                            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                           }}
                         />
                         <Area
@@ -606,13 +608,13 @@ export default function EventDetailPage() {
             </Card>
 
             {/* Event Description & Agenda */}
-            <Card className="border border-slate-800 shadow-2xl bg-slate-900/90 backdrop-blur-xl rounded-2xl">
+            <Card className="border border-slate-200 shadow-sm bg-white rounded-2xl">
               <CardContent className="p-6 space-y-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Event Overview &amp; Content</h3>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Event Overview &amp; Content</h3>
                 {event.description && (
-                  <p className="text-sm text-slate-300 leading-relaxed">{event.description}</p>
+                  <p className="text-sm text-slate-600 leading-relaxed">{event.description}</p>
                 )}
-                <div className="text-slate-300">
+                <div className="text-slate-700">
                   <RichTextDisplay content={event.content} />
                 </div>
               </CardContent>
@@ -623,7 +625,7 @@ export default function EventDetailPage() {
           <TabsContent value="financials" className="mt-4 space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Withdrawable Balance Action Card */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-950 to-slate-900 border border-slate-800 text-white shadow-2xl flex flex-col justify-between">
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 text-white shadow-xl flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs uppercase font-bold tracking-wider text-emerald-400">
@@ -671,20 +673,20 @@ export default function EventDetailPage() {
               </div>
 
               {/* Payout Requests History */}
-              <div className="lg:col-span-2 p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-2xl backdrop-blur-xl space-y-4">
+              <div className="lg:col-span-2 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                     Recent Payout Requests
                   </h3>
-                  <Badge variant="outline" className="text-xs border-slate-700 text-slate-300">
+                  <Badge variant="outline" className="text-xs border-slate-200 text-slate-600">
                     {settlement?.recent_payouts?.length || 0} requests
                   </Badge>
                 </div>
 
                 {settlement?.recent_payouts && settlement.recent_payouts.length > 0 ? (
-                  <div className="rounded-xl border border-slate-800 overflow-hidden">
+                  <div className="rounded-xl border border-slate-200 overflow-hidden">
                     <table className="w-full text-xs">
-                      <thead className="bg-slate-950/70 text-slate-400 font-semibold border-b border-slate-800">
+                      <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                         <tr>
                           <th className="text-left px-4 py-3">Reference</th>
                           <th className="text-left px-4 py-3">Amount</th>
@@ -693,32 +695,32 @@ export default function EventDetailPage() {
                           <th className="text-right px-4 py-3">Date</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800/70">
+                      <tbody className="divide-y divide-slate-100">
                         {settlement.recent_payouts.map((p) => (
-                          <tr key={p.reference} className="hover:bg-slate-800/40">
-                            <td className="px-4 py-3 font-mono font-bold text-slate-200">
+                          <tr key={p.reference} className="hover:bg-slate-50">
+                            <td className="px-4 py-3 font-mono font-bold text-slate-800">
                               {p.reference}
                             </td>
-                            <td className="px-4 py-3 font-semibold text-emerald-400">
+                            <td className="px-4 py-3 font-semibold text-emerald-600">
                               KES {p.amount_requested.toLocaleString()}
                             </td>
-                            <td className="px-4 py-3 font-mono text-slate-400">
+                            <td className="px-4 py-3 font-mono text-slate-600">
                               {p.payout_phone}
                             </td>
                             <td className="px-4 py-3">
                               <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                   p.status === "DISBURSED"
-                                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                     : p.status === "PENDING"
-                                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                                    : "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                                    ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                    : "bg-rose-50 text-rose-700 border border-rose-200"
                                 }`}
                               >
                                 {p.status}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right text-slate-400">
+                            <td className="px-4 py-3 text-right text-slate-500">
                               {format(new Date(p.created_at), "dd MMM, HH:mm")}
                             </td>
                           </tr>
@@ -737,7 +739,7 @@ export default function EventDetailPage() {
 
           {/* ── TAB 3: ATTENDEE CRM ── */}
           <TabsContent value="crm" className="mt-4">
-            <Card className="border border-slate-800 shadow-2xl bg-slate-900/90 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border border-slate-200 shadow-sm bg-white rounded-2xl overflow-hidden">
               <CardContent className="p-5 sm:p-6 space-y-4">
                 {/* Search & Filter Bar */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -748,16 +750,16 @@ export default function EventDetailPage() {
                       value={attendeeSearchQuery}
                       onChange={(e) => setAttendeeSearchQuery(e.target.value)}
                       placeholder="Search by attendee name, phone, email, ticket code or ref..."
-                      className="w-full pl-10 pr-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950/80 text-white placeholder:text-slate-500 focus:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                      className="w-full pl-10 pr-4 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     />
                   </div>
 
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <div className="flex items-center bg-slate-950 border border-slate-800 p-1 rounded-xl text-xs">
+                    <div className="flex items-center bg-slate-100 p-1 rounded-xl text-xs">
                       <button
                         onClick={() => setCrmFilter("ALL")}
                         className={`px-3 py-1 rounded-lg font-medium transition ${
-                          crmFilter === "ALL" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400"
+                          crmFilter === "ALL" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500"
                         }`}
                       >
                         All ({allBookings.length})
@@ -765,7 +767,7 @@ export default function EventDetailPage() {
                       <button
                         onClick={() => setCrmFilter("CHECKED_IN")}
                         className={`px-3 py-1 rounded-lg font-medium transition ${
-                          crmFilter === "CHECKED_IN" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400"
+                          crmFilter === "CHECKED_IN" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500"
                         }`}
                       >
                         Checked In
@@ -773,7 +775,7 @@ export default function EventDetailPage() {
                       <button
                         onClick={() => setCrmFilter("NOT_CHECKED_IN")}
                         className={`px-3 py-1 rounded-lg font-medium transition ${
-                          crmFilter === "NOT_CHECKED_IN" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400"
+                          crmFilter === "NOT_CHECKED_IN" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500"
                         }`}
                       >
                         Not Checked
@@ -784,7 +786,7 @@ export default function EventDetailPage() {
                       size="sm"
                       variant="outline"
                       onClick={handleExportCSV}
-                      className="h-9 text-xs gap-1.5 border-slate-700 bg-slate-800/60 text-slate-200 hover:bg-slate-800 hover:text-white"
+                      className="h-9 text-xs gap-1.5 border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                     >
                       <Download className="w-3.5 h-3.5" /> Export CSV
                     </Button>
@@ -793,9 +795,9 @@ export default function EventDetailPage() {
 
                 {/* Attendee Table */}
                 {filteredBookings.length > 0 ? (
-                  <div className="rounded-xl border border-slate-800 overflow-x-auto">
+                  <div className="rounded-xl border border-slate-200 overflow-x-auto">
                     <table className="w-full text-xs">
-                      <thead className="bg-slate-950/70 text-slate-400 font-semibold border-b border-slate-800">
+                      <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                         <tr>
                           <th className="text-left px-4 py-3">Attendee</th>
                           <th className="text-left px-4 py-3">Tier</th>
@@ -805,55 +807,71 @@ export default function EventDetailPage() {
                           <th className="text-right px-4 py-3">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800/70">
+                      <tbody className="divide-y divide-slate-100">
                         {filteredBookings.map((booking: any) => {
                           const isCheckedIn = (booking.tickets || []).some((t: any) => t.is_used);
                           const firstTicket = (booking.tickets || [])[0];
 
                           return (
-                            <tr key={booking.reference} className="hover:bg-slate-800/40 transition">
+                            <tr key={booking.reference} className="hover:bg-slate-50/80 transition">
                               <td className="px-4 py-3">
-                                <p className="font-semibold text-white text-sm">{booking.name}</p>
-                                <p className="text-slate-400 font-mono text-[11px]">{booking.phone}</p>
+                                <p className="font-semibold text-slate-900 text-sm">{booking.name}</p>
+                                <p className="text-slate-500 font-mono text-[11px]">{booking.phone}</p>
                               </td>
                               <td className="px-4 py-3">
-                                <span className="font-medium text-slate-200">
+                                <span className="font-medium text-slate-800">
                                   {booking.ticket_type_info?.name || "Regular"}
                                 </span>
                               </td>
                               <td className="px-4 py-3">
-                                <p className="font-bold text-white">{booking.quantity} tickets</p>
-                                <p className="text-emerald-400 font-medium">KES {Number(booking.amount).toLocaleString()}</p>
+                                <p className="font-bold text-slate-900">{booking.quantity} tickets</p>
+                                <p className="text-emerald-600 font-medium">KES {Number(booking.amount).toLocaleString()}</p>
                               </td>
                               <td className="px-4 py-3">
-                                <span className="font-mono text-slate-400">{booking.reference}</span>
+                                <span className="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[11px]">
+                                  {booking.reference}
+                                </span>
                               </td>
                               <td className="px-4 py-3">
                                 {isCheckedIn ? (
-                                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                                     <CheckCircle2 className="w-3 h-3" /> Checked In
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded-full">
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
                                     Not Scanned
                                   </span>
                                 )}
                               </td>
                               <td className="px-4 py-3 text-right">
-                                {!isCheckedIn && firstTicket && (
+                                <div className="flex items-center justify-end gap-1.5">
                                   <Button
+                                    asChild
                                     size="sm"
-                                    onClick={() => handleManualCheckIn(firstTicket.ticket_code)}
-                                    disabled={checkingInCode === firstTicket.ticket_code}
-                                    className="h-7 text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-2.5"
+                                    variant="outline"
+                                    className="h-7 text-[11px] border-slate-200 text-slate-700 hover:bg-slate-100 px-2"
                                   >
-                                    {checkingInCode === firstTicket.ticket_code ? (
-                                      <Loader2 className="w-3 h-3 animate-spin" />
-                                    ) : (
-                                      "Check In"
-                                    )}
+                                    <Link href={`/tickets/${booking.reference}`} target="_blank">
+                                      <Eye className="w-3 h-3 mr-1" />
+                                      Pass
+                                    </Link>
                                   </Button>
-                                )}
+
+                                  {!isCheckedIn && firstTicket && (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleManualCheckIn(firstTicket.ticket_code)}
+                                      disabled={checkingInCode === firstTicket.ticket_code}
+                                      className="h-7 text-[11px] bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-2.5"
+                                    >
+                                      {checkingInCode === firstTicket.ticket_code ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                      ) : (
+                                        "Check In"
+                                      )}
+                                    </Button>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           );
@@ -872,12 +890,12 @@ export default function EventDetailPage() {
 
           {/* ── TAB 4: TICKET TIERS ── */}
           <TabsContent value="tickets" className="mt-4">
-            <Card className="border border-slate-800 shadow-2xl bg-slate-900/90 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border border-slate-200 shadow-sm bg-white rounded-2xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Ticket Tiers</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage pricing, quota caps, and VIP access levels.</p>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Ticket Tiers</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">Manage pricing, quota caps, and VIP access levels.</p>
                   </div>
                   {!event.is_closed && (
                     <Button
@@ -891,9 +909,9 @@ export default function EventDetailPage() {
                 </div>
 
                 {ticketTypes.length > 0 ? (
-                  <div className="rounded-xl border border-slate-800 overflow-hidden">
+                  <div className="rounded-xl border border-slate-200 overflow-hidden">
                     <table className="w-full text-xs">
-                      <thead className="bg-slate-950/70 text-slate-400 font-semibold border-b border-slate-800">
+                      <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                         <tr>
                           <th className="text-left px-4 py-3">Tier Name</th>
                           <th className="text-left px-4 py-3">Price</th>
@@ -902,26 +920,26 @@ export default function EventDetailPage() {
                           <th className="text-right px-4 py-3">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800/70">
+                      <tbody className="divide-y divide-slate-100">
                         {ticketTypes.map((type: any) => (
-                          <tr key={type.ticket_type_code} className="hover:bg-slate-800/40">
+                          <tr key={type.ticket_type_code} className="hover:bg-slate-50">
                             <td className="px-4 py-3">
-                              <p className="font-semibold text-white text-sm">{type.name}</p>
+                              <p className="font-semibold text-slate-900 text-sm">{type.name}</p>
                               <p className="text-slate-400 font-mono text-[10px]">{type.ticket_type_code}</p>
                             </td>
-                            <td className="px-4 py-3 font-semibold text-white">
+                            <td className="px-4 py-3 font-semibold text-slate-900">
                               KES {Number(type.price).toLocaleString()}
                             </td>
-                            <td className="px-4 py-3 text-slate-400">
+                            <td className="px-4 py-3 text-slate-500">
                               {type.is_limited ? `${type.quantity_available?.toLocaleString()} left` : "Unlimited"}
                             </td>
-                            <td className="px-4 py-3 font-bold text-emerald-400">
+                            <td className="px-4 py-3 font-bold text-emerald-600">
                               {type.tickets_sold ?? 0}
                             </td>
                             <td className="px-4 py-3 text-right">
                               {!event.is_closed && (
                                 <button
-                                  className="text-xs text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1"
+                                  className="text-xs text-blue-600 hover:underline font-medium inline-flex items-center gap-1"
                                   onClick={() => {
                                     setSelectedTicketType(type);
                                     setIsEditTicketModalOpen(true);
@@ -947,12 +965,12 @@ export default function EventDetailPage() {
 
           {/* ── TAB 5: COUPONS ── */}
           <TabsContent value="coupons" className="mt-4">
-            <Card className="border border-slate-800 shadow-2xl bg-slate-900/90 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border border-slate-200 shadow-sm bg-white rounded-2xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Promoter &amp; Discount Coupons</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Track coupon redemption and affiliate promoter sales.</p>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Promoter &amp; Discount Coupons</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">Track coupon redemption and affiliate promoter sales.</p>
                   </div>
                   {!event.is_closed && (
                     <Button
@@ -966,9 +984,9 @@ export default function EventDetailPage() {
                 </div>
 
                 {coupons.length > 0 ? (
-                  <div className="rounded-xl border border-slate-800 overflow-hidden">
+                  <div className="rounded-xl border border-slate-200 overflow-hidden">
                     <table className="w-full text-xs">
-                      <thead className="bg-slate-950/70 text-slate-400 font-semibold border-b border-slate-800">
+                      <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                         <tr>
                           <th className="w-8 px-4 py-3"></th>
                           <th className="text-left px-4 py-3">Code</th>
@@ -978,13 +996,13 @@ export default function EventDetailPage() {
                           <th className="text-right px-4 py-3">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800/70">
+                      <tbody className="divide-y divide-slate-100">
                         {coupons.map((coupon: any) => {
                           const isExpanded = expandedCouponId === coupon.id;
                           return (
                             <React.Fragment key={coupon.id}>
                               <tr
-                                className="hover:bg-slate-800/40 cursor-pointer"
+                                className="hover:bg-slate-50 cursor-pointer"
                                 onClick={() => setExpandedCouponId(isExpanded ? null : coupon.id)}
                               >
                                 <td className="px-4 py-3">
@@ -995,23 +1013,23 @@ export default function EventDetailPage() {
                                   )}
                                 </td>
                                 <td className="px-4 py-3">
-                                  <span className="font-mono font-bold text-white text-sm">{coupon.code}</span>
+                                  <span className="font-mono font-bold text-slate-900 text-sm">{coupon.code}</span>
                                   <p className="text-[10px] text-slate-400">{coupon.name}</p>
                                 </td>
-                                <td className="px-4 py-3 font-semibold text-slate-200">
+                                <td className="px-4 py-3 font-semibold text-slate-800">
                                   {coupon.discount_type === "FIXED"
                                     ? `KES ${Number(coupon.discount_value).toLocaleString()} OFF`
                                     : `${coupon.discount_value}% OFF`}
                                 </td>
-                                <td className="px-4 py-3 text-slate-400">
+                                <td className="px-4 py-3 text-slate-500">
                                   {coupon.usage_count} / {coupon.usage_limit ?? "∞"}
                                 </td>
                                 <td className="px-4 py-3">
                                   <span
                                     className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                       coupon.is_active
-                                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                        : "bg-slate-800 text-slate-400"
+                                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                        : "bg-slate-100 text-slate-500"
                                     }`}
                                   >
                                     {coupon.is_active ? "Active" : "Inactive"}
@@ -1020,7 +1038,7 @@ export default function EventDetailPage() {
                                 <td className="px-4 py-3 text-right">
                                   {!event.is_closed && (
                                     <button
-                                      className="text-xs text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1"
+                                      className="text-xs text-blue-600 hover:underline font-medium inline-flex items-center gap-1"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         setSelectedCoupon(coupon);
