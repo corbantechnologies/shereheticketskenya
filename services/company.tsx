@@ -49,6 +49,7 @@ interface Company {
   updated_at: string;
   reference: string;
   company_events: Event[];
+  description?: string;
 }
 
 interface updateCompany {

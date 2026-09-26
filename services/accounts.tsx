@@ -13,7 +13,17 @@ interface signUp {
     country: string;
 }
 
-interface User {
+export interface UserCompany {
+    name: string;
+    reference: string;
+    company_code: string;
+    logo?: string;
+    banner?: string;
+    country?: string;
+    city?: string;
+}
+
+export interface User {
     email: string;
     first_name: string;
     last_name: string;
@@ -23,9 +33,10 @@ interface User {
     country: string;
     is_event_manager: boolean;
     is_staff: boolean;
+    is_superuser?: boolean;
     is_active: boolean;
     is_premium: boolean;
-    companies: string[];
+    companies: UserCompany[];
 }
 
 interface updateUser {
